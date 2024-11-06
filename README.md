@@ -15,14 +15,8 @@ Escrever aqui anotações importantes para replicação do projeto. Incluindo a 
 
 # Responsáveis 
 
-[Luiz Fonseca](https://github.com/fonluiz)
-[Raul Durlo](https://github.com/rdurl0)
-[Talita Lôbo](https://github.com/talitalobo)
+* [Luiz Fonseca](https://github.com/fonluiz)
+* [Raul Durlo](https://github.com/rdurl0)
+* [Talita Lôbo](https://github.com/talitalobo)
 
-
-https://web.stanford.edu/~gentzkow/research/CodeAndData.pdf
-
-https://hrdag.org/2016/06/14/the-task-is-a-quantum-of-workflow/
-
-https://www.amazon.com.br/Software-Engineering-Data-Scientists-Notebooks/dp/1098136209
 
