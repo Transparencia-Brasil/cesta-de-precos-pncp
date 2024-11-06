@@ -1,4 +1,5 @@
-#' Este script ...
+#' Este script é responsável pela limpeza da descrição dos itens do PNCP.
+#' Qualquer processamento adicional pode ser incorporado à função principal.
 
 library(dplyr)        # Data manipulation
 library(here)         # File referencing
