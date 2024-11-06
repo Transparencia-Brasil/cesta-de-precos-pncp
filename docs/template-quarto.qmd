@@ -1,0 +1,283 @@
+---
+title: "Título do relatório"
+subtitle: "Subtítulo"
+author: "Walcyr Carrasco"
+date: "today"
+date-format: "D.MMM.YYYY"
+date-modified: "last-modified"
+lang: pt-BR
+format:
+  html:
+    html-math-method: katex
+    css: style.css
+    anchor-sections: true
+    code-fold: true
+    code-tools: true
+    code-link: true
+    code-line-numbers: true
+    code-background: false
+    code-summary: "Código"
+    toc: true
+    toc-title: "Índice"
+    toc-depth: 4
+    toc-float: false
+    toc-collapsed: false
+    footnotes-hover: true
+    smooth-scroll: true
+    fig-width: 11
+    fig-height: 7
+    search: true
+    embed-resources: true
+    theme:
+          light: cosmo
+          dark: darkly
+knitr:
+  opts_chunk:
+    echo: true
+    collapse: true
+    message: false
+    warning: false
+    comment: "#>"
+editor_options:
+  chunk_output_type: console
+execute:
+  cache: false
+---
+
+```{r}
+#| label: libs-and-sources
+library(tidyverse)
+library(here)
+library(palmerpenguins)
+library(DT)
+source(here("src/00-plot-aesthetics.R"), encoding = "utf-8")
+```
+
+## Resumo
+
+O objetivo deste relatório é...
+
+Principais resultados:
+
+- Destaque 1.
+- Destaque 2.
+- ...
+
+## Análise
+
+`r stringi::stri_rand_lipsum(1)`
+
+### Datasets
+
+```{r}
+#| label: print-dataset
+
+iris %>%
+  datatable(
+    rownames = FALSE,
+    filter = "top",
+    escape = FALSE,
+    options = list(pageLength = 10, searchHighlight = TRUE)
+  ) %>%
+  formatStyle(columns = 1:5, fontSize = "80%")
+```
+
+### Gráfico
+
+```{r}
+#| label: plot-iris
+
+iris %>%
+  ggplot(aes(
+    x = Petal.Length,
+    y = Petal.Width,
+    fill = Species,
+    color = after_scale(colorspace::darken(fill, .4))
+  )) +
+  geom_point(shape = 21, size = 3) +
+  scale_fill_manual(values = c(
+    "virginica" = cores_tb[["azul"]],
+    "versicolor" = cores_tb[["laranja"]],
+    "setosa" = cores_tb[["cinza_claro"]]
+  )) +
+  labs(
+    title = "Um gráfico importante"
+  )
+```
+
+Algumas vezes precisamos exibir o código, podemos fazer assim:
+
+```{r}
+#| label: um-codigo-que-precisa-aparecer-no-report
+#| code-fold: false
+#| message: true
+
+# testando uma função:
+awesome_function <- function(x) {
+  stopifnot(is.integer(x))
+  a <- x + 10L
+  b <- x + 11L
+  c <- a + b
+  message("\nSomamos a com b!\n")
+  return(c)
+}
+
+awesome_function(30L)
+
+# filtando um dataset
+iris2 <- iris %>% tidylog::filter(Species == "setosa")
+```
+
+## Usando tips
+
+::: {.callout-note}
+Note that there are five types of callouts, including:
+`note`, `warning`, `important`, `tip`, and `caution`.
+:::
+
+::: {.callout-tip}
+### Tip with Title
+
+This is an example of a callout with a title.
+:::
+
+::: {.callout-caution collapse="true"}
+### Expand To Learn About Collapse
+
+This is an example of a 'folded' caution callout that can be expanded by the user. You can use `collapse="true"` to collapse it by default or `collapse="false"` to make a collapsible callout that is expanded by default.
+:::
+
+## Usando abas
+
+::: {.panel-tabset}
+
+### Pontos
+
+```{r}
+#| label: plot-pontos
+iris %>%
+  ggplot(aes(
+    x = Petal.Length,
+    y = Petal.Width,
+    fill = Species,
+    color = after_scale(colorspace::darken(fill, .4))
+  )) +
+  geom_point(shape = 21, size = 3) +
+  scale_fill_manual(values = c(
+    "virginica" = cores_tb[["azul"]],
+    "versicolor" = cores_tb[["laranja"]],
+    "setosa" = cores_tb[["cinza_claro"]]
+  )) +
+  labs(
+    title = "Um gráfico importante"
+  )
+```
+
+### Colunas
+
+```{r}
+#| label: plot-bars
+
+iris %>%
+  group_by(Species) %>%
+  summarise(across(where(is.double), mean, .names = "{.col}")) %>%
+  pivot_longer(-Species) %>%
+  mutate(
+    Species = reorder(Species, value),
+    name = reorder(name, value)
+  ) %>%
+  ggplot(aes(
+    x = Species,
+    y = value,
+    fill = name,
+    color = after_scale(colorspace::darken(fill, .4))
+  )) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = c(
+    "Sepal.Length" = cores_tb[["azul"]],
+    "Petal.Length" = cores_tb[["laranja"]],
+    "Sepal.Width" = cores_tb[["cinza_quase_branco"]],
+    "Petal.Width" = cores_tb[["cinza_claro"]]
+  )) +
+  labs(
+    title = "Média de Iris"
+  )
+```
+
+:::
+
+## Interatividade
+
+Trabalhando com gráficos em chunks OJS.
+
+```{r}
+#| label: prepara-dataset-penguins
+
+#glimpse(penguins)
+
+# envia dataset de R para OJS
+ojs_define(palmerPenguins = penguins)
+```
+
+```{ojs}
+//| label: plot-dataset-penguins
+
+// OJS recebe dataset enviado por R
+penguins = transpose(palmerPenguins)
+
+// range/slide de  32 até 50
+viewof bill_length_min = Inputs.range(
+  [32, 50],
+  {value: 35, step: 1, label: "Bill length (min):"}
+)
+
+//checkbox de Islands
+viewof islands = Inputs.checkbox(
+  ["Torgersen", "Biscoe", "Dream"],
+  { value: ["Torgersen", "Biscoe"],
+    label: "Islands:"
+  }
+)
+
+// aplica filtro no dataset
+filtered = penguins.filter(function(penguin) {
+  return bill_length_min < penguin.bill_length_mm &&
+         islands.includes(penguin.island);
+})
+
+// plot
+Plot.rectY(filtered,
+  Plot.binX(
+    {y: "count"},
+    {x: "body_mass_g", fill: "species", thresholds: 20}
+  ))
+  .plot({
+    facet: {
+      data: filtered,
+      x: "sex",
+      y: "species",
+      marginRight: 80
+    },
+    marks: [
+      Plot.frame(),
+    ]
+  }
+)
+```
+
+
+
+## Referências
+
+É importante que um relatório contenha:
+
+* Contexto/objetivo do relatório
+* Breve descrição e/ou dicionário dos dados utilizados
+* Demarcação/limitação temporal do recorte de dados utilizados
+* Análise em si (não apenas plots)
+
+
+E até opcionais:
+
+* Highlights/lowlights do processo
+* Referências técnicas ou de negócio

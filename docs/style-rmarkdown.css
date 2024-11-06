@@ -1,0 +1,20 @@
+.btn-default {
+  color: #2b2929;
+  background-color: #ffffff;
+  border-color: #ffffff;
+}
+
+pre:not(.r) {
+  color: #b0b0b0;
+}
+pre {
+  width: 80%;
+  margin-inline: auto;
+}
+.table {
+  width: 60%;
+  margin-inline: auto;
+}
+.word {
+  font-size: 15px;
+}
