@@ -1,0 +1,297 @@
+---
+title: "Dados do PNCP"
+author: "Luiz Fonseca e Raul Durlo"
+date: "today"
+date-format: "D.MMM.YYYY"
+date-modified: "last-modified"
+lang: pt-BR
+repo: true
+crossrref:
+  fig-prefix: "Gráfico"     # (default is "Figure")
+  tbl-title: "Tabela"     # (default is "Table")
+  title-delim: "—"   # (default is ":")
+format:
+  html:
+    code-links:
+      - text: Código fonte
+        icon: file-code
+        href: info.qmd
+    other-links:
+      - text: Repositório no GitHub
+        icon: github
+        href: https://github.com/Transparencia-Brasil/pncp-analises
+      - text: Portal PNCP
+        icon: box-arrow-up-right
+        href: https://www.gov.br/pncp/pt-br
+    html-math-method: katex
+    anchor-sections: true
+    code-fold: true
+    code-tools: true
+    code-link: true
+    code-line-numbers: true
+    code-background: false
+    code-summary: "Código"
+    toc: true
+    toc-title: "Índice"
+    toc-depth: 4
+    toc-float: false
+    toc-expand: true
+    toc-collapsed: true
+    footnotes-hover: true
+    smooth-scroll: true
+    fig-width: 10
+    fig-height: 7
+    fig-cap-location: top
+    search: true
+    embed-resources: true
+    link-external-newwindow: true
+    lightbox:
+          match: auto
+          desc-position: top
+          loop: true
+    theme:
+          light: cosmo
+          dark: darkly
+knitr:
+  opts_chunk:
+    echo: true
+    collapse: true
+    message: false
+    warning: false
+    comment: "#>"
+editor_options:
+  chunk_output_type: console
+execute:
+  cache: false
+---
+
+# Identificadores únicos
+
+> Documentação da API: https://www.gov.br/pncp/pt-br/acesso-a-informacao/manuais/manualdeintegrao-pncpverso2-3-0.pdf
+
+# Endpoints do PNCP e seus identificadores únicos
+
+## consultarContrato
+
+- **[Consultar dados do contrato:](https://pncp.gov.br/api/pncp/swagger-ui/index.html?configUrl=/pncp-api/v3/api-docs/swagger-config#/Contrato/consultarContrato)**
+  - Endpoint para consulta de detalhes do contrato
+- **Id do contrato**:
+  - CNPJ do Órgão Entidade da contratação (14 de dígitos)
+  - Digito "2" - marcador que indica tratar se de um contrato
+  - Número sequencial da contrato no PNCP
+  - Ano do contrato
+  - ex: `"numerocontrolePNCP" = "00509018000113-2-001322/2023"`
+- **URL**:
+  - `{cnpj}/`**`contratos`**`/{ano}/{sequencial}` ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/00509018000113/contratos/2023/1322))
+- **URL-filhas**
+  - recuperarInformacoesDocumentosContrato
+    - `{cnpj}/`**`contratos`**`/{ano}/{sequencial}/`**`arquivos`** ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/00509018000113/contratos/2023/1322/arquivos))
+  - recuperarContratoDocumentoQuantidade
+    - `{cnpj}/`**`contratos`**`/{ano}/{sequencial}/`**`arquivos/quantidade`** ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/00509018000113/contratos/2023/1322/arquivos/quantidade))
+  - recuperarArquivo_1
+    - `{cnpj}/`**`contratos`**`/{ano}/{sequencial}/`**`arquivos/{sequencialDocumento}`** ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/00509018000113/contratos/2023/1322/arquivos/1))
+  - consultarContrato_1
+    - `{cnpj}/`**`contratos`**`/{ano}/{sequencial}/`**`historico`** ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/00509018000113/contratos/2023/1322/historico))
+  - consultarContrato_2
+    - `{cnpj}/`**`contratos`**`/{ano}/{sequencial}/`**`historico/quantidade`** ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/00509018000113/contratos/2023/1322/historico/quantidade))
+
+## consultarCompra
+
+- **[Detalhamento da contratação](https://pncp.gov.br/api/pncp/swagger-ui/index.html?configUrl=/pncp-api/v3/api-docs/swagger-config#/Contrata%C3%A7%C3%A3o/consultarCompra)**
+  - Endpoint para detalhamento da contratação realizada / detalhes do gasto e do objeto
+- **Id da contratação**:
+  - CNPJ do Órgão Entidade da contratação (14 de dígitos)
+  - Digito "1" - marcador indica tratar-se de uma contratação
+  - Número sequencial da contratação no PNCP
+  - ex: `"numerocontrolePNCP" = "00509018000113-1-001508/2023"`
+- **URL**:
+  - `{cnpj}/`**`compras`**`/{ano}/{sequencial}` ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/00509018000113/compras/2023/1508))
+- **URL-filhas**
+  - pesquisarCompraItem
+    - `{cnpj}/`**`compras`**`/{ano}/{sequencial}/`**`itens`** ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/00509018000113/compras/2023/1508/itens))
+  - recuperarCompraItemQuantidade
+    - `{cnpj}/`**`compras`**`/{ano}/{sequencial}/`**`itens/quantidade`** ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/00509018000113/compras/2023/1508/itens/quantidade))
+  - `{cnpj}/`**`compras`**`/{ano}/{sequencial}/`**`itens/`**`{sequencialItem}/`**`resultados`** ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/18431312000115/compras/2023/70/itens/1/resultados))
+  - recuperarInformacoesDocumentosCompra
+    - `{cnpj}/`**`compras`**`/{ano}/{sequencial}/`**`arquivos`** ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/00509018000113/compras/2023/1508/arquivos))
+  - recuperarCompraDocumentoQuantidade
+    - `{cnpj}/`**`compras`**`/{ano}/{sequencial}/`**`arquivos/quantidade`** ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/00509018000113/compras/2023/1508/arquivos/quantidade))
+  - consultarQuantidade
+    - `{cnpj}/`**`compras`**`/{ano}/{sequencial}/`**`historico/quantidade`** ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/00509018000113/compras/2023/1508/historico/quantidade))
+  - consultarCompra_1
+    - `{cnpj}/`**`compras`**`/{ano}/{sequencial}/`**`historico/quantidade`** ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/00509018000113/contratos/2023/1508/historico))
+
+#### consultarContratosContratacao
+
+- **[Consultar contratos de uma contratação](https://pncp.gov.br/api/pncp/swagger-ui/index.html?configUrl=/pncp-api/v3/api-docs/swagger-config#/Contrato/consultarContratosContratacao)**
+- **numeroControlePNCP**:
+  - `18431312000115-2-000283/2023`
+- **numeroControlePncpCompra**:
+  - `18431312000115-1-000070/2023`, `18431312000115-2-000287/2023`, `18431312000115-2-000291/2023`, ... (um para muitos)
+- **URL**:
+  - `{cnpj}/`**`contratos/contratacao`**`/{ano}/{sequencial}/`**`?pagina=`**`{numeroPagina} ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/18431312000115/contratos/contratacao/2023/70?pagina=1))
+
+# Dicionário
+
+## contratacoes (consultarCompra)
+
+### Endpoint
+
+- `{cnpj}/`**`compras`**`/{ano}/{sequencial}/ ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/00509018000113/compras/2023/1508))
+
+### Descrição
+
+Data da coleta: 03/04/2024
+
+Dados de compras públicas provenientes do [PNCP](https://www.gov.br/pncp/pt-br).
+
+[Link para a documentação da API](https://www.gov.br/pncp/pt-br/acesso-a-informacao/manuais/manualdeintegrao-pncpverso2-3-0.pdf)
+
+Um conjunto de dados com 257.700 observações and 54 variáveis. 
+
+### ID da compra
+
+- **numerocontrolePNCP**: `{cnpj}-1-{sequencial}/{ano}`
+  - ex: `00509018000113-1-001508/2023`
+  
+### Variáveis
+
+```{r consultar-compra, eval = TRUE}
+library(tidyverse)
+library(kableExtra)
+
+dicionario_compras <- tribble(
+  ~ indicator, ~ description,
+"valorTotalEstimado", "Valor total estimado da Contratação Precisão de até. Obs Retornará valor zero se atributo orcamentoSigiloso for true e o item não possuir resultado.",
+  "valorTotalHomologado", "Valor total homologado com base nos resultados incluídos Precisão de até dígitos decimais",
+  "orcamentoSigilosoCodigo", "Código se a Compra tem itens cujo orçamento é sigiloso. 1 - COMPRA SEM SIGILO, 2 -COMPRA PARCIALMENTE SIGILOSA ou 3 - COMPRA TOTALMENTE SIGILOSA",
+  "orcamentoSigilosoDescricao", "Descrição se a Compra tem itens cujo orçamento é sigiloso",
+  "numeroControlePNCP", "Número de Controle PNCP da Contratação (id Contratação PNCP)",
+  "linkSistemaOrigem", "URL para página portal do sistema de origem da contratação para recebimento de propostas.",
+  "anoCompra", "Ano da Contratação",
+  "sequencialCompra", "Sequencial da Contratação no PNCP Número; sequencial gerado no momento que a contratação foi inserida no PNCP;",
+  "numeroCompra", "Número da Contratação no sistema de origem",
+  "processo", "Número do processo de Contratação no sistema de origem",
+    "objetoCompra", "Descrição do Objeto referente à Contratação",
+  "informacaoComplementar", "Informação Complementar do objeto referente à Contratação",
+  "srp", "Identifica se a compra trata se de um SRP (Sistema de registro de preços)",
+  "dataPublicacaoPncp", "Data da publicação da Contratação no PNCP",
+  "dataAberturaProposta", "Data de abertura do recebimento de propostas",
+  "dataEncerramentoProposta", "Data de encerramento do recebimento de propostas",
+  "situacaoCompraId", "Código da situação da Contratação",
+  "situacaoCompraNome", "Situação da Contratação",
+  "existeResultado", "Indicador de existência de resultado do item",
+  "dataInclusao", "Data da inclusão do registro da Contratação no PNCP",
+  "dataAtualizacao", "Data da última atualização do registro da Contratação",
+  "usuarioNome", "Nome do Usuário Sistema que enviou a Contratação",
+  "modalidadeId", "Código da Modalidade referente à Contratação.",
+  "modalidadeNome", "Modalidade referente à Contratação.",
+  "justificativaPresencial", "Justificativa pela escolha da modalidade presencial.",
+  "modoDisputaId", "Código do modo de disputa referente à Contratação",
+  "modoDisputaNome", "Modo de disputa referente à Contratação",
+  "tipoInstrumentoConvocatorioCodigo", "Código do instrumento convocatório da Contratação",
+  "tipoInstrumentoConvocatorioNome", "Nome do instrumento convocatório da Contratação",
+  
+  "orgaoSubRogado", "Dados do Órgão/Entidade subrogado",
+  "unidadeSubRogada", "Dados da Unidade Administrativa do Órgão subrogado",
+  
+  "cnpj", "CNPJ do Órgão referente à Contratação",
+  "razaosocial", "Razão social do Órgão referente à Contratação",
+  "esferaId", "Código da esfera a que pertence o Órgão. F - Federal, E - Estadual, M - Municipal, D - Distrital",
+  "poderId", "Código do poder a que pertence o Órgão. L - Legislativo, E - Executivo, J - Judiciário",
+  
+  "codigoUnidade", "Código da Unidade Administrativa pertencente ao Órgão",
+  "nomeUnidade", "Nome da Unidade Administrativa pertencente ao Órgão",
+  "municipioNome", "Nome do município",
+  "codigoIbge", "Código IBGE do município",
+  "ufSigla", "Sigla da unidade federativa do município",
+  "ufNome", "Nome da unidade federativa do município",
+  
+  "codigo", "Código do Amparo legal da tabela de domínio Amparo legal",
+  "nome", "Amparo legal da tabela de domínio Amparo legal",
+  "descricao", "Descrição do Amparo legal da tabela de domínio Amparo legal"
+)
+
+kable(
+  dicionario_compras,
+  format = "html",
+  col.names = c("", "")
+) %>%
+  group_rows(index = c("Dados e metadados da contratação" = 31,
+                       "orgaoEntidade - Dados do Órgão/Entidade" = 4,
+                       "unidadeOrgao - Dados da Unidade Administrativa" = 6,
+                       "amparoLegal - Dados do Amparo Legal" = 3)) %>%  ## Optional
+  kable_styling(bootstrap_options = c("hover"))
+
+
+```
+
+
+## itens-da-contratacao (pesquisarCompraItem)
+
+### Endpoint
+
+- `{cnpj}/`**`compras`**`/{ano}/{sequencial}/`**`itens`** ([exemplo](https://pncp.gov.br/api/pncp/v1/orgaos/00509018000113/compras/2023/1508/itens))
+
+### Descrição
+
+Data da coleta: 06/03/2024
+
+Um conjunto de dados com 435.774 observações e 32 variáveis.
+
+Itens de contratações públicas provenientes do [PNCP](https://www.gov.br/pncp/pt-br). Enpoint para retornar todos os contratos associados à itens homologados em um edital ou ato/aviso de contratação direta.
+
+### ID do item da compra
+
+- **numerocontrolePNCP** + **numeroItem**
+- o **numerocontrolePNCP** é formado por `{cnpj}-1-{sequencial}/{ano}`
+  - ex: `00509018000113-1-001508/2023`
+
+### Variáveis
+
+```{r}
+dicionario_itens <- tribble(
+  ~ indicator, ~ description,
+  "ano", "ano da contratação",
+  "numero_sequencial", "Sequencial da contratação no PNCP; Número sequencial gerado no momento que a contratação foi inserida no PNCP",
+  "orgao_cnpj", "Cnpj do órgão originário da contratação informado na inclusão (proprietário da contratação ou alienação de bens)",
+  "tipo_documento", "tipo de documento.",
+  "pncp_endpoint", "endpoint da API do pncp que proveu o dado.",
+  "quantidade_documentos", "Descrição faltante",
+  "error", "Log de erro obtida quando não foi possível obter o dado através de requisição na API",
+  "numeroItem", "Número do item na contratação (único e sequencial crescente).",
+  "descricao", "Descrição para o produto ou serviço.",
+  "materialOuServico", "Domínio: M - Material; S - Serviço. Contratações na modalidade leilão informar M.",
+  "materialOuServicoNome", "O mesmo que materialOuServico porém com a palavra completa como valor.",
+  "valorUnitarioEstimado", "Valor unitário estimado/avaliado. Maior ou igual a 0 (zero). Precisão de 4 dígitos decimais Ex: 100.0000; Obs Retornará valor zero (0) se atributo orcamentoSigiloso for true e o item não possuir resultado .",
+  "valorTotal", "Valor total do item. Maior ou igual a 0 (zero). Precisão de 4 dígitos decimais Ex: 100.0000.",
+  "quantidade", "Quantidade do item da contratação. Precisão de dígitos 4 decimais Ex: 100.0000.",
+  "unidadeMedida", "Unidade de medida do item.",
+  "orcamentoSigiloso", "Identifica se o orçamento é sigiloso. true: Sigiloso e false: Não sigiloso. Contratações na modalidade leilão informar false.",
+  "itemCategoriaId", "Categoria do item Domínios 1 ou 2 aplicados à modalidade leilão. Outras modalidades de contratação utilizar o domínio 3. Domínio: 1 - Bens Imóveis; 2 – Bens Móveis; 3 - Não se aplica.",
+  "itemCategoriaNome", "A mesma informação que itemCategoriaId, só que pelo nome da categoria (Bens móveis, bens imóveis ou não se aplica).",
+  "patrimonio", "Código de Patrimonio do Item de bens móveis quando existir.",
+  "codigoRegistroImobiliario", "Código de Registro Imobiliário. Obrigatório para contratação na modalidade leilão cuja categoria do item seja bens imóveis.",
+  "criterioJulgamentoId", "Código da tabela de domínio. Critério de julgamento.",
+  "criterioJulgamentoNome", "O nome do critério de julgamento utilizado.",
+  "situacaoCompraItem", "Código da tabela de domínio. Situação do item da Contratação.",
+  "situacaoCompraItemNome", "O mesmo que situacaoCompraItem, só que o nome ao invés do código.",
+  "tipoBeneficio", "Código da tabela de domínio Tipo de benefício. Contratações na modalidade leilão informar opção 'não se aplica'.",
+  "tipoBeneficioNome", "O mesmo que tipoBeneficio, só que pelo nome ao invés do código.",
+  "incentivoProdutivoBasico", "Incentivo fiscal PPB (Processo Produtivo Básico). true - Possui o incentivo; false - Não possui o incentivo. Contratações na modalidade leilão informar false.",
+  "dataInclusao", "Data de inclusão do registro do item no PNCP.",
+  "dataAtualizacao", "Data da última atualização do registro do item no PNCP.",
+  "temResultado", "Indicador de existência de resultado do item.",
+  "imagem", "Descrição faltante"
+)
+
+kable(
+  dicionario_itens,
+  format = "html",
+  col.names = c("", "")
+) %>%
+  # group_rows(index = c("grupo  1" = 5)) %>%  ## Optional
+  kable_styling(bootstrap_options = c("hover"))
+
+```
+
