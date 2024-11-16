@@ -59,8 +59,7 @@ print(
 
 # Remove os números da unidadeMedida para analisar apenas os tokens restantes
 medicamentos_df$clean_unidadeMedida <- gsub("\\d+([.,]\\d+)?", " ", medicamentos_df$clean_unidadeMedida) %>%
-  str_replace_all("[[:punct:]]", " ") %>% # Remove qualquer pontuação restante
-  str_squish() # Remove espaços vazios adicionais
+  remove_pontuacao()
   
 
 ## UNIDADE DE FORNECIMENTO -----------------------------------------------
