@@ -12,106 +12,29 @@ library(dplyr)        # Data manipulation
 library(tidyr)        # Tidy messy data
 library(here)         # File referencing
 library(stringr)      # String processing
-library(stringi)      # String processing
+
+source(here("tasks/normalizacao-unidades/src/limpa-texto.R"))
+source(here("tasks/normalizacao-unidades/src/define-unidades-padronizadas.R"))
 
 # OBTÉM DADOS -------------------------------------------------------------
 
 caminho_medicamentos <- here("data/pncp/medicamentos.rds")
-caminho_catalogo <- here("data/catmat/catmat.rds")
-
 medicamentos_df <- readRDS(caminho_medicamentos)
-catmat <- readRDS(caminho_catalogo)
 
 # LIMPA O TEXTO -----------------------------------------------------------
-
-#' Processa um vetor de strings com as seguintes operações:
-#' 1. Substitui traços, barras e parênteses por espaço vazio 
-#' 2. Todas os caracteres ficam minúsculos
-#' 3. Remove acentos (Examplo: à á â ã torna-se 'a', ç torna-se c, etc.)
-#' 4. Remove espaços em branco adicionais ("  a   b   c  " torna-se "a b c")
-#' 
-#' @param string_vector Um vetor de caracteres 
-#'
-#' @return O mesmo vetor com as strings transformadas.
-#' @noRd
-clean_text <- function(character_vector) {
-  result <- gsub("[-/()]", " ", character_vector) %>% # Substitui traços, barras e parênteses por espaço vazio 
-    tolower() %>%                                # Todas os caracteres ficam minúsculos
-    stri_trans_general(id = "Latin-ASCII") %>%   # Remove acentos
-    str_squish()                                 # Remove espaços em branco adicionais
-  
-  return(result)
-}
 
 # Limpa o campo textual unidadeMedida
 medicamentos_df$clean_unidadeMedida = clean_text(medicamentos_df$unidadeMedida)
 
-
-# OBTÉM PADRÕES DE UNIDADES DE FORNECIMENTO E UNIDADES DE MEDIDA ----------
-
-# As listas vêm do CATMAT
-
-# Desaninha a coluna unidadeFornecimento do catmat
-catmat_expandido <- catmat %>% unnest(unidadeFornecimento)
-
-# PASSO 1: Separa os valores únicos de unidade de fornecimento (uf)
-uf_df <- catmat_expandido %>%
-  select(siglaUnidadeFornecimento, nomeUnidadeFornecimento) %>%
-  unique() %>%
-  drop_na() %>%
-  mutate(siglaUnidadeFornecimento = clean_text(siglaUnidadeFornecimento),  
-         nomeUnidadeFornecimento = clean_text(nomeUnidadeFornecimento))
-
-# PASSO 2: separa valores únicos de unidade de medida (um)
-um_df <- catmat_expandido %>%
-  select(siglaUnidadeMedida, nomeUnidadeMedida) %>%
-  unique() %>%
-  drop_na() %>%
-  mutate(siglaUnidadeMedida = clean_text(siglaUnidadeMedida),
-         nomeUnidadeMedida = clean_text(nomeUnidadeMedida))
-# Substitui "dose s" por "dose" nas unidades de medida
-um_df$siglaUnidadeMedida <- gsub("dose s", "dose", um_df$siglaUnidadeMedida)
-
-# PASSO 3: Algumas unidades de medida estão como unidades de fornecimento, são elas:
-unidades_medida_em_unidades_fornecimento <- data.frame(
-  siglaUnidadeMedida = c("ci", "dose", "doses", "g", "gbq", "kg", "l", "mbq",
-                         "mcg", "mcu", "mg", "ml", "mui", "ui", "un"),
-  nomeUnidadeMedida = c("curie", "doses", "doses", "grama", "gigabecquerell",
-                        "quilograma", "litro", "megabecquerel", "micrograma",
-                        "milicurie", "miligrama", "mililitro", "milhao unid. intern.",
-                        "unid. internacional", "unidade")
-)
-# Adiciona as unidades de medida ao dataframe correto
-um_df <- bind_rows(um_df, unidades_medida_em_unidades_fornecimento) %>% distinct()
-# Remove as unidades de medida das unidades de fornecimento
-uf_df <- uf_df %>%
-  filter(!(nomeUnidadeFornecimento %in% unidades_medida_em_unidades_fornecimento$nomeUnidadeMedida))
-
-# PASSO 4: Cria um dicionário de unidades de fornecimento (uf) para agilizar a pesquisa
-uf_env <- new.env()
-for (i in 1:nrow(uf_df)) {
-  # Adiciona as siglas como chaves do dicionário e o nome como valor
-  uf_env[[uf_df$siglaUnidadeFornecimento[i]]] <- uf_df$nomeUnidadeFornecimento[i]
-  # Adiciona o nome também como chave e como valor (para ser possível pesquisar por sigla e nome)
-  uf_env[[uf_df$nomeUnidadeFornecimento[i]]] <- uf_df$nomeUnidadeFornecimento[i]
-}
-
-# OBS: As unidades de fornecimento "frasco-ampola", milheiro de cartelas" e "milheiro unid.intern"
-# serão tratadas de forma diferente pois o algoritmo só funciona para palavras individuais.
-
-# PASSO 5: Cria um dicionário de unidades de medida (um) para agilizar a pesquisa
-um_env <- new.env()
-for (i in 1:nrow(um_df)) {
-  # Adiciona as siglas como chaves do dicionário e o nome como valor
-  um_env[[um_df$siglaUnidadeMedida[i]]] <- um_df$nomeUnidadeMedida[i]
-  # Adiciona o nome também como chave e como valor (para ser possível pesquisar por sigla e nome)
-  um_env[[um_df$nomeUnidadeMedida[i]]] <- um_df$nomeUnidadeMedida[i]
-}
-
-# OBS: As unidades de medida "mil unid. intern.", "unid. internacional" e "milhao unid. intern."
-# serão tratadas de forma diferente pois o algoritmo só funciona para palavras individuais.
-
 # SEPARA OS ELEMENTOS QUE COMPÕEM O CAMPO unidadeMedida -------------------
+
+#' OBS: As unidades de fornecimento "frasco-ampola", milheiro de cartelas" e 
+#' "milheiro unid.intern" serão tratadas de forma diferente pois o algoritmo 
+#' só funciona para palavras individuais.
+
+#' OBS: As unidades de medida "mil unid. intern.", "unid. internacional" e 
+#' "milhao unid. intern." serão tratadas de forma diferente pois o algoritmo só 
+#' funciona para palavras individuais.
 
 ## CAPACIDADE -------------------------------------------------------------
 
@@ -143,7 +66,8 @@ medicamentos_df$clean_unidadeMedida <- gsub("\\d+([.,]\\d+)?", " ", medicamentos
 ## UNIDADE DE FORNECIMENTO -----------------------------------------------
 
 ### PROCESSA AS EXCEÇÕES -------------------------------------------------
-# As exceções são frasco-ampola (fr-am), milheiro de cartelas (mil cte) e milheiro unid. intern (mil ui)
+#' As exceções são frasco-ampola (fr-am), milheiro de cartelas (mil cte) e 
+#' milheiro unid. intern (mil ui)
 
 #cria a coluna nomeUnidadeFornecimento
 medicamentos_df$nomeUnidadeFornecimento <- NA
@@ -152,7 +76,7 @@ medicamentos_df$nomeUnidadeFornecimento <- NA
 medicamentos_df <- medicamentos_df %>% 
   mutate(
     nomeUnidadeFornecimento = ifelse(
-      grepl("frasco ampola|fr am", clean_unidadeMedida, ignore.case = TRUE),
+      grepl("frasco ampola|fr am|frascos ampola", clean_unidadeMedida, ignore.case = TRUE),
       "frasco-ampola",
       nomeUnidadeFornecimento
     )
@@ -162,7 +86,7 @@ medicamentos_df <- medicamentos_df %>%
 medicamentos_df <- medicamentos_df %>% 
   mutate(
     nomeUnidadeFornecimento = ifelse(
-      grepl("milheiro de cartelas|mil cte", clean_unidadeMedida, ignore.case = TRUE),
+      grepl("milheiro de cartelas|mil cte|milheiros de cartelas", clean_unidadeMedida, ignore.case = TRUE),
       "milheiro de cartelas",
       nomeUnidadeFornecimento
     )
@@ -172,7 +96,7 @@ medicamentos_df <- medicamentos_df %>%
 medicamentos_df <- medicamentos_df %>% 
   mutate(
     nomeUnidadeFornecimento = ifelse(
-      grepl("milheiro unid intern|mil ui", clean_unidadeMedida, ignore.case = TRUE),
+      grepl("milheiro unid intern|mil ui|milheiros unid intern", clean_unidadeMedida, ignore.case = TRUE),
       "milheiro unid. intern",
       nomeUnidadeFornecimento
     )
@@ -222,14 +146,15 @@ medicamentos_df <- medicamentos_df %>%
 print(
   paste(
     "Porcentagem de valores NÃO vazios em nomeUnidadeFornecimento",
-    sum(!is.na(medicamentos_df$nomeUnidadeFornecimento))/nrow(medicamentos_df) # 60%
+    sum(!is.na(medicamentos_df$nomeUnidadeFornecimento))/nrow(medicamentos_df) # 61%
   )
 )
 
 ## UNIDADE DE MEDIDA -----------------------------------------------------
 
 ### PROCESSA AS EXCEÇÕES -------------------------------------------------
-# As exceções são mil unid. intern. (kui), unid. internacional (ui) e milhao unid. intern. (mui)
+#' As exceções são mil unid. intern. (kui), unid. internacional (ui) e 
+#' milhao unid. intern. (mui)
 
 #cria a coluna nomeUnidadeMedida
 medicamentos_df$nomeUnidadeMedida <- NA
@@ -262,7 +187,7 @@ medicamentos_df <- medicamentos_df %>%
 medicamentos_df <- medicamentos_df %>% 
   mutate(
     nomeUnidadeMedida = ifelse(
-      grepl("milhao unid intern|mui", clean_unidadeMedida, ignore.case = TRUE),
+      grepl("milhao unid intern|mui|milhoes unid intern", clean_unidadeMedida, ignore.case = TRUE),
       "milheiro unid. intern",
       nomeUnidadeMedida
     )
@@ -311,7 +236,7 @@ medicamentos_df <- medicamentos_df %>%
 print(
   paste(
     "Porcentagem de valores NÃO vazios em nomeUnidadeMedida",
-    sum(!is.na(medicamentos_df$nomeUnidadeMedida))/nrow(medicamentos_df) # 43%
+    sum(!is.na(medicamentos_df$nomeUnidadeMedida))/nrow(medicamentos_df) # 44%
   )
 )
 
