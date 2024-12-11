@@ -1,9 +1,10 @@
 #' Este script organiza as unidades de fornecimento e de medida padrões provenientes
-#' do catálogo de materiais. 
+#' do catálogo de materiais.
 #' As unidades são disponibilizadas através de environments (equivalente a um dicionário,
 #' mapa ou tabela hash).
-#' 
+#'
 
+library(tidyr) # Data manipulation
 library(dplyr)        # Data manipulation
 library(here)         # File referencing
 
@@ -20,7 +21,7 @@ uf_df <- catmat_expandido %>%
   select(siglaUnidadeFornecimento, nomeUnidadeFornecimento) %>%
   unique() %>%
   drop_na() %>%
-  mutate(siglaUnidadeFornecimento = remove_pontuacao(clean_text(siglaUnidadeFornecimento)),  
+  mutate(siglaUnidadeFornecimento = remove_pontuacao(clean_text(siglaUnidadeFornecimento)),
          nomeUnidadeFornecimento = remove_pontuacao(clean_text(nomeUnidadeFornecimento)))
 
 # PASSO 2: separa valores únicos de unidade de medida (um)
@@ -43,7 +44,7 @@ unidades_medida_em_unidades_fornecimento <- data.frame(
                         "unid internacional", "unidade")
 )
 # Adiciona as unidades de medida ao dataframe correto
-um_df <- bind_rows(um_df, unidades_medida_em_unidades_fornecimento) %>% 
+um_df <- bind_rows(um_df, unidades_medida_em_unidades_fornecimento) %>%
   distinct(nomeUnidadeMedida, .keep_all = TRUE)
 # Remove as unidades de medida das unidades de fornecimento
 uf_df <- uf_df %>%
@@ -71,13 +72,13 @@ um_df$pluralUnidadeMedida <- c("centimetros", "curies", "doses", "gigabecquerels
 # PASSO 5: Corrige erros ortográficos nas unidades de fornecimento e medida
 um_df <- um_df %>%
   mutate( # gigabecquerel só tem 1 "l"
-    nomeUnidadeMedida = gsub("gigabecquerell", "gigabecquerel", nomeUnidadeMedida) 
+    nomeUnidadeMedida <- gsub("gigabecquerell", "gigabecquerel", nomeUnidadeMedida)
   )
 
 # PASSO 6: Cria dicionários de unidades de fornecimento (uf) e unidades de medida (um)
 # para agilizar a pesquisa
 uf_env <- new.env()
-for (i in 1:nrow(uf_df)) {
+for (i in seq_len(nrow(uf_df))) {
   # Adiciona as siglas como chaves do dicionário e o nome como valor
   uf_env[[uf_df$siglaUnidadeFornecimento[i]]] <- uf_df$nomeUnidadeFornecimento[i]
   # Adiciona o nome também como chave e como valor (para ser possível pesquisar por sigla e nome)
@@ -87,7 +88,7 @@ for (i in 1:nrow(uf_df)) {
 }
 
 um_env <- new.env()
-for (i in 1:nrow(um_df)) {
+for (i in seq_len(nrow(um_df))) {
   # Adiciona as siglas como chaves do dicionário e o nome como valor
   um_env[[um_df$siglaUnidadeMedida[i]]] <- um_df$nomeUnidadeMedida[i]
   # Adiciona o nome também como chave e como valor (para ser possível pesquisar por sigla e nome)
@@ -95,4 +96,3 @@ for (i in 1:nrow(um_df)) {
   # Adiciona o plural como chave e o nome como valor
   um_env[[um_df$pluralUnidadeMedida[i]]] <- um_df$nomeUnidadeMedida[i]
 }
-
