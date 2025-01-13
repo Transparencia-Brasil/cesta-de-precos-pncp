@@ -13,14 +13,18 @@ library(dplyr)
 library(here)
 
 medicamentos <- readRDS(here("data/pncp/medicamentos.rds"))
+catmat <- readRDS(here("data/catmat/catmat.rds"))
 
 # AMOSTRA ALEATÓRIA -------------------------------------------------------
 
-amostra_aleatória <- medicamentos %>% 
+# Defina a semente sempre antes de executar o código abaixo para garantir o 
+# mesmos resultados aleatórios.
+set.seed(180596)  
+medicamentos %>% 
   distinct(descricao, .keep_all = TRUE) %>%
   sample_n(1000) %>%
   select(endpoint, numeroItem, codigo_pdm, descricao, unidadeMedida) %>%
-  saveRDS(here("tasks/dados-de-teste/outputs/medicamentos-teste-aleatorio.rds"))
+  write.csv(here("tasks/dados-de-teste/outputs/medicamentos-teste-aleatorio.csv"), row.names = F)
 
 # AMOSTRA PROPOSITAL ------------------------------------------------------
 
@@ -43,9 +47,18 @@ mais_descricoes_diferentes <- medicamentos %>%
 #' Uma amostra aleatória será extraída a partir de uma pre-seleção de itens que
 #' sejam de algum tipo acima.
 
+set.seed(180596)
 amostra_proposital <- medicamentos %>% 
   filter(codigo_pdm %in% c("2259", "1289", "8428", "8007", "15458")) %>%
   distinct(descricao, .keep_all = TRUE) %>%
   sample_n(1000) %>%
   select(endpoint, numeroItem, codigo_pdm, descricao, unidadeMedida) %>%
-  saveRDS(here("tasks/dados-de-teste/outputs/medicamentos-teste-proposital.rds"))
+  write.csv(here("tasks/dados-de-teste/outputs/medicamentos-teste-proposital.csv"), row.names = F)
+
+
+# CATÁLOGO DE REFERÊNCIA (CATMAT) -----------------------------------------
+
+catmat %>%
+  select(codigo_pdm, nome_pdm, codigo_br, nome_item) %>%
+  write.csv(here("tasks/dados-de-teste/outputs/catmat-para-rotulagem.csv"), row.names = F)
+
