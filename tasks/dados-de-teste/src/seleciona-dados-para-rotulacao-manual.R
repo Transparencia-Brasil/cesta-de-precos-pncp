@@ -1,13 +1,4 @@
-#' Este script seleciona duas amostras dos dados de medicamentos do PNCP usando 
-#' estratégias diferentes de amostragem. 
-#' 
-#' A primeira amostra é uma amostra aleatória de mil itens com descrições distintas.
-#' 
-#' A segunda amostra é uma amostra proposital dos itens que possuem o maior número
-#' de descrições diferentes. Alguns deste itens são medicamentos, mas também são 
-#' utilizados em outras atividades humanas. A ideia é testar se o modelo consegue
-#' identificar bem quais itens são medicamentos e quais não são.
-#' 
+#' Este script seleciona amostras aleatórias dos dados de medicamentos do PNCP.
 
 library(dplyr)
 library(here)
@@ -15,46 +6,27 @@ library(here)
 medicamentos <- readRDS(here("data/pncp/medicamentos.rds"))
 catmat <- readRDS(here("data/catmat/catmat.rds"))
 
-# AMOSTRA ALEATÓRIA -------------------------------------------------------
+# AMOSTRAS ALEATÓRIAS -----------------------------------------------------
 
 # Defina a semente sempre antes de executar o código abaixo para garantir o 
 # mesmos resultados aleatórios.
 set.seed(180596)  
-medicamentos %>% 
+amostra1 <- medicamentos %>% 
   distinct(descricao, .keep_all = TRUE) %>%
   sample_n(1000) %>%
-  select(endpoint, numeroItem, codigo_pdm, descricao, unidadeMedida) %>%
-  write.csv(here("tasks/dados-de-teste/outputs/medicamentos-teste-aleatorio.csv"), row.names = F)
+  select(endpoint, numeroItem, codigo_pdm, descricao, unidadeMedida) 
 
-# AMOSTRA PROPOSITAL ------------------------------------------------------
+amostra1 %>%
+  write.csv(here("tasks/dados-de-teste/outputs/medicamentos-teste-aleatorio-1.csv"), row.names = F)
 
-mais_descricoes_diferentes <- medicamentos %>%
-  group_by(codigo_pdm) %>%
-  summarise(n_descricoes = n_distinct(clean_descricao)) %>%
-  arrange(desc(n_descricoes))
-
-#' O código 2259 é álool etílico (etanol). Usos: limpeza de ambiente, combustível,
-#' bebida alcóolica.
-#' O código 1289 é "soro". Soro é uma palavra muito genérica e qualquer coisa que
-#' contenha soro será identificada como medicamento. Exemplos: suporte para soro,
-#' biscoito com soro de leite, etc.
-#' O código 8428 é "insulina". Qualquer material para aplicação de insulina como
-#' agulhas, seringa, bomba, etc. também está sendo classificado como medicamento.
-#' o código 8007 é "glicose".
-#' o código 15458 é "vacina"
-#' 
-#' Ao todo são 10437 descrições diferentes 
-#' Uma amostra aleatória será extraída a partir de uma pre-seleção de itens que
-#' sejam de algum tipo acima.
-
-set.seed(180596)
-amostra_proposital <- medicamentos %>% 
-  filter(codigo_pdm %in% c("2259", "1289", "8428", "8007", "15458")) %>%
+amostra2 <- medicamentos %>% 
   distinct(descricao, .keep_all = TRUE) %>%
+  anti_join(amostra1, by = "endpoint") %>%
   sample_n(1000) %>%
-  select(endpoint, numeroItem, codigo_pdm, descricao, unidadeMedida) %>%
-  write.csv(here("tasks/dados-de-teste/outputs/medicamentos-teste-proposital.csv"), row.names = F)
+  select(endpoint, numeroItem, codigo_pdm, descricao, unidadeMedida) 
 
+amostra2 %>%
+  write.csv(here("tasks/dados-de-teste/outputs/medicamentos-teste-aleatorio-2.csv"), row.names = F)
 
 # CATÁLOGO DE REFERÊNCIA (CATMAT) -----------------------------------------
 
