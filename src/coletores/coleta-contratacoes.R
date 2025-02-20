@@ -8,9 +8,9 @@
 #' chamado "coleta/contratacoes" na raiz do projeto.
 #' 
 #' Ao final da coleta 3 arquivos são salvos:
-#' 1. dados.rds - contém os dados das contratações.
-#' 2. erros.rds - contém os endpoints que retornaram erros ao consultar e a mensagem de erro.
-#' 3. monitoramento.rds - contém metadados sobre a duração da coleta para cada lote de dados.
+#' 1. dados.csv - contém os dados das contratações.
+#' 2. erros.csv - contém os endpoints que retornaram erros ao consultar e a mensagem de erro.
+#' 3. monitoramento.csv - contém metadados sobre a duração da coleta para cada lote de dados.
 
 library(dplyr)
 library(tidyr)

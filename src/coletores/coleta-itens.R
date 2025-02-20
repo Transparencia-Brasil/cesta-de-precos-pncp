@@ -1,7 +1,7 @@
 #' Este script coleta os dados de itens das contratações a partir da API do PNCP.
 #' 
 #' Há dois parâmetros de entrada:
-#' parâmetro 1 (obrigatório) - o caminho para um arquivo .rds que seja um dataframe
+#' parâmetro 1 (obrigatório) - o caminho para um arquivo .csv que seja um dataframe
 #' contendo uma coluna nomeada 'endpoint', indicando os endpoints de contratações 
 #' coletadas anteriormente.
 #' 
@@ -10,14 +10,15 @@
 #' chamado "coleta/itens" na raiz do projeto.
 #' 
 #' Ao final da coleta 3 arquivos são salvos:
-#' 1. dados.rds - contém os dados de itens das contratações.
-#' 2. erros.rds - contém os endpoints que retornaram erros ao consultar e a mensagem de erro.
-#' 3. monitoramento.rds - contém metadados sobre a duração da coleta para cada lote de dados.
+#' 1. dados.csv - contém os dados de itens das contratações.
+#' 2. erros.csv - contém os endpoints que retornaram erros ao consultar e a mensagem de erro.
+#' 3. monitoramento.csv - contém metadados sobre a duração da coleta para cada lote de dados.
 #' 
 #' https://pncp.gov.br/api/pncp/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/pesquisarCompraItem
 
 library(dplyr)
 library(here)
+library(readr)
 
 source(here("src/coletores/funcoes.R"))
 
@@ -32,9 +33,9 @@ if (length(args) < 1) {
 
 PATH_CONTRATACOES <- here(args[1])
 
-# Verifica se a extensão do arquivo é .rds
-if (tolower(tools::file_ext(PATH_CONTRATACOES)) != "rds") {
-  stop("Erro: O arquivo deve ter a extensão .rds")
+# Verifica se a extensão do arquivo é .csv
+if (tolower(tools::file_ext(PATH_CONTRATACOES)) != "csv") {
+  stop("Erro: O arquivo deve ter a extensão .csv")
 }
 
 # Verifica se o segundo argumento foi passado, caso contrário, define um padrão
@@ -42,7 +43,7 @@ PATH_OUTPUT_DIR <- ifelse(length(args) >= 2, args[2], here("coleta", "itens"))
 
 # LISTA DE ENDPOINTS A COLETAR --------------------------------------------
 
-contratacoes_df <- readRDS(PATH_CONTRATACOES)
+contratacoes_df <- read_csv(PATH_CONTRATACOES)
 
 if (! "endpoint" %in% names(contratacoes_df)) {
   stop("Erro: O dataframe passado precisa ter uma coluna chamada 'endpoint'.")

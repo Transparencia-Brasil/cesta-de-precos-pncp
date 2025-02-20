@@ -1,23 +1,31 @@
 """
-Documente o script
+Este script identifica quais itens são medicamentos dentre uma lista de itens passada como argumento.
+
+Parâmetros:
+1. itens (obrigatório) - Caminho para um arquivo .csv contendo os itens a serem identificados. A descricao do item 
+deve estar em uma coluna chamada 'descricao'.
+
+2. Catálogo (obrigatório) - Caminho para um arquivo .csv contendo o catálogo de medicamentos que será utilizado 
+como referência para identificar os medicamentos dentre os itens.
+
+Método:
+1 - Primeiro os itens são varridos para verificar se sua descrição contém algum nome PDM do catálogo. 
+Isso agiliza identificar potenciais candidatos a medicamentos.
+2 - Um modelo LLM transforma as descrições dos itens candidatos a medicamentos em embeddings e faz o mesmo
+com as descrições dos medicamentos no catálogo.
+3 - Os embeddings dos itens candidatos são comparados com os embeddings dos medicamentos do catálogo que possuem o mesmo PDM.
+A similaridade do coseno é a métrica de comparação e então o medicamento do catálogo com maior similaridade é escolhido como
+párea do item candidato.
+4 - Os itens cujos páreas possuírem similaridade igual ou superior a 0.5 serão classificados como medicamento.
+O valor 0.5 foi definido experimentalmente como sendo o limite que rende os melhores resultados de acurácia.
+
+Por fim, os medicamentos idntificados são salvos em um arquivo chamado 'medicamentos.csv', junto com o código BR do item 
+mais similar do catálogo. Os embeddings do catálogo são salvos em um arquivo (catalogo-vetorizado.csv) para evitar calculá-los a
+cada execução do script.
 """
-
-# Ler o catalogo
-# verifica se ja existe um arquivo de embeddings do catálogo
-# Se não existir, computa os embeddings do catalogo
-# se existir, verifica se há algum medicamento que não foi computado ainda e se houver computa os embeddings
-# salva os embeddings
-
-
-# Lê o arquivo de itens
-# computa os embeddings
-# identifica os medicamentos
-# salva um arquivo de medicamentos
-# Salva um arquivo de embeddings dos medicamentos
 
 import argparse     # Conversor para opções de linha de comando
 import os           # Sistema operacional
-import pyreadr      # Lê e escreve arquivos .rds
 import unicodedata  # Unicode Database
 import nltk         # Natural Language ToolKit
 import json         # Codificador e decodificador JSON
@@ -42,23 +50,23 @@ parser.add_argument("catalogo", help="Caminho para o arquivo .rds de catálogo d
 args = parser.parse_args()
 
 # Valida as extensões dos arquivos
-if os.path.splitext(args.itens)[1].lower() != ".rds":
-    raise ValueError("A extensão do arquivo de itens (primeiro argumento) deve ser .rds")
+if os.path.splitext(args.itens)[1].lower() != ".csv":
+    raise ValueError("A extensão do arquivo de itens (primeiro argumento) deve ser .csv")
 
-if os.path.splitext(args.catalogo)[1].lower() != ".rds":
-    raise ValueError("A extensão do arquivo de catálogo (segundo argumento) deve ser .rds")
+if os.path.splitext(args.catalogo)[1].lower() != ".csv":
+    raise ValueError("A extensão do arquivo de catálogo (segundo argumento) deve ser .csv")
 
 # Diretórios dos arquivos de entrada (onde serão salvos os arquivos gerados)
 dir_itens = os.path.dirname(args.itens)
 dir_catalogo = os.path.dirname(args.catalogo)
 
 # Carrega os dados
-catmat_df = pyreadr.read_r(args.catalogo)[None]  # CATMAT
-itens_df = pyreadr.read_r(args.itens)[None]      # Itens PNCP
+catmat_df = pd.read_csv(args.catalogo)  # CATMAT
+itens_df = pd.read_csv(args.itens)      # Itens PNCP
 
 ### DETECÇÃO DE PDMS ######################################################################
 
-print('\Detectando nomes PDM nos itens.', end="", flush=True)
+print('\rDetectando nomes PDM nos itens.', end="", flush=True)
 
 def limpa_texto(texto):
     """
@@ -185,17 +193,11 @@ model = SentenceTransformer(model_name)
 
 ### VETORIZAÇÃO DO CATÁLOGO ###############################################################
 
-NOME_CATALOGO_VETORIZADO = dir_catalogo + "\catalogo-vetorizado.csv"
+NOME_CATALOGO_VETORIZADO = dir_catalogo + "/catalogo-vetorizado.csv"
 
 # Verifica se já existe um arquivo vetorizado do catálogo.
 # Se não existir um catalogo vetorizado, cria-se um.
 if not os.path.exists(NOME_CATALOGO_VETORIZADO):
-    # Carrega o catálogo
-    catmat_rds = pyreadr.read_r(args.catalogo)  # utilize o catmat-para-python.rds (sem colunas aninhadas)
-
-    # Extrai o dataframe
-    catmat_df = catmat_rds[None]
-
     # Computa os vetores (embeddings)
     print('\rCalculando os vetores do catálogo.', end="", flush=True)
     documentos = catmat_df['nome_item']
@@ -240,7 +242,7 @@ print('\rIdentificando os medicamentos', end="", flush=True)
 THRESHOLD = 0.5
 
 # Caminho do arquivo de saída ondes serão salvos os medicamentos
-NOME_ARQUIVO_MEDICAMENTOS = dir_itens + "\medicamentos.csv"
+NOME_ARQUIVO_MEDICAMENTOS = dir_itens + "/medicamentos.csv"
 
 def mais_similar(medicamento):
     """
@@ -291,14 +293,14 @@ medicamentos_df[['codigo_br', 'similaridade']] = medicamentos_df.apply(mais_simi
 # Itens acima do limite são rotulados como medicamentos
 medicamentos_df['medicamento'] = medicamentos_df['similaridade'] >= THRESHOLD
 
+# Filtra somente os itens que são medicamentos
+medicamentos_df = medicamentos_df[medicamentos_df['medicamento']]
+
 # Remove colunas criadas desnecessárias
-medicamentos_df.drop('descricao_limpa', axis=1, inplace=True)
+medicamentos_df.drop(['descricao_limpa', 'embedding'], axis=1, inplace=True)
 
 # Converte o codigo_br em inteiro
 medicamentos_df['codigo_br'] = medicamentos_df['codigo_br'].astype(int)
-
-# Coverte os embeddings para json antes de salvar, para manter o formato
-medicamentos_df['embedding'] = medicamentos_df['embedding'].apply(lambda x: json.dumps(x.tolist()))
 
 # Salva o arquivo de medicamentos em formato CSV
 medicamentos_df.to_csv(NOME_ARQUIVO_MEDICAMENTOS, index=False)

@@ -51,19 +51,18 @@ coleta_endpoint <- function(endpoint) {
 }
 
 
-#' Salva arquivos CSV como RDS em um diretório organizado por data
+#' Salva os resultados da coleta no diretório passado como argumento.
 #'
-#' A função `salva_dados_em_rds()` lê três arquivos CSV contendo dados, erros e monitoramento,
-#' e os salva no formato `.rds` dentro de `output_dir`.
+#' A função `salva_resultados()` coloca os três arquivos CSV resultantes da coleta
+#' contendo dados, erros e monitoramento dentro de `output_dir`.
 #'
-#' @param output_dir Caminho base onde os arquivos `.rds` serão armazenados.
-#' O diretório final será criado dentro de `output_dir` com o nome da data atual.
+#' @param output_dir Caminho base onde os arquivos serão armazenados.
+#' Se o diretório não existir, ele será criado.
 #'
 #' @details
 #' - A função verifica se o diretório correspondente à `output_dir` já existe.
 #' - Se o diretório não existir, ele será criado.
-#' - Os arquivos CSV (`PATH_DADOS`, `PATH_ERROS`, `PATH_MONITORAMENTO`) são lidos e convertidos para `.rds`.
-#' - Os arquivos `.rds` são armazenados em `output_dir`.
+#' - Os arquivos são armazenados em `output_dir`.
 #'
 #' @return A função não retorna valores diretamente. Os arquivos são salvos no disco.
 #'
@@ -71,22 +70,17 @@ coleta_endpoint <- function(endpoint) {
 #' 
 #' @examples
 #' # Exemplo de uso:
-#' salva_dados_em_rds("meu_diretorio")
-salva_dados_em_rds <- function(output_dir) {
+#' salva_resultados("meu_diretorio")
+salva_resultados <- function(output_dir) {
   
+  # Cria o diretório de saída, caso não exista
   if (!dir.exists(output_dir)) { 
     dir.create(output_dir, recursive = TRUE) 
   }
   
-  # Lê os arquivos .csv
-  resultados_df <- read_csv(PATH_DADOS)
-  erros_df <- read_csv(PATH_ERROS)
-  monitoramento_df <- read_csv(PATH_MONITORAMENTO)
-  
-  # Salva os arquivos em .rds
-  saveRDS(resultados_df, here(output_dir, "dados.rds"))
-  saveRDS(erros_df, here(output_dir, "erros.rds"))
-  saveRDS(monitoramento_df, here(output_dir, "monitoramento.rds"))
+  file.copy(PATH_DADOS, here(output_dir, "dados.csv"), overwrite = TRUE)
+  file.copy(PATH_ERROS, here(output_dir, "erros.csv"), overwrite = TRUE)
+  file.copy(PATH_MONITORAMENTO, here(output_dir, "monitoramento.csv"), overwrite = TRUE)
   
   # Apaga o diretório temporário
   unlink(PATH_DIR_TEMP, recursive = TRUE, force = TRUE)
@@ -253,6 +247,6 @@ coleta <- function(endpoints, output_dir = here("coleta"), tamanho_lote = 1000) 
     Sys.sleep(0.5)
   }
   
-  # Ao final da coleta, salva os arquivos .csv como arquivos .rds para economizar espaço
-  salva_dados_em_rds(output_dir)
+  # Ao final da coleta, transfere os arquivos .csv para o diretório de saída
+  salva_resultados(output_dir)
 }
