@@ -17,9 +17,9 @@
 #' 
 #' https://pncp.gov.br/api/pncp/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/recuperarResultados
 
-library(dplyr)
-library(here)
-library(readr)
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(readr))
 
 source(here("src/coletores/funcoes.R"))
 

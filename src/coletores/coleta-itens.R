@@ -16,9 +16,9 @@
 #' 
 #' https://pncp.gov.br/api/pncp/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/pesquisarCompraItem
 
-library(dplyr)
-library(here)
-library(readr)
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(readr))
 
 source(here("src/coletores/funcoes.R"))
 
@@ -45,16 +45,25 @@ PATH_OUTPUT_DIR <- ifelse(length(args) >= 2, args[2], here("coleta", "itens"))
 
 contratacoes_df <- read_csv(PATH_CONTRATACOES)
 
-if (! "endpoint" %in% names(contratacoes_df)) {
-  stop("Erro: O dataframe passado precisa ter uma coluna chamada 'endpoint'.")
+if (! "data.orgaoEntidade.cnpj" %in% names(contratacoes_df)) {
+  stop("Erro: O dataframe passado precisa ter uma coluna chamada 'data.orgaoEntidade.cnpj'.")
 }
 
-# Os endpoints das contratacões coletadas
-endpoints_contratacoes <- contratacoes_df %>% pull(endpoint)
+if (! "data.anoCompra" %in% names(contratacoes_df)) {
+  stop("Erro: O dataframe passado precisa ter uma coluna chamada 'data.anoCompra'.")
+}
 
-# Adiciona "/itens" aos endpoints das contratações para transformá-los em 
-# endpoints de itens.
-endpoints_itens <- paste0(endpoints_contratacoes, "/itens")
+if (! "data.sequencialCompra" %in% names(contratacoes_df)) {
+  stop("Erro: O dataframe passado precisa ter uma coluna chamada 'data.sequencialCompra'.")
+}
+
+# Monta os endpoints dos itens a partir de informacoes da contratacao.
+# Formato: https://pncp.gov.br/api/pncp/v1/orgaos/<CNPJ>/compras/<ano>/<sequencial>/itens
+endpoints_itens <- paste0("https://pncp.gov.br/api/pncp/v1/orgaos/",
+                          contratacoes_df$data.orgaoEntidade.cnpj, 
+                          "/compras/", contratacoes_df$data.anoCompra,
+                          "/", contratacoes_df$data.sequencialCompra,
+                          "/itens")
 
 
 # COLETA ------------------------------------------------------------------

@@ -4,13 +4,13 @@
 #' As demais funções são utilizadas dentro de `coleta`.
 #' 
 
-library(dplyr)
-library(httr2)
-library(here)
-library(lubridate)
-library(jsonlite)
-library(readr)
-library(data.table)
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(httr2))
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(jsonlite))
+suppressPackageStartupMessages(library(readr))
+suppressPackageStartupMessages(library(data.table))
 
 #' Faz uma requisição a um endpoint e retorna os dados em formato de dataframe
 #'

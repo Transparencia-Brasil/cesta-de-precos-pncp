@@ -11,11 +11,14 @@
 #' 1. dados.csv - contém os dados das contratações.
 #' 2. erros.csv - contém os endpoints que retornaram erros ao consultar e a mensagem de erro.
 #' 3. monitoramento.csv - contém metadados sobre a duração da coleta para cada lote de dados.
+#' 
+#' https://pncp.gov.br/api/consulta/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/consultarContratacaoPorDataUltimaAtualizacao
 
-library(dplyr)
-library(tidyr)
-library(here)
-library(lubridate)
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyr))
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(readr))
 
 source(here("src/coletores/funcoes.R"))
 
@@ -30,7 +33,7 @@ PATH_OUTPUT_DIR <- ifelse(length(args) >= 1, args[1], here("coleta", "contrataco
 PRIMEIRO_DIA <- floor_date(today() - months(1), "month")
 
 # Obtém o último dia do mês anterior
-ULTIMO_DIA <- ceiling_date(primeiro_dia, "month") - days(1)
+ULTIMO_DIA <- ceiling_date(PRIMEIRO_DIA, "month") - days(1)
 
 # Os códigos das modalidades de contratações no PNCP vão de 1 a 14
 # Ref: https://pncp.gov.br/app/entidades-dominio
@@ -89,6 +92,7 @@ for (i in MODALIDADES) {
     resposta <- coleta_endpoint(endpoint)
     resposta$erro <- FALSE
     resposta$codigoModalidade <- i
+    resposta$endpoint <- endpoint
     # Adiciona a resposta retornada ao dataframe `paginas_por_modalidade`
     paginas_por_modalidade <- bind_rows(paginas_por_modalidade, resposta)
     
@@ -97,12 +101,31 @@ for (i in MODALIDADES) {
     print(e$message)
     paginas_por_modalidade <- bind_rows(
       paginas_por_modalidade,
-      data.frame(erro = TRUE, codigoModalidade = i))
+      data.frame(
+        erro = TRUE,
+        codigoModalidade = i,
+        endpoint = endpoint,
+        mensagem_erro = as.character(e$message),
+        stringsAsFactors = FALSE
+      )
+    )
   })
   
   # Acompanhamento das consultas
   cat(sprintf("Modalidade %d coletada", i), "\r")
   flush.console()
+}
+
+# Salva um arquivo com as consultas que deram erro
+if (nrow(paginas_por_modalidade %>% filter(erro == TRUE)) > 0) {
+  if (!dir.exists(PATH_OUTPUT_DIR)) { 
+    dir.create(output_dir, recursive = TRUE) 
+  }
+  
+  paginas_por_modalidade %>% 
+    filter(erro == TRUE) %>% 
+    select(endpoint, mensagem_erro) %>%
+    write_csv(here(PATH_OUTPUT_DIR, "erros.csv"))
 }
 
 # Sumariza o dataframe para saber quantas páginas e registros temos por modalidade
