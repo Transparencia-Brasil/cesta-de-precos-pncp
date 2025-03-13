@@ -382,6 +382,7 @@ for (i in 1:nrow(tb_fornecedor)) {
   })
 }
 
+# Insere uma contratação nova ou, caso a contratação já exista no banco, atualiza os campos
 query_contratacao <- "
 INSERT INTO contratacao (
     numero_controle_pncp, ano_compra, sequencial_compra, objeto_compra,
@@ -393,7 +394,22 @@ INSERT INTO contratacao (
     codigo_modo_disputa, nome_modo_disputa
 )
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
-ON CONFLICT (numero_controle_pncp) DO NOTHING;
+ON CONFLICT (numero_controle_pncp) 
+DO UPDATE SET
+    objeto_compra = $4,
+    data_abertura_proposta = $5,
+    data_encerramento_proposta = $6,
+    valor_estimado_compra = $7,
+    valor_homologado_compra = $8,
+    srp = $9,
+    codigo_tipo_instrumento_convocatorio = $10,
+    nome_tipo_instrumento_convocatorio = $11,
+    codigo_modalidade = $12,
+    nome_modalidade = $13,
+    codigo_amparo_legal = $14,
+    nome_amparo_legal = $15,
+    codigo_modo_disputa = $16,
+    nome_modo_disputa = $17;
 "
 
 # Loop para inserir as contratacoes
@@ -409,6 +425,7 @@ for (i in 1:nrow(tb_contratacao)) {
   })
 }
 
+# Insere um item novo ou, caso o item já exista no banco, atualiza os campos
 query_item_homologado <- "
     INSERT INTO item_homologado (
         numero_controle_pncp, codigo_item_catalogo,
@@ -437,7 +454,44 @@ query_item_homologado <- "
         $21, $22, $23, $24, $25, $26, $27, $28, $29, $30,
         $31, $32, $33, $34, $35, $36, $37, $38, $39, $40,
         $41, $42)
-    ON CONFLICT (numero_controle_pncp, numero_item) DO NOTHING
+    ON CONFLICT (numero_controle_pncp, numero_item) 
+    DO UPDATE SET
+        codigo_item_catalogo = $2,
+        cnpj_contratante_subrogado = $5, 
+        codigo_unidade_contratante_subrogado = $6,
+        ni_fornecedor = $7,
+        descricao = $9, 
+        unidade_medida = $10, 
+        material_servico = $11,
+        codigo_categoria_item = $12, 
+        nome_categoria_item = $13,
+        codigo_catalogo = $14,
+        nome_catalogo = $15,
+        codigo_categoria_item_catalogo = $16, 
+        nome_categoria_item_catalogo = $17,
+        codigo_item_catalogo_pncp = $18,
+        codigo_ncm_nbs = $19, 
+        descricao_ncm_nbs = $20,
+        codigo_criterio_julgamento = $21, 
+        nome_criterio_julgamento = $22,
+        codigo_situacao_item = $23, 
+        nome_situacao_item = $24,
+        codigo_tipo_beneficio = $25, 
+        nome_tipo_beneficio = $26,
+        orcamento_sigiloso = $27,
+        valor_unitario_estimado = $28, 
+        valor_total_estimado = $29, 
+        quantidade_estimada = $30,
+        codigo_situacao_resultado = $31, 
+        nome_situacao_resultado = $32,
+        valor_unitario_homologado = $33, 
+        valor_total_homologado = $34, 
+        quantidade_homologada = $35,
+        moeda_estrangeira = $36, 
+        valor_nominal_moeda_estrangeira = $37,
+        data_resultado = $38, 
+        data_cancelamento = $39, 
+        motivo_cancelamento = $40;
 "
 
 # Loop para inserir os itens homologados
@@ -456,6 +510,7 @@ for (i in 1:nrow(tb_item_homologado)) {
   })
 }
 
+# Insere um item novo ou, caso o item já exista no banco, atualiza os campos
 query_item_licitado <- "
     INSERT INTO item_licitado (
         numero_controle_pncp, codigo_item_catalogo,
@@ -477,7 +532,33 @@ query_item_licitado <- "
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
         $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,
         $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31)
-    ON CONFLICT (numero_controle_pncp, numero_item) DO NOTHING
+    ON CONFLICT (numero_controle_pncp, numero_item)
+    DO UPDATE SET
+        codigo_item_catalogo = $2,
+        cnpj_contratante_subrogado = $5, 
+        codigo_unidade_contratante_subrogado = $6,
+        descricao = $8, 
+        unidade_medida = $9, 
+        material_servico = $10,
+        codigo_categoria_item = $11, 
+        nome_categoria_item = $12,
+        codigo_catalogo = $13,
+        nome_catalogo = $14,
+        codigo_categoria_item_catalogo = $15, 
+        nome_categoria_item_catalogo = $16,
+        codigo_item_catalogo_pncp = $17,
+        codigo_ncm_nbs = $18, 
+        descricao_ncm_nbs = $19,
+        codigo_criterio_julgamento = $20, 
+        nome_criterio_julgamento = $21,
+        codigo_situacao_item = $22, 
+        nome_situacao_item = $23,
+        codigo_tipo_beneficio = $24, 
+        nome_tipo_beneficio = $25,
+        orcamento_sigiloso = $26,
+        valor_unitario_estimado = $27, 
+        valor_total_estimado = $28, 
+        quantidade_estimada = $29;
 "
 
 # Loop para inserir os itens homologados
