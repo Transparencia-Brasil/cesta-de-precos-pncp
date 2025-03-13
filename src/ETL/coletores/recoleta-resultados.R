@@ -21,40 +21,162 @@
 #'   * Os itens homologados devem ser removidos da lista de itens ainda não homologados.
 #'   
 
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(here))
+suppressPackageStartupMessages(library(readr))
+suppressPackageStartupMessages(library(DBI))
+suppressPackageStartupMessages(library(RPostgres))
 
+source(here("src/ETL/coletores/funcoes.R"))
 
 # PARÂMETROS DE ENTRADAS --------------------------------------------------
 
-# Se o usuário tiver passado o parâmetro opcional de entrada, salve-o em uma variável
-# Se não tiver passado, defina o valor padrão similar aos demais arquivos da coleta
+args <- commandArgs(trailingOnly = TRUE)
+
+# Verifica se o argumento foi passado, caso contrário, define um padrão
+PATH_OUTPUT_DIR <- ifelse(length(args) >= 1,
+                          args[1],
+                          here("coleta", "resultados", "itens-licitados"))
 
 
 # CONECTA-SE AO BANCO -----------------------------------------------------
 
-#' Você vai precisar rodar uma cópia do banco localmente para testar o script.
-#' Eu deixei um dump do banco no slack.
+NOME_BD <- "medicamentos-transparentes"
+HOST <- "localhost"
+USUARIO <- "postgres"
+SENHA <- "postgres"
+PORTA <- 5432
+
+con <- dbConnect(
+  RPostgres::Postgres(),
+  dbname = NOME_BD ,
+  host = HOST,
+  user = USUARIO,
+  password = SENHA,
+  port = PORTA
+)
 
 
 # EXTRAI LISTA DE ITENS AINDA NÃO HOMOLOGADOS -----------------------------
 
-#' Faz a consulta no banco para retornar esta lista. É só pegar a coluna urlAPI
-#' da tabela item_licitado
-#' SELECT urlAPI FROM item_licitado
-#' Depois, você vai gerar os endpoints dos resultados a partir dos endpoints dos itens.
+# Tabela de itens licitados mas não homologados
+query <- "SELECT * FROM item_licitado;"
+tb_item_licitado <- dbGetQuery(con, query)
 
+# Gera endpoints de resultados a partir dos endpoints de itens
+endpoints_resultados = paste0(tb_item_licitado$url_api, "/resultados")
 
 # RECOLETA OS RESULTADOS --------------------------------------------------
 
-#' Agora é só chamar a função de coleta (funcoes.R) passando a lista de endpoints a coletar.
-#' Os resultados serão salvos no diretório passado como parâmetro (ou o valor padrão definido)
+# Executa a coleta
+coleta(endpoints = endpoints_resultados, output_dir = PATH_OUTPUT_DIR)
 
 
 # INSERE RESULTADOS NO BANCO ----------------------------------------------
 
-#' Para os itens que tiveram resultados coletados:
-#' Agora você vai formatar os dados para inserí-los na tabela item_homologado.
-#' Só precisa basicamente adicionar as colunas referentes aos resultados.
-#' Salve os ids dos itens em algum lugar pois será preciso remover estes itens da tabela item_licitado.
+CAMINHO_RESULTADOS <- here(PATH_OUTPUT_DIR, "dados.csv")
+resultados <- read_csv(CAMINHO_RESULTADOS, show_col_types = FALSE)
+
+colunas_item_homologado <- c(
+  "numero_controle_pncp",
+  "codigo_item_catalogo",
+  "cnpj_contratante",
+  "codigo_unidade_contratante",
+  "cnpj_contratante_subrogado",
+  "codigo_unidade_contratante_subrogado",
+  "niFornecedor",                      # Essa coluna vem dos resultados
+  "numero_item",
+  "descricao",
+  "unidade_medida",
+  "material_servico",
+  "codigo_categoria_item",
+  "nome_categoria_item",
+  "codigo_catalogo",
+  "nome_catalogo",
+  "codigo_categoria_item_catalogo",
+  "nome_categoria_item_catalogo",
+  "codigo_item_catalogo_pncp",
+  "codigo_ncm_nbs",
+  "descricao_ncm_nbs",
+  "codigo_criterio_julgamento",
+  "nome_criterio_julgamento",
+  "codigo_situacao_item",
+  "nome_situacao_item",
+  "codigo_tipo_beneficio",
+  "nome_tipo_beneficio",
+  "orcamento_sigiloso",
+  "valor_unitario_estimado",
+  "valor_total_estimado",
+  "quantidade_estimada",
+  "situacaoCompraItemResultadoId",     # Essa coluna vem dos resultados
+  "situacaoCompraItemResultadoNome",   # Essa coluna vem dos resultados
+  "valorUnitarioHomologado",           # Essa coluna vem dos resultados
+  "valorTotalHomologado",              # Essa coluna vem dos resultados
+  "quantidadeHomologada",              # Essa coluna vem dos resultados
+  "moedaEstrangeira",                  # Essa coluna vem dos resultados
+  "valorNominalMoedaEstrangeira",      # Essa coluna vem dos resultados
+  "dataResultado",                     # Essa coluna vem dos resultados
+  "dataCancelamento",                  # Essa coluna vem dos resultados
+  "motivoCancelamento",                # Essa coluna vem dos resultados
+  "url_api",
+  "url_pncp"
+)
+
+tb_item_homologado <- tb_item_licitado %>%
+  inner_join(
+    resultados,
+    by = join_by(numero_controle_pncp == numeroControlePNCPCompra, numero_item == numeroItem),
+    suffix = c("", "Resultado"),
+    multiple = "first" # se ouver mais de um resultado, usar só o primeiro
+  ) %>% 
+  select(any_of(colunas_item_homologado))
+
+query_item_homologado <- "
+    INSERT INTO item_homologado (
+        numero_controle_pncp, codigo_item_catalogo,
+        cnpj_contratante, codigo_unidade_contratante,
+        cnpj_contratante_subrogado, codigo_unidade_contratante_subrogado,
+        ni_fornecedor,
+        numero_item, descricao, unidade_medida, material_servico,
+        codigo_categoria_item, nome_categoria_item,
+        codigo_catalogo, nome_catalogo,
+        codigo_categoria_item_catalogo, nome_categoria_item_catalogo,
+        codigo_item_catalogo_pncp,
+        codigo_ncm_nbs, descricao_ncm_nbs,
+        codigo_criterio_julgamento, nome_criterio_julgamento,
+        codigo_situacao_item, nome_situacao_item,
+        codigo_tipo_beneficio, nome_tipo_beneficio,
+        orcamento_sigiloso,
+        valor_unitario_estimado, valor_total_estimado, quantidade_estimada,
+        codigo_situacao_resultado, nome_situacao_resultado,
+        valor_unitario_homologado, valor_total_homologado, quantidade_homologada,
+        moeda_estrangeira, valor_nominal_moeda_estrangeira,
+        data_resultado, data_cancelamento, motivo_cancelamento,
+        url_api, url_pncp)
+    VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
+        $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,
+        $21, $22, $23, $24, $25, $26, $27, $28, $29, $30,
+        $31, $32, $33, $34, $35, $36, $37, $38, $39, $40,
+        $41, $42)
+    ON CONFLICT (numero_controle_pncp, numero_item) DO NOTHING;
+"
+
+# Loop para inserir os itens homologados
+for (i in 1:nrow(tb_item_homologado)) {
+  tryCatch({
+    dbExecute(con, query_item_homologado, params = as.list(unname(tb_item_homologado[i, colunas_item_homologado])))
+  }, error = function(e) {
+    message(
+      sprintf(
+        "Erro ao inserir o item %s, %i: %s",
+        tb_item_homologado[[i, 'data.numeroControlePNCP']],
+        tb_item_homologado[[i, 'numeroItem']],
+        e$message
+      )
+    )
+  })
+}
 
 
 # REMOVE ITENS HOMOLOGADOS DA TABELA ITEM_LICITADO ------------------------
@@ -64,3 +186,5 @@
 #' feche a conexão com o banco e FIM.
 
 
+# Fecha a conexão com o BD
+dbDisconnect(con)
