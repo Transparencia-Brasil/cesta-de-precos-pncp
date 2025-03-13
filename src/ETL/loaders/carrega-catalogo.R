@@ -59,8 +59,11 @@ colunas_catalogo <- c(
 )
 
 tb_catalogo <- catalogo %>% select(all_of(colunas_catalogo)) %>%
+  mutate( # Seleciona atributos de interesse
+    caracteristicas = map(buscaItemCaracteristica, ~ select(.x, nomeCaracteristica, caracteristicaObrigatoria, nomeValorCaracteristica))
+  ) %>%
   mutate( # transforma as características em um JSON
-    caracteristicas = map(buscaItemCaracteristica, ~ toJSON(.x, auto_unbox = TRUE)),
+    caracteristicas = map(caracteristicas, ~ toJSON(.x, auto_unbox = TRUE)),
     unidade_fornecimento = map(unidadeFornecimento, ~ toJSON(.x, auto_unbox = TRUE))
   ) %>%
   mutate( # transforma o JSON em character (string)
