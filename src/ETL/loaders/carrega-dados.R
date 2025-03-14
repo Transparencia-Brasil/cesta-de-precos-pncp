@@ -18,6 +18,8 @@ suppressPackageStartupMessages(library(purrr))
 suppressPackageStartupMessages(library(DBI))
 suppressPackageStartupMessages(library(RPostgres))
 
+source(here("src/ETL/loaders/utils.R"))
+
 # LÊ ARQUIVOS  ------------------------------------------------------------
 
 # Captura os argumentos da linha de comando
@@ -55,7 +57,7 @@ contratacoes <- contratacoes %>% filter(!is.na(endpoint))
 medicamentos <- medicamentos %>% filter(!is.na(endpoint))
 resultados <- resultados %>% filter(!is.na(endpoint))
 
-# Cria chaves para fazer joins e adiciona URLs úteis
+# Cria chaves para fazer joins e adiciona a url do item na API
 medicamentos <- medicamentos %>%
   mutate(
     endpointResultado = paste0(endpoint, "/", numeroItem, "/resultados"),
@@ -63,7 +65,7 @@ medicamentos <- medicamentos %>%
     urlAPI = paste0(endpoint, "/", numeroItem)
   )
 
-# Cria chaves para fazer joins e adiciona URLs úteis
+# Cria chaves para fazer joins e adiciona a url da contratacao no PNCP
 contratacoes <- contratacoes %>%
   mutate(
     endpoint = paste0(
@@ -88,236 +90,99 @@ contratacoes <- contratacoes %>%
 contratacoes <- contratacoes %>%
   semi_join(medicamentos, by = join_by(endpoint == endpointContratacao))
 
-# Constrói o dataset de itens homologados (itens com resultado)
-itens_homologados <- medicamentos %>%
-  inner_join(
-    resultados,
-    by = join_by(endpointResultado == endpoint),
-    suffix = c("", "Resultado"),
-    multiple = "first"
-  ) %>% # se ouver mais de um resultado, usar só o primeiro
-  inner_join(
-    contratacoes,
-    by = join_by(endpointContratacao == endpoint),
-    suffix = c("", "Contratacao")
-  )
-
-# Constrói o dataset de itens ainda não homologados (itens sem resultado)
-itens_licitados <- medicamentos %>%
-  anti_join(resultados, by = join_by(endpointResultado == endpoint)) %>%
-  inner_join(
-    contratacoes,
-    by = join_by(endpointContratacao == endpoint),
-    suffix = c("", "Contratacao")
-  )
-
 
 # EXTRAI TABELAS----------------------------------------------------------
 
-colunas_contratante <- c(
-  "data.orgaoEntidade.cnpj",
-  "data.orgaoEntidade.razaoSocial",
-  "data.orgaoEntidade.esferaId",
-  "data.orgaoEntidade.poderId",
-  "data.unidadeOrgao.codigoUnidade",
-  "data.unidadeOrgao.nomeUnidade",
-  "data.unidadeOrgao.codigoIbge",
-  "data.unidadeOrgao.municipioNome",
-  "data.unidadeOrgao.ufSigla",
-  "data.unidadeOrgao.ufNome"
-)
-
-colunas_contratante_subrogado <- c(
-  "data.orgaoSubRogado.cnpj",
-  "data.orgaoSubRogado.razaoSocial",
-  "data.orgaoSubRogado.esferaId",
-  "data.orgaoSubRogado.poderId",
-  "data.unidadeSubRogada.codigoUnidade",
-  "data.unidadeSubRogada.nomeUnidade",
-  "data.unidadeSubRogada.codigoIbge",
-  "data.unidadeSubRogada.municipioNome",
-  "data.unidadeSubRogada.ufSigla",
-  "data.unidadeSubRogada.ufNome"
-)
-
-colunas_fornecedor <- c(
-  "niFornecedor",
-  "nomeRazaoSocialFornecedor",
-  "codigoPais",
-  "tipoPessoa",
-  "porteFornecedorId",
-  "porteFornecedorNome",
-  "naturezaJuridicaId",
-  "naturezaJuridicaNome"
-)
-
-colunas_contratacao <- c(
-  "data.numeroControlePNCP",
-  "data.anoCompra",
-  "data.sequencialCompra",
-  "data.objetoCompra",
-  "data.dataAberturaProposta",
-  "data.dataEncerramentoProposta",
-  "data.valorTotalEstimado",
-  "data.valorTotalHomologado",
-  "data.srp",
-  "data.tipoInstrumentoConvocatorioCodigo",
-  "data.tipoInstrumentoConvocatorioNome",
-  "data.modalidadeId",
-  "data.modalidadeNome",
-  "data.amparoLegal.codigo",
-  "data.amparoLegal.nome",
-  "data.modoDisputaId",
-  "data.modoDisputaNome"
-)
-
-colunas_item_homologado <- c(
-  "data.numeroControlePNCP",
-  "codigo_br",
-  "data.orgaoEntidade.cnpj",
-  "data.unidadeOrgao.codigoUnidade",
-  "data.orgaoSubRogado.cnpj",
-  "data.unidadeSubRogada.codigoUnidade",
-  "niFornecedor",
-  "numeroItem",
-  "descricao",
-  "unidadeMedida",
-  "materialOuServico",
-  "itemCategoriaId",
-  "itemCategoriaNome",
-  "catalogo.id",
-  "catalogo.nome",
-  "categoriaItemCatalogo.id",
-  "categoriaItemCatalogo.nome",
-  "catalogoCodigoItem",
-  "ncmNbsCodigo",
-  "ncmNbsDescricao",
-  "criterioJulgamentoId",
-  "criterioJulgamentoNome",
-  "situacaoCompraItem",
-  "situacaoCompraItemNome",
-  "tipoBeneficio",
-  "tipoBeneficioNome",
-  "orcamentoSigiloso",
-  "valorUnitarioEstimado",
-  "valorTotal",
-  "quantidade",
-  "situacaoCompraItemResultadoId",
-  "situacaoCompraItemResultadoNome",
-  "valorUnitarioHomologado",
-  "valorTotalHomologado",
-  "quantidadeHomologada",
-  "moedaEstrangeira",
-  "valorNominalMoedaEstrangeira",
-  "dataResultado",
-  "dataCancelamento",
-  "motivoCancelamento",
-  "urlAPI",
-  "urlPNCP"
-)
-
-colunas_item_licitado <- c(
-  "data.numeroControlePNCP",
-  "codigo_br",
-  "data.orgaoEntidade.cnpj",
-  "data.unidadeOrgao.codigoUnidade",
-  "data.orgaoSubRogado.cnpj",
-  "data.unidadeSubRogada.codigoUnidade",
-  "numeroItem",
-  "descricao",
-  "unidadeMedida",
-  "materialOuServico",
-  "itemCategoriaId",
-  "itemCategoriaNome",
-  "catalogo.id",
-  "catalogo.nome",
-  "categoriaItemCatalogo.id",
-  "categoriaItemCatalogo.nome",
-  "catalogoCodigoItem",
-  "ncmNbsCodigo",
-  "ncmNbsDescricao",
-  "criterioJulgamentoId",
-  "criterioJulgamentoNome",
-  "situacaoCompraItem",
-  "situacaoCompraItemNome",
-  "tipoBeneficio",
-  "tipoBeneficioNome",
-  "orcamentoSigiloso",
-  "valorUnitarioEstimado",
-  "valorTotal",
-  "quantidade",
-  "urlAPI",
-  "urlPNCP"
-)
-
 # Cria a tabela "contratante"
 {
-  # Junta os contratantes dos itens homologados e apenas licitados
-  tb_contratante <- itens_homologados %>% select(all_of(colunas_contratante)) %>%
-    bind_rows(itens_licitados %>% select(all_of(colunas_contratante))) %>%
+  # Todos os contratantes coletados
+  tb_contratante <- contratacoes %>% select(all_of(COLUNAS_CONTRATANTE))
+  
+  # Todos os contratantes subrogados coletados
+  tb_contratante_subrogado <- contratacoes %>%
+    select(all_of(COLUNAS_CONTRATANTE_SUBROGADO)) %>%
+    filter(!is.na(data.orgaoSubRogado.cnpj) &
+             !is.na(data.unidadeSubRogada.codigoUnidade))
+  
+  # Deixa os dataframes com os mesmos nomes de colunas (para uní-los)
+  names(tb_contratante_subrogado) <- names(tb_contratante)
+  
+  # Certifica-se que os dataframes possuem colunas de mesmo tipo (para uní-los)
+  tb_contratante_subrogado <- map2_dfr(tb_contratante_subrogado, tb_contratante, ~ as(.x, class(.y)))
+  
+  # Une os dataframes em uma única tabela de contratantes
+  tb_contratante <- bind_rows(tb_contratante, tb_contratante_subrogado) %>%
     distinct(data.orgaoEntidade.cnpj,
              data.unidadeOrgao.codigoUnidade,
              .keep_all = TRUE)
-  
-  # Cria a tabela "contratante subrogado". O Contratante subrogado é inserido
-  # na mesma tabela que os demais contratantes.
-  tb_contratante_subrogado <- itens_homologados %>% select(all_of(colunas_contratante_subrogado)) %>%
-    bind_rows(itens_licitados %>% select(all_of(colunas_contratante_subrogado))) %>%
-    filter(!is.na(data.orgaoSubRogado.cnpj) &
-             !is.na(data.unidadeSubRogada.codigoUnidade)) %>%
-    distinct(data.orgaoSubRogado.cnpj,
-             data.unidadeSubRogada.codigoUnidade,
-             .keep_all = TRUE)
-  
-  # Deixa as tabelas de contratante e contratante subrogado com as mesmas colunas
-  names(tb_contratante_subrogado) <- names(tb_contratante)
-  # Certifica-se que as tabelas possuem colunas de mesmo tipo
-  tb_contratante_subrogado <- map2_dfr(tb_contratante_subrogado, tb_contratante, ~ as(.x, class(.y)))
-  # Une as tabelas em um único dataframe
-  tb_contratante <- bind_rows(tb_contratante, tb_contratante_subrogado)
 }
-
 
 # Cria a tabela "contratacao"
 {
-  tb_contratacao <- itens_homologados %>% select(all_of(colunas_contratacao)) %>%
-    bind_rows(itens_licitados %>% select(all_of(colunas_contratacao))) %>%
+  tb_contratacao <- contratacoes %>%
+    select(all_of(COLUNAS_CONTRATACAO)) %>%
     distinct(data.numeroControlePNCP, .keep_all = TRUE)
 }
 
 # Cria a tabela "fornecedor"
 {
-  tb_fornecedor <- itens_homologados %>%
-    select(all_of(colunas_fornecedor)) %>%
+  tb_fornecedor <- resultados %>%
+    select(all_of(COLUNAS_FORNECEDOR)) %>%
     distinct(niFornecedor, .keep_all = TRUE)
 }
 
-# Cria a tabela "item_homologado"
+# Cria a tabela "item_homologado" (item com resultado)
 {
-  tb_item_homologado <- itens_homologados %>%
-    select(any_of(colunas_item_homologado))
+  # Une as contratações, itens e resultados em um único dataframe
+  tb_item_homologado <- medicamentos %>%
+    inner_join(
+      resultados,
+      by = join_by(endpointResultado == endpoint),
+      suffix = c("", "Resultado"),
+      multiple = "first"
+    ) %>% # se ouver mais de um resultado, usar só o primeiro
+    inner_join(
+      contratacoes,
+      by = join_by(endpointContratacao == endpoint),
+      suffix = c("", "Contratacao")
+    )
+  
+  # Seleciona apenas as colunas que serão inseridas no banco de dados
+  tb_item_homologado <- tb_item_homologado %>% select(any_of(COLUNAS_ITEM_HOMOLOGADO))
+  
   # Se houver colunas faltantes, elas são preenchidas como NA
-  colunas_faltantes <- setdiff(colunas_item_homologado, names(tb_item_homologado))
+  colunas_faltantes <- setdiff(COLUNAS_ITEM_HOMOLOGADO, names(tb_item_homologado))
   for (col in colunas_faltantes) {
     tb_item_homologado[col] <- NA
   }
-  # Ordena as colunas
-  tb_item_homologado <- tb_item_homologado[colunas_item_homologado]
+  
+  # Organiza as colunas na ordem correta de inserção
+  tb_item_homologado <- tb_item_homologado[COLUNAS_ITEM_HOMOLOGADO]
 }
 
-# Cria a tabela "item_licitado"
+# Cria a tabela "item_licitado" (item sem resultado)
 {
-  tb_item_licitado <- itens_licitados %>%
-    select(any_of(colunas_item_licitado))
+  # Seleciona apenas os itens que não possuem resultado
+  tb_item_licitado <- medicamentos %>%
+    anti_join(resultados, by = join_by(endpointResultado == endpoint)) %>%
+    inner_join(
+      contratacoes,
+      by = join_by(endpointContratacao == endpoint),
+      suffix = c("", "Contratacao")
+    )
+  
+  # Seleciona apenas as colunas que serão inseridas no banco de dados
+  tb_item_licitado <- tb_item_licitado %>% select(any_of(COLUNAS_ITEM_LICITADO))
+  
   # Se houver colunas faltantes, elas são preenchidas como NA
-  colunas_faltantes <- setdiff(colunas_item_licitado, names(tb_item_licitado))
+  colunas_faltantes <- setdiff(COLUNAS_ITEM_LICITADO, names(tb_item_licitado))
   for (col in colunas_faltantes) {
     tb_item_licitado[col] <- NA
   }
-  # Ordena as colunas
-  tb_item_licitado <- tb_item_licitado[colunas_item_licitado]
+  
+  # Organiza as colunas na ordem correta de inserção
+  tb_item_licitado <- tb_item_licitado[COLUNAS_ITEM_LICITADO]
 }
-
 
 # CONECTA-SE  COM O BD ----------------------------------------------------
 
@@ -339,51 +204,26 @@ con <- dbConnect(
 
 # INSERE OS DADOS ---------------------------------------------------------
 
-query_contratante <- "
+consulta_insere_contratante <- "
     INSERT INTO contratante (cnpj, razao_social, esfera, poder, codigo_unidade,
     nome_unidade, codigo_ibge_municipio, nome_municipio, sigla_uf, nome_uf)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     ON CONFLICT (cnpj, codigo_unidade) DO NOTHING
 "
 
-# Loop para inserir os contratantes
-for (i in 1:nrow(tb_contratante)) {
-  tryCatch({
-    dbExecute(con, query_contratante, params = as.list(unname(tb_contratante[i, colunas_contratante])))
-  }, error = function(e) {
-    message(
-      sprintf(
-        "Erro ao inserir o contratante %d (órgão) %d (unidade): %s",
-        tb_contratante[[i, 'data.orgaoEntidade.cnpj']],
-        tb_contratante[[i, 'data.unidadeOrgao.codigoUnidade']],
-        e$message
-      )
-    )
-  })
-}
+insere_tabela(con, tb_contratante, consulta_insere_contratante)
 
-query_fornecedor <- "
+consulta_insere_fornecedor <- "
     INSERT INTO fornecedor (ni, nome, codigo_pais, tipo_pessoa, codigo_porte,
     nome_porte, codigo_natureza_juridica, nome_natureza_juridica)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     ON CONFLICT (ni) DO NOTHING
 "
 
-# Loop para inserir os fornecedores
-for (i in 1:nrow(tb_fornecedor)) {
-  tryCatch({
-    dbExecute(con, query_fornecedor, params = as.list(unname(tb_fornecedor[i, colunas_fornecedor])))
-  }, error = function(e) {
-    message(sprintf(
-      "Erro ao inserir o fornecedor %s: %s",
-      tb_fornecedor[[i, 'niFornecedor']],
-      e$message
-    ))
-  })
-}
+insere_tabela(con, tb_fornecedor, consulta_insere_fornecedor)
 
 # Insere uma contratação nova ou, caso a contratação já exista no banco, atualiza os campos
-query_contratacao <- "
+consulta_insere_contratacao <- "
 INSERT INTO contratacao (
     numero_controle_pncp, ano_compra, sequencial_compra, objeto_compra,
     data_abertura_proposta, data_encerramento_proposta,
@@ -412,21 +252,10 @@ DO UPDATE SET
     nome_modo_disputa = $17;
 "
 
-# Loop para inserir as contratacoes
-for (i in 1:nrow(tb_contratacao)) {
-  tryCatch({
-    dbExecute(con, query_contratacao, params = as.list(unname(tb_contratacao[i, colunas_contratacao])))
-  }, error = function(e) {
-    message(sprintf(
-      "Erro ao inserir a contratação %s: %s",
-      tb_contratacao[[i, 'data.numeroControlePNCP']],
-      e$message
-    ))
-  })
-}
+insere_tabela(con, tb_contratacao, consulta_insere_contratacao)
 
 # Insere um item novo ou, caso o item já exista no banco, atualiza os campos
-query_item_homologado <- "
+consulta_insere_item_homologado <- "
     INSERT INTO item_homologado (
         numero_controle_pncp, codigo_item_catalogo,
         cnpj_contratante, codigo_unidade_contratante,
@@ -494,24 +323,10 @@ query_item_homologado <- "
         motivo_cancelamento = $40;
 "
 
-# Loop para inserir os itens homologados
-for (i in 1:nrow(tb_item_homologado)) {
-  tryCatch({
-    dbExecute(con, query_item_homologado, params = as.list(unname(tb_item_homologado[i, colunas_item_homologado])))
-  }, error = function(e) {
-    message(
-      sprintf(
-        "Erro ao inserir o item %s, %i: %s",
-        tb_item_homologado[[i, 'data.numeroControlePNCP']],
-        tb_item_homologado[[i, 'numeroItem']],
-        e$message
-      )
-    )
-  })
-}
+insere_tabela(con, tb_item_homologado, consulta_insere_item_homologado)
 
 # Insere um item novo ou, caso o item já exista no banco, atualiza os campos
-query_item_licitado <- "
+consulta_insere_item_licitado <- "
     INSERT INTO item_licitado (
         numero_controle_pncp, codigo_item_catalogo,
         cnpj_contratante, codigo_unidade_contratante,
@@ -561,21 +376,7 @@ query_item_licitado <- "
         quantidade_estimada = $29;
 "
 
-# Loop para inserir os itens homologados
-for (i in 1:nrow(tb_item_licitado)) {
-  tryCatch({
-    dbExecute(con, query_item_licitado, params = as.list(unname(tb_item_licitado[i, colunas_item_licitado])))
-  }, error = function(e) {
-    message(
-      sprintf(
-        "Erro ao inserir o item %s, %d: %s",
-        tb_item_licitado[[i, 'data.numeroControlePNCP']],
-        tb_item_licitado[[i, 'numeroItem']],
-        e$message
-      )
-    )
-  })
-}
+insere_tabela(con, tb_item_licitado, consulta_insere_item_licitado)
 
 # Fecha a conexão com o BD
 dbDisconnect(con)
