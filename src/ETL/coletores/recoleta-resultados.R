@@ -77,6 +77,17 @@ coleta(endpoints = endpoints_resultados, output_dir = PATH_OUTPUT_DIR)
 CAMINHO_RESULTADOS <- here(PATH_OUTPUT_DIR, "dados.csv")
 resultados <- read_csv(CAMINHO_RESULTADOS, show_col_types = FALSE)
 
+colunas_fornecedor <- c(
+  "niFornecedor",
+  "nomeRazaoSocialFornecedor",
+  "codigoPais",
+  "tipoPessoa",
+  "porteFornecedorId",
+  "porteFornecedorNome",
+  "naturezaJuridicaId",
+  "naturezaJuridicaNome"
+)
+
 colunas_item_homologado <- c(
   "numero_controle_pncp",
   "codigo_item_catalogo",
@@ -122,6 +133,14 @@ colunas_item_homologado <- c(
   "url_pncp"
 )
 
+# Cria a tabela "fornecedor"
+{
+  tb_fornecedor <- resultados %>%
+    select(all_of(colunas_fornecedor)) %>%
+    distinct(niFornecedor, .keep_all = TRUE)
+}
+
+# Une os resultados dos itens ao restante das informações
 tb_item_homologado <- tb_item_licitado %>%
   inner_join(
     resultados,
@@ -129,7 +148,28 @@ tb_item_homologado <- tb_item_licitado %>%
     suffix = c("", "Resultado"),
     multiple = "first" # se ouver mais de um resultado, usar só o primeiro
   ) %>% 
-  select(any_of(colunas_item_homologado))
+  select(all_of(colunas_item_homologado))
+
+
+query_fornecedor <- "
+    INSERT INTO fornecedor (ni, nome, codigo_pais, tipo_pessoa, codigo_porte,
+    nome_porte, codigo_natureza_juridica, nome_natureza_juridica)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    ON CONFLICT (ni) DO NOTHING
+"
+
+# Loop para inserir os fornecedores
+for (i in 1:nrow(tb_fornecedor)) {
+  tryCatch({
+    dbExecute(con, query_fornecedor, params = as.list(unname(tb_fornecedor[i, colunas_fornecedor])))
+  }, error = function(e) {
+    message(sprintf(
+      "Erro ao inserir o fornecedor %s: %s",
+      tb_fornecedor[[i, 'niFornecedor']],
+      e$message
+    ))
+  })
+}
 
 query_item_homologado <- "
     INSERT INTO item_homologado (
@@ -162,10 +202,11 @@ query_item_homologado <- "
     ON CONFLICT (numero_controle_pncp, numero_item) DO NOTHING;
 "
 
+
 # Loop para inserir os itens homologados
 for (i in 1:nrow(tb_item_homologado)) {
   tryCatch({
-    dbExecute(con, query_item_homologado, params = as.list(unname(tb_item_homologado[i, colunas_item_homologado])))
+    dbExecute(con, query_item_homologado, params = as.list(unname(tb_item_homologado[i, ])))
   }, error = function(e) {
     message(
       sprintf(
@@ -181,10 +222,33 @@ for (i in 1:nrow(tb_item_homologado)) {
 
 # REMOVE ITENS HOMOLOGADOS DA TABELA ITEM_LICITADO ------------------------
 
-#' Agora, para os itens que foram homologados, remova-os da tabela item_licitado 
-#' pela chave (numero_controle_pncp, numero_item)
-#' feche a conexão com o banco e FIM.
+ids_itens_homologados <- tb_item_homologado %>% select(numero_controle_pncp, numero_item)
 
+# Iniciar a transação manualmente
+dbBegin(con)
+
+# Cria tabela temporária no PostgreSQL
+dbExecute(
+  con,
+  "CREATE TEMP TABLE temp_ids (
+      numero_controle_pncp VARCHAR(30),
+      numero_item INTEGER,
+      PRIMARY KEY (numero_controle_pncp, numero_item)) ON COMMIT DROP"
+)
+
+# Inseri os IDs na tabela temporária
+dbWriteTable(con, "temp_ids", ids_itens_homologados, append = TRUE, row.names = FALSE)
+
+# Executa o DELETE usando JOIN
+dbExecute(
+  con, 
+  "DELETE FROM item_licitado USING temp_ids 
+  WHERE item_licitado.numero_controle_pncp = temp_ids.numero_controle_pncp
+  AND item_licitado.numero_item = temp_ids.numero_item"
+)
+
+# Confirmar as mudanças (commit da transação)
+dbCommit(con)
 
 # Fecha a conexão com o BD
 dbDisconnect(con)
