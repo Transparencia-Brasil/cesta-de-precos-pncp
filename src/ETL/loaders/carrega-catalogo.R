@@ -18,6 +18,8 @@ suppressPackageStartupMessages(library(purrr))
 suppressPackageStartupMessages(library(DBI))
 suppressPackageStartupMessages(library(RPostgres))
 
+source(here("src/ETL/loaders/utils.R"))
+
 # LÊ ARQUIVOS  ------------------------------------------------------------
 
 # Captura os argumentos da linha de comando
@@ -44,21 +46,7 @@ catalogo <- read_csv(CAMINHO_CATALOGO, show_col_types = FALSE)
 
 # TRANSFORMA A TABELA -----------------------------------------------------
 
-colunas_catalogo <- c(
-  "codigo_classe",
-  "nome_classe",
-  "codigo_pdm",
-  "nome_pdm",
-  "codigo_br",
-  "nome_item",
-  "item_suspenso",
-  "item_ativo",
-  "item_sustentavel",
-  "buscaItemCaracteristica",
-  "unidadeFornecimento"
-)
-
-tb_catalogo <- catalogo %>% select(all_of(colunas_catalogo)) %>%
+tb_catalogo <- catalogo %>% select(all_of(COLUNAS_CATALOGO)) %>%
   mutate( # Seleciona atributos de interesse
     caracteristicas = map(buscaItemCaracteristica, ~ select(.x, nomeCaracteristica, caracteristicaObrigatoria, nomeValorCaracteristica))
   ) %>%
@@ -93,15 +81,7 @@ con <- dbConnect(
 
 # INSERE OS DADOS ---------------------------------------------------------
 
-query <- "INSERT INTO catalogo (codigo_classe, nome_classe, codigo_pdm, nome_pdm,
-codigo_item, nome_item, item_suspenso, item_ativo, item_sustentavel, características,
-unidades_fornecimento)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11::jsonb)
-ON CONFLICT (codigo_item) DO NOTHING;"
-
-for (i in 1:nrow(tb_catalogo)) {
-  dbExecute(con, query, params = as.list(unname(tb_catalogo[i, ])))
-}
+insere_tabela(con, tb_catalogo, CONSULTA_INSERIR_CATALOGO)
 
 # Fechar conexão
 dbDisconnect(con)
