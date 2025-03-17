@@ -27,7 +27,7 @@ suppressPackageStartupMessages(library(readr))
 suppressPackageStartupMessages(library(DBI))
 suppressPackageStartupMessages(library(RPostgres))
 
-source(here("src/ETL/coletores/funcoes.R"))
+source(here("src/ETL/coletores/utils.R"))
 source(here("src/ETL/loaders/utils.R"))
 
 # PARÂMETROS DE ENTRADAS --------------------------------------------------
