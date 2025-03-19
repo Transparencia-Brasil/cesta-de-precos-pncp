@@ -25,7 +25,7 @@ input_dir <- "tasks/unifica-dados/input"
 #' @param drive_url URL da pasta no Google Drive de onde os arquivos serão baixados.
 #' @param pattern Padrão de correspondência para filtrar os arquivos a serem baixados.
 #' @param input_dir Diretório local onde os arquivos serão salvos.
-#' @param local_files Lista de arquivos locais para mapear os nomes dos arquivos baixados.
+#' @param local_files named vector com nomes de arquivos locais para mapear os nomes dos arquivos baixados.
 #'
 #' @return Um data frame contendo informações sobre os arquivos baixados, incluindo seus IDs e caminhos locais.
 #'
@@ -39,9 +39,26 @@ download_from_googledrive <- function(drive_url, pattern, input_dir, local_files
   return(files)
 }
 
+# COLETA I ---------------------------------------------------------------------
+
+# URL da pasta no Google Drive para a coleta II
+coleta1_url <- "https://drive.google.com/drive/folders/1A9mNmKapHchsy9qqXCdg2xAh9pnnOWaJ"
+
+# Mapeamento dos arquivos a serem baixados e seus nomes locais
+coleta1_files <- c(
+  "10-itens-da-contratacao-2024-03-06.rds" = "itens1.rds"
+)
+
+# Criação de um padrão regex para filtrar os arquivos no Google Drive
+coleta1_pattern <- paste0(names(coleta1_files), collapse = "|")
+
+# Realiza o download dos arquivos do Google Drive para o diretório local
+coleta1_dir <- download_from_googledrive(coleta1_url, coleta1_pattern, input_dir, coleta1_files)
+
 # COLETA II --------------------------------------------------------------------
 
 # URL da pasta no Google Drive para a coleta II
+
 coleta2_url <- "https://drive.google.com/drive/folders/1ZZ5ysQixMzT4srwCpirGhGsm9OpWeKy9"
 
 # Mapeamento dos arquivos a serem baixados e seus nomes locais
