@@ -363,7 +363,7 @@ suppressPackageStartupMessages(library(DBI))
 #' @import DBI
 #' @import RPostgres
 insere_tabela <- function(con, tabela, consulta) {
-  for (i in 1:nrow(tabela)) {
+  for (i in seq_len(nrow(tabela))) {
     tryCatch({
       dbExecute(con, consulta, params = as.list(unname(tabela[i, ])))
     }, error = function(e) {
