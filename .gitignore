@@ -28,6 +28,7 @@ vignettes/*.pdf
 .Renviron
 project.Rproj
 
-# arquivos específicos
-catalogo-vetorizado.csv
+# Arquivos específicos
 valida-rotulagem.ipynb
+catalogo-vetorizado.csv
+

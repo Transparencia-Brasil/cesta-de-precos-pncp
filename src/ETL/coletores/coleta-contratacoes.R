@@ -20,7 +20,7 @@ suppressPackageStartupMessages(library(here))
 suppressPackageStartupMessages(library(lubridate))
 suppressPackageStartupMessages(library(readr))
 
-source(here("src/coletores/funcoes.R"))
+source(here("src/ETL/coletores/utils.R"))
 
 # PARAMETROS --------------------------------------------------------------
 
