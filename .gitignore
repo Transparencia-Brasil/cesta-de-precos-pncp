@@ -31,3 +31,11 @@ project.Rproj
 # arquivos específicos
 catalogo-vetorizado.csv
 valida-rotulagem.ipynb
+tasks/unifica-dados/input/contratacoes2.rds
+tasks/unifica-dados/input/contratacoes3.csv
+tasks/unifica-dados/input/contratacoes3.rds
+tasks/unifica-dados/input/itens2_resultados.rds
+tasks/unifica-dados/input/itens2-resultados.rds
+tasks/unifica-dados/input/itens2.rds
+tasks/unifica-dados/input/itens3-resultados.rds
+tasks/unifica-dados/input/itens3.rds
