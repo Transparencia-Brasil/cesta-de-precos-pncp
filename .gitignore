@@ -27,6 +27,8 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 project.Rproj
+
 # Arquivos específicos
 valida-rotulagem.ipynb
 catalogo-vetorizado.csv
+

@@ -44,7 +44,9 @@ print('\rValidando os argumentos.', end="", flush=True)
 
 # Define os parâmetros 'itens'e 'catalogo'
 parser = argparse.ArgumentParser()
-parser.add_argument("itens", help="Caminho para o arquivo .rds de itens de contratações.")
+# arquivos são csvs
+parser.add_argument("itens", help="Caminho para o arquivo .csv de itens de contratações.")
+parser.add_argument("catalogo", help="Caminho para o arquivo .csv de catálogo de medicamentos.")
 parser.add_argument("catalogo", help="Caminho para o arquivo .rds de catálogo de medicamentos.")
 
 args = parser.parse_args()
