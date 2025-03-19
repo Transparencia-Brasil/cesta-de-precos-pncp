@@ -1,3 +1,7 @@
+#' ---
+#' Unifica coletas de contratações
+#' ---
+#'
 #' Este script une os dados de contratações de medicamentos.
 #' Esta unificação busca facilitar a análise de variação de preços de medicamentos.
 #'
@@ -19,9 +23,9 @@ INPUT_DIR <- "tasks/unifica-dados/input"
 # os arquivos unificados ficarão salvos na pasta "output"
 OUTPUT_DIR <- "tasks/unifica-dados/output"
 
-# Arquivo: https://drive.google.com/file/d/1Al2pfTFfa_ODGgHlq7ApiyfAnpJpbuEK/view?usp=drive_link
+# Arquivo: https://drive.google.com/file/d/1Al2pfTFfa_ODGgHlq7ApiyfAnpJpbuEK
 CAMINHO_CONTRATACOES_COLETA2 <- here(INPUT_DIR, "contratacoes2.rds")
-# Arquivo: https://drive.google.com/file/d/1VfrLyZoGOoc9ugF2lvLeKwcBbiReVpZm/view?usp=drive_link
+# Arquivo: https://drive.google.com/file/d/1VfrLyZoGOoc9ugF2lvLeKwcBbiReVpZm
 CAMINHO_CONTRATACOES_COLETA3 <- here(INPUT_DIR, "contratacoes3.rds")
 
 # CARREGA COLETAS --------------------------------------------------------------
