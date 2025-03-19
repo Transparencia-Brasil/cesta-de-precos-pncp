@@ -20,7 +20,7 @@ input_dir <- "tasks/unifica-dados/input"
 
 #' Baixa arquivos do Google Drive
 #'
-#' @description Função para baixar arquivos de uma pasta no Google Drive para um diretório local.
+#' @description Função para baixar arquivos de uma pasta no Google Drive para um diretório local. Esta função utiliza a API do Google Drive para listar e baixar arquivos de uma pasta específica. Os arquivos são filtrados com base no padrão fornecido e salvos no diretório local especificado.
 #'
 #' @param drive_url URL da pasta no Google Drive de onde os arquivos serão baixados.
 #' @param pattern Padrão de correspondência para filtrar os arquivos a serem baixados.
@@ -28,12 +28,13 @@ input_dir <- "tasks/unifica-dados/input"
 #' @param local_files Lista de arquivos locais para mapear os nomes dos arquivos baixados.
 #'
 #' @return Um data frame contendo informações sobre os arquivos baixados, incluindo seus IDs e caminhos locais.
-#' @details Esta função utiliza a API do Google Drive para listar e baixar arquivos de uma pasta específica. Os arquivos são filtrados com base no padrão fornecido e salvos no diretório local especificado.
 #'
 download_from_googledrive <- function(drive_url, pattern, input_dir, local_files) {
-  files <- drive_url %>%
-    drive_ls(pattern = pattern, recursive = TRUE) %>%
-    transmute(file = id, path = here(input_dir, local_files[name])) %>%
+  files <- drive_ls(drive_url, pattern = pattern, recursive = TRUE) %>%
+    transmute(
+      file = id,
+      path = here(input_dir, local_files[name])
+    ) %>%
     pmap_df(drive_download, overwrite = TRUE)
   return(files)
 }
@@ -56,12 +57,7 @@ coleta2_pattern <- names(coleta2_files) %>%
   str_replace_all("\\(|\\)", ".")
 
 # Realiza o download dos arquivos do Google Drive para o diretório local
-coleta2_dir <- download_from_googledrive(
-  drive_url = coleta2_url,
-  pattern = coleta2_pattern,
-  input_dir = input_dir,
-  local_files = coleta2_files
-)
+coleta2_dir <- download_from_googledrive(coleta2_url, coleta2_pattern, input_dir, coleta2_files)
 
 # COLETA III -------------------------------------------------------------------
 
@@ -80,12 +76,7 @@ coleta3_pattern <- names(coleta3_files) %>%
   paste0(collapse = "|")
 
 # Realiza o download dos arquivos do Google Drive para o diretório local
-coleta3_dir <- download_from_googledrive(
-  drive_url = coleta3_url,
-  pattern = coleta3_pattern,
-  input_dir = input_dir,
-  local_files = coleta3_files
-)
+coleta3_dir <- download_from_googledrive(coleta3_url, coleta3_pattern, input_dir, coleta3_files)
 
 # Lê o arquivo CSV baixado, converte todas as colunas para o tipo caractere e salva como RDS
 here(input_dir, "contratacoes3.csv") %>%
