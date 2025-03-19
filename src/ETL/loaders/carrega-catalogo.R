@@ -16,7 +16,6 @@ suppressPackageStartupMessages(library(here))
 suppressPackageStartupMessages(library(jsonlite))
 suppressPackageStartupMessages(library(purrr))
 suppressPackageStartupMessages(library(DBI))
-suppressPackageStartupMessages(library(RPostgres))
 
 source(here("src/ETL/loaders/utils.R"))
 
@@ -63,21 +62,7 @@ tb_catalogo <- catalogo %>% select(all_of(COLUNAS_CATALOGO)) %>%
 
 # CONECTA-SE  COM O BD ----------------------------------------------------
 
-NOME_BD <- "medicamentos-transparentes"
-HOST <- "localhost"
-USUARIO <- "postgres"
-SENHA <- "postgres"
-PORTA <- 5432
-
-con <- dbConnect(
-  RPostgres::Postgres(),
-  dbname = NOME_BD ,
-  host = HOST,
-  user = USUARIO,
-  password = SENHA,
-  port = PORTA
-)
-
+con <- conecta_bd_medicamentos_transparentes()
 
 # INSERE OS DADOS ---------------------------------------------------------
 

@@ -25,7 +25,6 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(here))
 suppressPackageStartupMessages(library(readr))
 suppressPackageStartupMessages(library(DBI))
-suppressPackageStartupMessages(library(RPostgres))
 
 source(here("src/ETL/coletores/utils.R"))
 source(here("src/ETL/loaders/utils.R"))
@@ -42,21 +41,7 @@ PATH_OUTPUT_DIR <- ifelse(length(args) >= 1,
 
 # CONECTA-SE AO BANCO -----------------------------------------------------
 
-NOME_BD <- "medicamentos-transparentes"
-HOST <- "localhost"
-USUARIO <- "postgres"
-SENHA <- "postgres"
-PORTA <- 5432
-
-con <- dbConnect(
-  RPostgres::Postgres(),
-  dbname = NOME_BD ,
-  host = HOST,
-  user = USUARIO,
-  password = SENHA,
-  port = PORTA
-)
-
+con <- conecta_bd_medicamentos_transparentes()
 
 # EXTRAI LISTA DE ITENS AINDA NÃO HOMOLOGADOS -----------------------------
 

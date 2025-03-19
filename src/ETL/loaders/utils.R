@@ -3,10 +3,12 @@
 #' Conteúdo:
 #'  * Mapeamento entre colunas dos arquivos do PNCP e colunas do banco de dados.
 #'  * Consultas de inserção no banco.
+#'  * Função para se conectar ao banco.
 #'  * Função para inserir dados no banco a partir de um dataframe.
 #'
 
 suppressPackageStartupMessages(library(DBI))
+suppressPackageStartupMessages(library(RPostgres))
 
 # Mapeamento entre colunas dos arquivos do PNCP e colunas do banco de dados
 {
@@ -332,6 +334,45 @@ suppressPackageStartupMessages(library(DBI))
         valor_total_estimado = $28, 
         quantidade_estimada = $29;"
 }
+
+
+#' Conecta ao banco de dados "medicamentos-transparentes"
+#'
+#' Esta função estabelece uma conexão com o banco de dados PostgreSQL chamado 
+#' "medicamentos-transparentes", localizado no host "localhost" com as credenciais 
+#' padrão de usuário e senha ("postgres").
+#'
+#' @return Um objeto de conexão do tipo `DBI::DBIConnection`, que pode ser utilizado para 
+#' executar consultas SQL no banco de dados.
+#' @examples
+#' # Criar conexão com o banco de dados
+#' con <- conecta_bd_medicamentos_transparentes()
+#' 
+#' # Verificar se a conexão está ativa
+#' DBI::dbIsValid(con)
+#' 
+#' # Lembre-se de fechar a conexão ao finalizar o uso
+#' DBI::dbDisconnect(con)
+#' @import DBI RPostgres
+conecta_bd_medicamentos_transparentes <- function() {
+  NOME_BD <- "medicamentos-transparentes"
+  HOST <- "localhost"
+  USUARIO <- "postgres"
+  SENHA <- "postgres"
+  PORTA <- 5432
+  
+  con <- dbConnect(
+    RPostgres::Postgres(),
+    dbname = NOME_BD ,
+    host = HOST,
+    user = USUARIO,
+    password = SENHA,
+    port = PORTA
+  )
+  
+  return(con)
+}
+
 
 #' Insere os dados de um dataframe em um banco de dados PostgreSQL
 #'
