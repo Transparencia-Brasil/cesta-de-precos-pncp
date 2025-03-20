@@ -1,0 +1,420 @@
+#' Script auxiliar ao inserir dados no banco.
+#'
+#' Conteúdo:
+#'  * Mapeamento entre colunas dos arquivos do PNCP e colunas do banco de dados.
+#'  * Consultas de inserção no banco.
+#'  * Função para se conectar ao banco.
+#'  * Função para inserir dados no banco a partir de um dataframe.
+#'
+
+suppressPackageStartupMessages(library(DBI))
+suppressPackageStartupMessages(library(RPostgres))
+
+# Mapeamento entre colunas dos arquivos do PNCP e colunas do banco de dados
+{
+  COLUNAS_CATALOGO <- c(
+    "codigo_classe",
+    "nome_classe",
+    "codigo_pdm",
+    "nome_pdm",
+    "codigo_br",
+    "nome_item",
+    "item_suspenso",
+    "item_ativo",
+    "item_sustentavel",
+    "buscaItemCaracteristica",
+    "unidadeFornecimento"
+  )
+  
+  COLUNAS_CONTRATANTE <- c(
+    "data.orgaoEntidade.cnpj",
+    "data.orgaoEntidade.razaoSocial",
+    "data.orgaoEntidade.esferaId",
+    "data.orgaoEntidade.poderId",
+    "data.unidadeOrgao.codigoUnidade",
+    "data.unidadeOrgao.nomeUnidade",
+    "data.unidadeOrgao.codigoIbge",
+    "data.unidadeOrgao.municipioNome",
+    "data.unidadeOrgao.ufSigla",
+    "data.unidadeOrgao.ufNome"
+  )
+  
+  COLUNAS_CONTRATANTE_SUBROGADO <- c(
+    "data.orgaoSubRogado.cnpj",
+    "data.orgaoSubRogado.razaoSocial",
+    "data.orgaoSubRogado.esferaId",
+    "data.orgaoSubRogado.poderId",
+    "data.unidadeSubRogada.codigoUnidade",
+    "data.unidadeSubRogada.nomeUnidade",
+    "data.unidadeSubRogada.codigoIbge",
+    "data.unidadeSubRogada.municipioNome",
+    "data.unidadeSubRogada.ufSigla",
+    "data.unidadeSubRogada.ufNome"
+  )
+  
+  COLUNAS_FORNECEDOR <- c(
+    "niFornecedor",
+    "nomeRazaoSocialFornecedor",
+    "codigoPais",
+    "tipoPessoa",
+    "porteFornecedorId",
+    "porteFornecedorNome",
+    "naturezaJuridicaId",
+    "naturezaJuridicaNome"
+  )
+  
+  COLUNAS_CONTRATACAO <- c(
+    "data.numeroControlePNCP",
+    "data.anoCompra",
+    "data.sequencialCompra",
+    "data.objetoCompra",
+    "data.dataAberturaProposta",
+    "data.dataEncerramentoProposta",
+    "data.valorTotalEstimado",
+    "data.valorTotalHomologado",
+    "data.srp",
+    "data.tipoInstrumentoConvocatorioCodigo",
+    "data.tipoInstrumentoConvocatorioNome",
+    "data.modalidadeId",
+    "data.modalidadeNome",
+    "data.amparoLegal.codigo",
+    "data.amparoLegal.nome",
+    "data.modoDisputaId",
+    "data.modoDisputaNome"
+  )
+  
+  COLUNAS_ITEM_HOMOLOGADO <- c(
+    "data.numeroControlePNCP",
+    "codigo_br",
+    "data.orgaoEntidade.cnpj",
+    "data.unidadeOrgao.codigoUnidade",
+    "data.orgaoSubRogado.cnpj",
+    "data.unidadeSubRogada.codigoUnidade",
+    "niFornecedor",
+    "numeroItem",
+    "descricao",
+    "unidadeMedida",
+    "materialOuServico",
+    "itemCategoriaId",
+    "itemCategoriaNome",
+    "catalogo.id",
+    "catalogo.nome",
+    "categoriaItemCatalogo.id",
+    "categoriaItemCatalogo.nome",
+    "catalogoCodigoItem",
+    "ncmNbsCodigo",
+    "ncmNbsDescricao",
+    "criterioJulgamentoId",
+    "criterioJulgamentoNome",
+    "situacaoCompraItem",
+    "situacaoCompraItemNome",
+    "tipoBeneficio",
+    "tipoBeneficioNome",
+    "orcamentoSigiloso",
+    "valorUnitarioEstimado",
+    "valorTotal",
+    "quantidade",
+    "situacaoCompraItemResultadoId",
+    "situacaoCompraItemResultadoNome",
+    "valorUnitarioHomologado",
+    "valorTotalHomologado",
+    "quantidadeHomologada",
+    "moedaEstrangeira",
+    "valorNominalMoedaEstrangeira",
+    "dataResultado",
+    "dataCancelamento",
+    "motivoCancelamento",
+    "urlAPI",
+    "urlPNCP"
+  )
+  
+  COLUNAS_ITEM_LICITADO <- c(
+    "data.numeroControlePNCP",
+    "codigo_br",
+    "data.orgaoEntidade.cnpj",
+    "data.unidadeOrgao.codigoUnidade",
+    "data.orgaoSubRogado.cnpj",
+    "data.unidadeSubRogada.codigoUnidade",
+    "numeroItem",
+    "descricao",
+    "unidadeMedida",
+    "materialOuServico",
+    "itemCategoriaId",
+    "itemCategoriaNome",
+    "catalogo.id",
+    "catalogo.nome",
+    "categoriaItemCatalogo.id",
+    "categoriaItemCatalogo.nome",
+    "catalogoCodigoItem",
+    "ncmNbsCodigo",
+    "ncmNbsDescricao",
+    "criterioJulgamentoId",
+    "criterioJulgamentoNome",
+    "situacaoCompraItem",
+    "situacaoCompraItemNome",
+    "tipoBeneficio",
+    "tipoBeneficioNome",
+    "orcamentoSigiloso",
+    "valorUnitarioEstimado",
+    "valorTotal",
+    "quantidade",
+    "urlAPI",
+    "urlPNCP"
+  )
+}
+
+# Consultas de inserção no banco
+{
+  # Insere um item do catálogo
+  CONSULTA_INSERIR_CATALOGO <- "
+    INSERT INTO catalogo (codigo_classe, nome_classe, codigo_pdm, nome_pdm,
+    codigo_item, nome_item, item_suspenso, item_ativo, item_sustentavel, características,
+    unidades_fornecimento)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11::jsonb)
+    ON CONFLICT (codigo_item) DO NOTHING;"
+  
+  # Insere um contratante
+  CONSULTA_INSERIR_CONTRATANTE <- "
+    INSERT INTO contratante (cnpj, razao_social, esfera, poder, codigo_unidade,
+    nome_unidade, codigo_ibge_municipio, nome_municipio, sigla_uf, nome_uf)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    ON CONFLICT (cnpj, codigo_unidade) DO NOTHING"
+  
+  # Insere um fornecedor
+  CONSULTA_INSERIR_FORNECEDOR <- "
+    INSERT INTO fornecedor (ni, nome, codigo_pais, tipo_pessoa, codigo_porte,
+    nome_porte, codigo_natureza_juridica, nome_natureza_juridica)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    ON CONFLICT (ni) DO NOTHING"
+  
+  # Insere uma contratação nova ou, caso a contratação já exista no banco, atualiza os campos
+  CONSULTA_INSERIR_CONTRATACAO <- "
+    INSERT INTO contratacao (
+        numero_controle_pncp, ano_compra, sequencial_compra, objeto_compra,
+        data_abertura_proposta, data_encerramento_proposta,
+        valor_estimado_compra, valor_homologado_compra, srp,
+        codigo_tipo_instrumento_convocatorio, nome_tipo_instrumento_convocatorio,
+        codigo_modalidade, nome_modalidade,
+        codigo_amparo_legal, nome_amparo_legal,
+        codigo_modo_disputa, nome_modo_disputa
+    )
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+    ON CONFLICT (numero_controle_pncp) 
+    DO UPDATE SET
+        objeto_compra = $4,
+        data_abertura_proposta = $5,
+        data_encerramento_proposta = $6,
+        valor_estimado_compra = $7,
+        valor_homologado_compra = $8,
+        srp = $9,
+        codigo_tipo_instrumento_convocatorio = $10,
+        nome_tipo_instrumento_convocatorio = $11,
+        codigo_modalidade = $12,
+        nome_modalidade = $13,
+        codigo_amparo_legal = $14,
+        nome_amparo_legal = $15,
+        codigo_modo_disputa = $16,
+        nome_modo_disputa = $17;"
+  
+  # Insere um item homologado novo ou, caso o item já exista no banco, atualiza os campos
+  CONSULTA_INSERIR_ITEM_HOMOLOGADO <- "
+    INSERT INTO item_homologado (
+        numero_controle_pncp, codigo_item_catalogo,
+        cnpj_contratante, codigo_unidade_contratante,
+        cnpj_contratante_subrogado, codigo_unidade_contratante_subrogado,
+        ni_fornecedor,
+        numero_item, descricao, unidade_medida, material_servico,
+        codigo_categoria_item, nome_categoria_item,
+        codigo_catalogo, nome_catalogo,
+        codigo_categoria_item_catalogo, nome_categoria_item_catalogo,
+        codigo_item_catalogo_pncp,
+        codigo_ncm_nbs, descricao_ncm_nbs,
+        codigo_criterio_julgamento, nome_criterio_julgamento,
+        codigo_situacao_item, nome_situacao_item,
+        codigo_tipo_beneficio, nome_tipo_beneficio,
+        orcamento_sigiloso,
+        valor_unitario_estimado, valor_total_estimado, quantidade_estimada,
+        codigo_situacao_resultado, nome_situacao_resultado,
+        valor_unitario_homologado, valor_total_homologado, quantidade_homologada,
+        moeda_estrangeira, valor_nominal_moeda_estrangeira,
+        data_resultado, data_cancelamento, motivo_cancelamento,
+        url_api, url_pncp)
+    VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
+        $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,
+        $21, $22, $23, $24, $25, $26, $27, $28, $29, $30,
+        $31, $32, $33, $34, $35, $36, $37, $38, $39, $40,
+        $41, $42)
+    ON CONFLICT (numero_controle_pncp, numero_item) 
+    DO UPDATE SET
+        codigo_item_catalogo = $2,
+        cnpj_contratante_subrogado = $5, 
+        codigo_unidade_contratante_subrogado = $6,
+        ni_fornecedor = $7,
+        descricao = $9, 
+        unidade_medida = $10, 
+        material_servico = $11,
+        codigo_categoria_item = $12, 
+        nome_categoria_item = $13,
+        codigo_catalogo = $14,
+        nome_catalogo = $15,
+        codigo_categoria_item_catalogo = $16, 
+        nome_categoria_item_catalogo = $17,
+        codigo_item_catalogo_pncp = $18,
+        codigo_ncm_nbs = $19, 
+        descricao_ncm_nbs = $20,
+        codigo_criterio_julgamento = $21, 
+        nome_criterio_julgamento = $22,
+        codigo_situacao_item = $23, 
+        nome_situacao_item = $24,
+        codigo_tipo_beneficio = $25, 
+        nome_tipo_beneficio = $26,
+        orcamento_sigiloso = $27,
+        valor_unitario_estimado = $28, 
+        valor_total_estimado = $29, 
+        quantidade_estimada = $30,
+        codigo_situacao_resultado = $31, 
+        nome_situacao_resultado = $32,
+        valor_unitario_homologado = $33, 
+        valor_total_homologado = $34, 
+        quantidade_homologada = $35,
+        moeda_estrangeira = $36, 
+        valor_nominal_moeda_estrangeira = $37,
+        data_resultado = $38, 
+        data_cancelamento = $39, 
+        motivo_cancelamento = $40;"
+  
+  # Insere um item licitado novo ou, caso o item já exista no banco, atualiza os campos
+  CONSULTA_INSERIR_ITEM_LICITADO <- "
+    INSERT INTO item_licitado (
+        numero_controle_pncp, codigo_item_catalogo,
+        cnpj_contratante, codigo_unidade_contratante,
+        cnpj_contratante_subrogado, codigo_unidade_contratante_subrogado,
+        numero_item, descricao, unidade_medida, material_servico,
+        codigo_categoria_item, nome_categoria_item,
+        codigo_catalogo, nome_catalogo,
+        codigo_categoria_item_catalogo, nome_categoria_item_catalogo,
+        codigo_item_catalogo_pncp,
+        codigo_ncm_nbs, descricao_ncm_nbs,
+        codigo_criterio_julgamento, nome_criterio_julgamento,
+        codigo_situacao_item, nome_situacao_item,
+        codigo_tipo_beneficio, nome_tipo_beneficio,
+        orcamento_sigiloso,
+        valor_unitario_estimado, valor_total_estimado, quantidade_estimada,
+        url_api, url_pncp)
+    VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
+        $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,
+        $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31)
+    ON CONFLICT (numero_controle_pncp, numero_item)
+    DO UPDATE SET
+        codigo_item_catalogo = $2,
+        cnpj_contratante_subrogado = $5, 
+        codigo_unidade_contratante_subrogado = $6,
+        descricao = $8, 
+        unidade_medida = $9, 
+        material_servico = $10,
+        codigo_categoria_item = $11, 
+        nome_categoria_item = $12,
+        codigo_catalogo = $13,
+        nome_catalogo = $14,
+        codigo_categoria_item_catalogo = $15, 
+        nome_categoria_item_catalogo = $16,
+        codigo_item_catalogo_pncp = $17,
+        codigo_ncm_nbs = $18, 
+        descricao_ncm_nbs = $19,
+        codigo_criterio_julgamento = $20, 
+        nome_criterio_julgamento = $21,
+        codigo_situacao_item = $22, 
+        nome_situacao_item = $23,
+        codigo_tipo_beneficio = $24, 
+        nome_tipo_beneficio = $25,
+        orcamento_sigiloso = $26,
+        valor_unitario_estimado = $27, 
+        valor_total_estimado = $28, 
+        quantidade_estimada = $29;"
+}
+
+
+#' Conecta ao banco de dados "medicamentos-transparentes"
+#'
+#' Esta função estabelece uma conexão com o banco de dados PostgreSQL chamado 
+#' "medicamentos-transparentes", localizado no host "localhost" com as credenciais 
+#' padrão de usuário e senha ("postgres").
+#'
+#' @return Um objeto de conexão do tipo `DBI::DBIConnection`, que pode ser utilizado para 
+#' executar consultas SQL no banco de dados.
+#' @examples
+#' # Criar conexão com o banco de dados
+#' con <- conecta_bd_medicamentos_transparentes()
+#' 
+#' # Verificar se a conexão está ativa
+#' DBI::dbIsValid(con)
+#' 
+#' # Lembre-se de fechar a conexão ao finalizar o uso
+#' DBI::dbDisconnect(con)
+#' @import DBI RPostgres
+conecta_bd_medicamentos_transparentes <- function() {
+  NOME_BD <- "medicamentos-transparentes"
+  HOST <- "localhost"
+  USUARIO <- "postgres"
+  SENHA <- "postgres"
+  PORTA <- 5432
+  
+  con <- dbConnect(
+    RPostgres::Postgres(),
+    dbname = NOME_BD ,
+    host = HOST,
+    user = USUARIO,
+    password = SENHA,
+    port = PORTA
+  )
+  
+  return(con)
+}
+
+
+#' Insere os dados de um dataframe em um banco de dados PostgreSQL
+#'
+#' Esta função percorre todas as linhas de um dataframe e executa uma consulta SQL 
+#' para inseri-las no banco de dados. Se ocorrer um erro ao inserir uma linha, 
+#' uma mensagem de aviso é exibida com o índice da linha e o nome da tabela de origem.
+#'
+#' @param con Conexão ativa com o banco de dados, criada com `DBI::dbConnect()`.
+#' @param tabela Dataframe contendo os dados a serem inseridos no banco.
+#' @param consulta Consulta SQL parametrizada (`INSERT INTO ... VALUES ($1, $2, ...)`) 
+#' para inserção dos dados.
+#'
+#' @return Nenhum valor é retornado explicitamente. As inserções são feitas diretamente 
+#' no banco de dados.
+#'
+#' @examples
+#' \dontrun{
+#' con <- DBI::dbConnect(RPostgres::Postgres(), dbname = "meubanco", user = "usuario", password = "senha")
+#' 
+#' df <- data.frame(id = 1:3, nome = c("A", "B", "C"))
+#' 
+#' query <- "INSERT INTO minha_tabela (id, nome) VALUES ($1, $2)"
+#' 
+#' insere_tabela(con, df, query)
+#' 
+#' DBI::dbDisconnect(con)
+#' }
+#' 
+#' @import DBI
+#' @import RPostgres
+insere_tabela <- function(con, tabela, consulta) {
+  for (i in seq_len(nrow(tabela))) {
+    tryCatch({
+      dbExecute(con, consulta, params = as.list(unname(tabela[i, ])))
+    }, error = function(e) {
+      nome_tabela <- deparse(substitute(tabela))
+      message(sprintf(
+        "Erro ao inserir a linha %d da tabela %s: %s",
+        i,
+        nome_tabela,
+        e$message
+      ))
+    })
+  }
+}
