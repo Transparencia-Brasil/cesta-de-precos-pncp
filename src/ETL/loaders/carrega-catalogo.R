@@ -11,6 +11,7 @@
 #' 
 
 suppressPackageStartupMessages(library(readr))
+suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(here))
 suppressPackageStartupMessages(library(jsonlite))
@@ -43,11 +44,68 @@ if (tolower(tools::file_ext(arg)) != ".rds") {
 catalogo <- read_csv(CAMINHO_CATALOGO, show_col_types = FALSE)
 
 
+# SELECIONA CARACTERÍSTICAS DOS MEDICAMENTOS ------------------------------
+
+# Número máximo de características a manter por medicamento (por PDM)
+MAX_CARACTERISTICAS = 3
+
+# Desaninha a coluna "buscaItemCaracteristica"
+catalogo <- catalogo %>% unnest(buscaItemCaracteristica)
+
+# Cria um  dataframe com as caracteristicas que serão mantidas para cada medicamento
+caracteristicas <- catalogo %>%
+  # Agrupa por PDM e codigoCaracteristica
+  group_by(codigo_pdm, codigoCaracteristica) %>%
+  # Conta valores únicos para cada característica dentro de cada PDM
+  summarise(n_valores_unicos = n_distinct(nomeValorCaracteristica),
+            .groups = "drop") %>%
+  # Agrupa por PDM
+  group_by(codigo_pdm) %>%
+  # Seleciona as (MAX_CARACTERISTICAS) características com mais valores distintos
+  slice_max(n = MAX_CARACTERISTICAS,
+            order_by = n_valores_unicos,
+            with_ties = FALSE) %>%
+  # remove características com apenas 1 valor distinto
+  filter(n_valores_unicos > 1) %>%
+  # Adiciona uma flag: Devemos manter essa caracteristica?
+  mutate(manter = TRUE)
+
+# Marca no catálogo as caracteristicas que serão utilizadas (manter == TRUE)
+catalogo <- catalogo %>%
+  left_join(caracteristicas, by = c("codigo_pdm", "codigoCaracteristica"))
+
+# Reaninha as características dentro do catálogo
+# Reaninha antes de excluir as características para não correr o risco de excluir
+# medicamentos que possuam apenas uma característica com um único valor.
+# Exemplo: Hidróxido De Alumínio, Indicação:300mg (codigo br: 267271)
+catalogo <- catalogo %>%
+  group_by(codigo_br) %>%
+  nest(
+    buscaItemCaracteristica = c(
+      codigoCaracteristica,
+      codigoValorCaracteristica,
+      nomeCaracteristica,
+      caracteristicaObrigatoria,
+      statusCaracteristica,
+      numeroCaracteristica,
+      nomeValorCaracteristica,
+      siglaUnidadeMedida,
+      statusValorCaracteristica,
+      manter
+    )
+  ) %>%
+  ungroup()
+
+# Filtra as características dentro do dataframe aninhado
+catalogo <- catalogo %>%
+  mutate(buscaItemCaracteristica = map(buscaItemCaracteristica, ~ filter(.x, manter == TRUE)))
+
+
 # TRANSFORMA A TABELA -----------------------------------------------------
 
 tb_catalogo <- catalogo %>% select(all_of(COLUNAS_CATALOGO)) %>%
   mutate( # Seleciona atributos de interesse
-    caracteristicas = map(buscaItemCaracteristica, ~ select(.x, nomeCaracteristica, caracteristicaObrigatoria, nomeValorCaracteristica))
+    caracteristicas = map(buscaItemCaracteristica, ~ select(.x, nomeCaracteristica, nomeValorCaracteristica))
   ) %>%
   mutate( # transforma as características em um JSON
     caracteristicas = map(caracteristicas, ~ toJSON(.x, auto_unbox = TRUE)),
