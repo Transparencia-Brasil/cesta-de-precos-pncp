@@ -5,8 +5,8 @@
 #'
 
 library(tidyr) # Data manipulation
-library(dplyr)        # Data manipulation
-library(here)         # File referencing
+library(dplyr) # Data manipulation
+library(here)  # File referencing
 
 source(here("tasks/normalizacao-unidades/src/limpa-texto.R"))
 

@@ -13,11 +13,11 @@ library(stringi)      # String processing
 #' @param string_vector Um vetor de caracteres 
 #'
 #' @return O mesmo vetor com as strings transformadas.
-#' @noRd
 clean_text <- function(character_vector) {
   result <- gsub("[-/()]", " ", character_vector) %>% # Substitui traços, barras e parênteses por espaço vazio 
     tolower() %>%                                # Todas os caracteres ficam minúsculos
     stri_trans_general(id = "Latin-ASCII") %>%   # Remove acentos
+    str_replace_all("[[:punct:]]", " ") %>%  # Substitui qualquer pontuação por espaço vazio
     str_squish()                                 # Remove espaços em branco adicionais
   
   return(result)
