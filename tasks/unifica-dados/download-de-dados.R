@@ -69,8 +69,7 @@ coleta2_files <- c(
 )
 
 # Criação de um padrão regex para filtrar os arquivos no Google Drive
-coleta2_pattern <- names(coleta2_files) %>%
-  paste0(collapse = "|") %>%
+coleta2_pattern <- paste0(names(coleta2_files), collapse = "|") %>%
   str_replace_all("\\(|\\)", ".")
 
 # Realiza o download dos arquivos do Google Drive para o diretório local
@@ -89,8 +88,7 @@ coleta3_files <- c(
 )
 
 # Criação de um padrão regex para filtrar os arquivos no Google Drive
-coleta3_pattern <- names(coleta3_files) %>%
-  paste0(collapse = "|")
+coleta3_pattern <- paste0(names(coleta3_files), collapse = "|")
 
 # Realiza o download dos arquivos do Google Drive para o diretório local
 coleta3_dir <- download_from_googledrive(coleta3_url, coleta3_pattern, input_dir, coleta3_files)
