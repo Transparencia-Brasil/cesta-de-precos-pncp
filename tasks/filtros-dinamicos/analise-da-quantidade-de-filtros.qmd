@@ -50,7 +50,7 @@ execute:
     dpi: 600       # Ajusta o DPI para gráficos de alta qualidade
 ---
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 #| label: libs-and-sources
 library(dplyr)
 library(here)
@@ -66,10 +66,12 @@ library(purrr)
 # Lê o arquivo
 catmat <- readRDS(here("data/catmat/catmat.rds"))
 
-# Adicionando uma nova coluna com o número de características de cada medicamento
+# Adicionando uma nova coluna com o número de características de cada PDM de medicamento
 catmat <- catmat %>%
   mutate(num_caracteristicas = sapply(buscaItemCaracteristica, nrow))
+```
 
+```{r}
 # Cria uma tabela com a contagem e a frequência relativa
 freq_table <- catmat %>%
   count(num_caracteristicas) %>%
@@ -86,9 +88,10 @@ ggplot(freq_table, aes(x = factor(num_caracteristicas), y = n)) +
   theme_minimal()
 ```
 
+
 ## Remove características menos importantes
 
-Para os itens com mais de 3 características, serão selecionadas apenas as 3 características com maior quantidade de valores distintos. Por exemplo:
+Para os itens com mais de 3 características, serão selecionadas apenas as 3 características que possuem maior quantidade de instâncias com valores distintos. Por exemplo:
 
 O medicamento Paracetamol (PDM: 10422) possui 12 características diferentes, são elas:
 
@@ -99,16 +102,20 @@ catmat <- catmat %>% unnest(buscaItemCaracteristica)
 
 catmat %>%
   filter(nome_pdm == 'Paracetamol') %>%
-  group_by(codigo_pdm, nome_pdm, codigoCaracteristica, nomeCaracteristica) %>%
+  group_by(codigoCaracteristica, nomeCaracteristica, codigo_pdm, nome_pdm) %>%
   summarise(n_valores_unicos = n_distinct(nomeValorCaracteristica), .groups = "drop") %>%
   arrange(desc(n_valores_unicos))
 ```
-Cada característica possui diferentes valores possíveis. As características *concentração*, *dosagem* e *composição* são as que possuem mais valores distintos, diferente de *uso* que só possui os valores "Solução Oral-Gotas" e "Solução Oral". 
+
+
+Cada característica possui diferentes valores possíveis. As características *concentração*, *dosagem* e *composição* são as que possuem mais valores distintos, diferente de *uso* que só possui 2 valores ("Solução Oral-Gotas" e "Solução Oral"). 
 
 Considerando que as características que possuem mais valores distintos especificam melhor o medicamento que o usuário gostaria de pesquisar, elas serão selecionadas para compor os filtros na plataforma Medicamentos Transparentes. Em suma, o critério de seleção de características utilizado será o **maior número de valores distintos**.
 
+
 ```{r}
 #| label: remove-caracteristicas-menos-importantes
+
 # Contando valores distintos de características por codigoCaracteristica dentro de cada PDM
 df_contagem <- catmat %>%
   group_by(codigo_pdm, codigoCaracteristica) %>%
@@ -133,13 +140,16 @@ catmat <- catmat %>%
 # Exemplo: Hidróxido De Alumínio, Indicação:300mg (codigo br: 267271)
 catmat <- catmat %>%
   group_by(codigo_br) %>%
-  nest(caracteristicas = c(codigoCaracteristica, codigoValorCaracteristica, nomeCaracteristica, caracteristicaObrigatoria, statusCaracteristica, numeroCaracteristica, nomeValorCaracteristica, siglaUnidadeMedida, statusValorCaracteristica, manter)) %>%
+  nest(caracteristicas = c(codigoCaracteristica, codigoValorCaracteristica, nomeCaracteristica, 
+                           caracteristicaObrigatoria, statusCaracteristica, numeroCaracteristica, 
+                           nomeValorCaracteristica, siglaUnidadeMedida, statusValorCaracteristica, manter)) %>%
   ungroup()
 
 # Filtra as características dentro do dataframe aninhado
 catmat <- catmat %>%
   mutate(caracteristicas = map(caracteristicas, ~ filter(.x, manter == TRUE)))
 ```
+
 
 ## Nova distribuição da quantidade de características por medicamento
 
