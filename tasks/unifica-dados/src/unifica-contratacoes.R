@@ -15,7 +15,9 @@ library(dplyr)
 library(purrr)
 library(here)
 
-# FILEPATHS --------------------------------------------------------------------
+source(here("tasks/unifica-dados/src/mapeamento.R"))
+
+# :: FILEPATHS --------------------------------------------------------------------
 
 # os arquivos de coleta foram baixados do google drive e salvos localmente com o script "download-de-dados.R"
 INPUT_DIR <- "tasks/unifica-dados/input"
@@ -32,73 +34,21 @@ CAMINHO_CONTRATACOES_COLETA3 <- here(INPUT_DIR, "contratacoes3.rds")
 contratacoes_coleta2 <- readRDS(CAMINHO_CONTRATACOES_COLETA2)
 contratacoes_coleta3 <- readRDS(CAMINHO_CONTRATACOES_COLETA3)
 
-# MAPPING ----------------------------------------------------------------------
-
-# Mapeamento das colunas dos arquivos de contratações
-mapeamento_colunas <- c(
-  # orgaoEntidade
-  "data.orgaoEntidade.cnpj" = "orgaoEntidade_cnpj",
-  "data.orgaoEntidade.razaoSocial" = "orgaoEntidade_razaoSocial",
-  "data.orgaoEntidade.esferaId" = "orgaoEntidade_esferaId",
-  "data.orgaoEntidade.poderId" = "orgaoEntidade_poderId",
-  # unidadeOrgao
-  "data.unidadeOrgao.codigoUnidade" = "unidadeOrgao_codigoUnidade",
-  "data.unidadeOrgao.nomeUnidade" = "unidadeOrgao_nomeUnidade",
-  "data.unidadeOrgao.codigoIbge" = "unidadeOrgao_codigoIbge",
-  "data.unidadeOrgao.municipioNome" = "unidadeOrgao_municipioNome",
-  "data.unidadeOrgao.ufSigla" = "unidadeOrgao_ufSigla",
-  "data.unidadeOrgao.ufNome" = "unidadeOrgao_ufNome",
-  # orgaoSubRogado
-  "data.orgaoSubRogado.cnpj" = "orgaoSubRogado_cnpj",
-  "data.orgaoSubRogado.razaoSocial" = "orgaoSubRogado_razaoSocial",
-  "data.orgaoSubRogado.esferaId" = "orgaoSubRogado_esferaId",
-  "data.orgaoSubRogado.poderId" = "orgaoSubRogado_poderId",
-  # unidadeSubRogada
-  "data.unidadeSubRogada.codigoUnidade" = "unidadeSubRogada_codigoUnidade",
-  "data.unidadeSubRogada.nomeUnidade" = "unidadeSubRogada_nomeUnidade",
-  "data.unidadeSubRogada.codigoIbge" = "unidadeSubRogada_codigoIbge",
-  "data.unidadeSubRogada.municipioNome" = "unidadeSubRogada_municipioNome",
-  "data.unidadeSubRogada.ufSigla" = "unidadeSubRogada_ufSigla",
-  "data.unidadeSubRogada.ufNome" = "unidadeSubRogada_ufNome",
-  # ids
-  "data.numeroControlePNCP" = "numeroControlePNCP",
-  "data.anoCompra" = "anoCompra",
-  "data.sequencialCompra" = "sequencialCompra",
-  # objetoCompra
-  "data.objetoCompra" = "objetoCompra",
-  # dataAbertura e dataEncerramento
-  "data.dataAberturaProposta" = "dataAberturaProposta",
-  "data.dataEncerramentoProposta" = "dataEncerramentoProposta",
-  # valorEstimado e valorHomologado
-  "data.valorTotalEstimado" = "valorTotalEstimado",
-  "data.valorTotalHomologado" = "valorTotalHomologado",
-  # srp
-  "data.srp" = "srp",
-  # instrumentoConvocatorio
-  "data.tipoInstrumentoConvocatorioCodigo" = "tipoInstrumentoConvocatorioCodigo",
-  "data.tipoInstrumentoConvocatorioNome" = "tipoInstrumentoConvocatorioNome",
-  # modalidade
-  "data.modalidadeId" = "modalidadeId",
-  "data.modalidadeNome" = "modalidadeNome",
-  # ampareLegal
-  "data.amparoLegal.codigo" = "amparoLegal_codigo",
-  "data.amparoLegal.nome" = "amparoLegal_nome",
-  # modoDisputa
-  "data.modoDisputaId" = "modoDisputaId",
-  "data.modoDisputaNome" = "modoDisputaNome"
-)
+# :: MAPPING -------------------------------------------------------------------
 
 # Renomeia as colunas e seleciona somente as necessárias
 contratacoes_coleta2 <- contratacoes_coleta2 %>%
-  rename(all_of(mapeamento_colunas)) %>%
-  select(names(mapeamento_colunas))
+  rename(all_of(mapeamento_colunas_contratacoes)) %>%
+    select(names(mapeamento_colunas_contratacoes))
 
 contratacoes_coleta3 <- contratacoes_coleta3 %>%
-  rename(all_of(mapeamento_colunas)) %>%
-  select(names(mapeamento_colunas))
+  rename(all_of(mapeamento_colunas_contratacoes)) %>%
+    select(names(mapeamento_colunas_contratacoes))
 
 # Certifica-se que os dataframes possuem colunas de mesmo tipo (para uní-los)
 contratacoes_coleta3 <- map2_dfr(contratacoes_coleta3, contratacoes_coleta2, ~ as(.x, class(.y)))
+
+# :: UNIFICA COLETAS -----------------------------------------------------------
 
 # Une os dados de contratações de todas as coletas.
 contratacoes <- bind_rows(contratacoes_coleta2, contratacoes_coleta3)

@@ -14,9 +14,10 @@ library(googledrive)
 library(dplyr)
 library(purrr)
 library(stringr)
+library(readr)
 
 # os dados baixados serão guardados neste diretório
-input_dir <- "tasks/unifica-dados/input"
+INPUT_DIR <- "tasks/unifica-dados/input"
 
 #' Baixa arquivos do Google Drive
 #'
@@ -53,7 +54,7 @@ coleta1_files <- c(
 coleta1_pattern <- paste0(names(coleta1_files), collapse = "|")
 
 # Realiza o download dos arquivos do Google Drive para o diretório local
-coleta1_dir <- download_from_googledrive(coleta1_url, coleta1_pattern, input_dir, coleta1_files)
+coleta1_dir <- download_from_googledrive(coleta1_url, coleta1_pattern, INPUT_DIR, coleta1_files)
 
 # COLETA II --------------------------------------------------------------------
 
@@ -73,7 +74,7 @@ coleta2_pattern <- paste0(names(coleta2_files), collapse = "|") %>%
   str_replace_all("\\(|\\)", ".")
 
 # Realiza o download dos arquivos do Google Drive para o diretório local
-coleta2_dir <- download_from_googledrive(coleta2_url, coleta2_pattern, input_dir, coleta2_files)
+coleta2_dir <- download_from_googledrive(coleta2_url, coleta2_pattern, INPUT_DIR, coleta2_files)
 
 # COLETA III -------------------------------------------------------------------
 
@@ -91,9 +92,9 @@ coleta3_files <- c(
 coleta3_pattern <- paste0(names(coleta3_files), collapse = "|")
 
 # Realiza o download dos arquivos do Google Drive para o diretório local
-coleta3_dir <- download_from_googledrive(coleta3_url, coleta3_pattern, input_dir, coleta3_files)
+coleta3_dir <- download_from_googledrive(coleta3_url, coleta3_pattern, INPUT_DIR, coleta3_files)
 
 # Lê o arquivo CSV baixado, converte todas as colunas para o tipo caractere e salva como RDS
-here(input_dir, "contratacoes3.csv") %>%
+here(INPUT_DIR, "contratacoes3.csv") %>%
   read_csv(col_types = cols(.default = col_character())) %>%
-  saveRDS(here(input_dir, "contratacoes3.rds"))
+  saveRDS(here(INPUT_DIR, "contratacoes3.rds"))
