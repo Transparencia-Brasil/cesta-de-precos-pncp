@@ -1,4 +1,3 @@
-#' ---
 #' Unifica coletas de itens das contratações
 #' ---
 #'
@@ -13,7 +12,6 @@
 #'
 #' A união dos datasets é feita com base no arquivo src/ETL/dados-de-teste/amostra_medicamentos.csv
 #'
-
 
 library(readr)
 library(dplyr)
@@ -97,5 +95,9 @@ itens_coleta3 <- coerce_class(itens_coleta3)
 # Une os dados de contratações de todas as coletas.
 itens <- bind_rows(itens_coleta1, itens_coleta2, itens_coleta3)
 
+# inclui numeroControlePNCPCompra
+itens <- itens %>%
+  mutate(numeroControlePNCPCompra = make_id(endpoint))
+
 # Salva o arquivo em formato rds
-saveRDS(itens, here(OUTPUT_DIR, "itens.csv"))
+write_csv(itens, here(OUTPUT_DIR, "itens.csv"))

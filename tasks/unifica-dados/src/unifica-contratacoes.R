@@ -1,4 +1,3 @@
-#' ---
 #' Unifica coletas de contratações
 #' ---
 #'
@@ -55,4 +54,4 @@ contratacoes <- bind_rows(contratacoes_coleta2, contratacoes_coleta3)
 
 # Salva o arquivo em formato rds
 dir.create(here(OUTPUT_DIR))
-saveRDS(contratacoes, here(OUTPUT_DIR, "contratacoes.csv"))
+write_csv(contratacoes, here(OUTPUT_DIR, "contratacoes.csv"))

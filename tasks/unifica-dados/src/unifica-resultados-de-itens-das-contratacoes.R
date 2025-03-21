@@ -1,4 +1,3 @@
-#' ---
 #' Unifica coletas de resultados de itens das contratações
 #' ---
 #'
@@ -81,4 +80,4 @@ resultado_coleta3 <- coerce_class(resultado_coleta3)
 itens_resultados <- bind_rows(resultado_coleta2, resultado_coleta3)
 
 # Salva o arquivo em formato rds
-saveRDS(itens_resultados, here(OUTPUT_DIR, "itens-resultados.csv"))
+write_csv(itens_resultados, here(OUTPUT_DIR, "itens-resultados.csv"))
