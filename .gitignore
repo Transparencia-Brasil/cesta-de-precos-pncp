@@ -44,3 +44,4 @@ tasks/unifica-dados/output/contratacoes.csv
 tasks/unifica-dados/input/itens1.rds
 tasks/unifica-dados/output/itens.csv
 tasks/unifica-dados/output/itens-resultados.csv
+tasks/unifica-dados/output/medicamentos.csv
