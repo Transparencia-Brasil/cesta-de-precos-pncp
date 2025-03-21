@@ -308,7 +308,7 @@ medicamentos_df['medicamento'] = medicamentos_df['similaridade'] >= THRESHOLD
 medicamentos_df = medicamentos_df[medicamentos_df['medicamento']]
 
 # Remove colunas criadas desnecessárias
-medicamentos_df.drop(['descricao_limpa', 'embedding'], axis=1, inplace=True)
+medicamentos_df.drop(['descricao_limpa'], axis=1, inplace=True)
 
 # Converte o codigo_br em inteiro
 medicamentos_df['codigo_br'] = medicamentos_df['codigo_br'].astype(int)
