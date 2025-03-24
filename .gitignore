@@ -32,3 +32,6 @@ project.Rproj
 valida-rotulagem.ipynb
 catalogo-vetorizado.csv
 
+#Arquivos de dados volumosos
+tasks/unifica-dados/input
+tasks/unifica-dados/output
