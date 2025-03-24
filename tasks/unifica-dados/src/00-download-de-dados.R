@@ -1,4 +1,3 @@
-#' ---
 #' Download de Dados
 #' ---
 #'
