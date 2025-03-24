@@ -46,8 +46,8 @@ print('\rValidando os argumentos.', end="", flush=True)
 # Simula os argumentos da linha de comando
 sys.argv = [
     "filtra-medicamentos.py",  # Nome do script (simulado)
-    "C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tasks/unifica-dados/output/itens.csv",  # Argumento para 'itens'
-    # "C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tasks/unifica-dados/output/itens-resultados.csv",  # Argumento para 'itens-resultados'
+    "C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tasks/unifica-dados/output/itens-endpoint-recuperado.csv",  #
+    # "C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tasks/unifica-dados/output/itens.csv",  #
     "C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/data/catmat/catmat.csv"  # Argumento para 'catalogo'
 ]
 
@@ -55,7 +55,6 @@ sys.argv = [
 parser = argparse.ArgumentParser()
 # arquivos são csvs
 parser.add_argument("itens", help="Caminho para o arquivo .csv de itens de contratações.")
-parser.add_argument("itens_resultados", help="Caminho para o arquivo .csv de resultados de itens das contratações.")
 parser.add_argument("catalogo", help="Caminho para o arquivo .csv de catálogo de medicamentos.")
 
 args = parser.parse_args()
@@ -74,7 +73,6 @@ dir_catalogo = os.path.dirname(args.catalogo)
 # Carrega os dados
 catmat_df = pd.read_csv(args.catalogo)  # CATMAT
 itens_df = pd.read_csv(args.itens)      # Itens PNCP
-# resultados_df = pd.read_csv(args.itens_resultados)      # Itens PNCP
 
 ### DETECÇÃO DE PDMS ######################################################################
 
@@ -254,7 +252,8 @@ print('\rIdentificando os medicamentos', end="", flush=True)
 THRESHOLD = 0.5
 
 # Caminho do arquivo de saída ondes serão salvos os medicamentos
-NOME_ARQUIVO_MEDICAMENTOS = dir_itens + "/medicamentos.csv"
+# NOME_ARQUIVO_MEDICAMENTOS = dir_itens + "/medicamentos.csv"
+NOME_ARQUIVO_MEDICAMENTOS = dir_itens + "/medicamentos-endpoint-recuperado.csv"
 
 def mais_similar(medicamento):
     """
@@ -283,7 +282,7 @@ def mais_similar(medicamento):
     itens_pdm = catmat_df.loc[[codigoPDM]] # Use double brackets para forçar o resultado a ser um dataframe
 
     # Converte os embeddings para np.array e garante dtype float32
-    embeddings_array = np.vstack(itens_pdm['embedding'].apply(lambda x: np.array(eval(x), dtype=np.float32)))
+    embeddings_array = np.vstack(itens_pdm['embedding'].apply(lambda x: np.array(x, dtype=np.float32)))
 
     # Computa a similaridade entre os embeddings da descrição do CATMAT e o embedding do item do PNCP
     similaridades = model.similarity(consulta, embeddings_array)
