@@ -45,3 +45,12 @@ tasks/unifica-dados/input/itens1.rds
 tasks/unifica-dados/output/itens.csv
 tasks/unifica-dados/output/itens-resultados.csv
 tasks/unifica-dados/output/medicamentos.csv
+tasks/unifica-dados/output/medicamentos.csv.old
+tasks/unifica-dados/output/medicamentos-endpoint-recuperado.csv
+tasks/unifica-dados/output/itens.csv.old
+tasks/unifica-dados/output/itens-endpoint-recuperado.csv
+coleta/resultados/temp/monitoramento.csv
+coleta/resultados/temp/erros.csv
+coleta/resultados/temp/dados.csv
+coleta/itens/itens.csv
+coleta-resultados.log
