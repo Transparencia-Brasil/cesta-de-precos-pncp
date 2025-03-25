@@ -393,7 +393,7 @@ make_id <- \(endpoint) {
     str_remove(str_glue("\\/itens")) %>%
     str_pad(width = 6, pad = "0")
 
-  numeroControlePNCP <- str_glue("{niFornecedor}-1-{sequencial}/{ano}")
+  numeroControlePNCP <- str_glue("{cnpj}-1-{sequencial}/{ano}")
 
   return(numeroControlePNCP)
 }
