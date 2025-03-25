@@ -380,7 +380,7 @@ comparar_colunas <- function(df, template) {
 #' make_id("https://api.exemplo.com/orgaos/12345/compras/2023/6789/itens")
 #' # Retorna: "12345-1-006789/2023"
 make_id <- \(endpoint) {
-  niFornecedor <- endpoint %>%
+  cnpj <- endpoint %>%
     str_remove("^.+orgaos\\/") %>%
     str_remove("\\/compras.+")
 
