@@ -18,6 +18,11 @@ library(readr)
 # os dados baixados serão guardados neste diretório
 INPUT_DIR <- "tasks/unifica-dados/input"
 
+# Cria o diretório INPUT_DIR, caso não exista
+if (!dir.exists(INPUT_DIR)) { 
+  dir.create(INPUT_DIR, recursive = TRUE) 
+}
+  
 #' Baixa arquivos do Google Drive
 #'
 #' @description Função para baixar arquivos de uma pasta no Google Drive para um diretório local. 
