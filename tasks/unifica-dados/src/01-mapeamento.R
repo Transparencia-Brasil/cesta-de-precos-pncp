@@ -375,7 +375,7 @@ comparar_colunas <- function(df, template) {
 #' * O número PNCP será gerado sequencialmente com 6 dígitos e reiniciado a cada mudança de ano.
 #' (Fonte: Manual de Integração do PNCP)
 #' @param endpoint Uma string representando o endpoint da API contendo informações sobre o fornecedor, ano e sequencial.
-#' @return Uma string contendo o identificador no formato "{niFornecedor}-1-{sequencial}/{ano}".
+#' @return Uma string contendo o identificador no formato "{cnpj}-1-{sequencial}/{ano}".
 #' @examples
 #' make_id("https://api.exemplo.com/orgaos/12345/compras/2023/6789/itens")
 #' # Retorna: "12345-1-006789/2023"
