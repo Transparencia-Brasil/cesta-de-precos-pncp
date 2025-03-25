@@ -273,7 +273,8 @@ def mais_similar(medicamento):
     itens_pdm = catmat_df.loc[[codigoPDM]] # Use double brackets para forçar o resultado a ser um dataframe
 
     # Converte os embeddings para np.array e garante dtype float32
-    embeddings_array = np.vstack(itens_pdm['embedding'].apply(lambda x: np.array(x, dtype=np.float32)))
+    embeddings_array = np.vstack(itens_pdm['embedding'].apply(lambda x: np.array(eval(x), dtype=np.float32)))
+
 
     # Computa a similaridade entre os embeddings da descrição do CATMAT e o embedding do item do PNCP
     similaridades = model.similarity(consulta, embeddings_array)

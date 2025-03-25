@@ -16,11 +16,18 @@ library(stringr)
 library(readr)
 
 # os dados baixados serão guardados neste diretório
-INPUT_DIR <- "tasks/unifica-dados/input"
+INPUT_DIR <- here("tasks/unifica-dados/input")
 
+# Cria o diretório INPUT_DIR, caso não exista
+if (!dir.exists(INPUT_DIR)) { 
+  dir.create(INPUT_DIR, recursive = TRUE) 
+}
+  
 #' Baixa arquivos do Google Drive
 #'
-#' @description Função para baixar arquivos de uma pasta no Google Drive para um diretório local. Esta função utiliza a API do Google Drive para listar e baixar arquivos de uma pasta específica. Os arquivos são filtrados com base no padrão fornecido e salvos no diretório local especificado.
+#' @description Função para baixar arquivos de uma pasta no Google Drive para um diretório local. 
+#' Esta função utiliza a API do Google Drive para listar e baixar arquivos de uma pasta específica. 
+#' Os arquivos são filtrados com base no padrão fornecido e salvos no diretório local especificado.
 #'
 #' @param drive_url URL da pasta no Google Drive de onde os arquivos serão baixados.
 #' @param pattern Padrão de correspondência para filtrar os arquivos a serem baixados.
@@ -41,7 +48,7 @@ download_from_googledrive <- function(drive_url, pattern, input_dir, local_files
 
 # COLETA I ---------------------------------------------------------------------
 
-# URL da pasta no Google Drive para a coleta II
+# URL da pasta no Google Drive para a coleta I
 coleta1_url <- "https://drive.google.com/drive/folders/1A9mNmKapHchsy9qqXCdg2xAh9pnnOWaJ"
 
 # Mapeamento dos arquivos a serem baixados e seus nomes locais
