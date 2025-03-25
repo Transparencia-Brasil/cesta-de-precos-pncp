@@ -20,7 +20,9 @@ INPUT_DIR <- "tasks/unifica-dados/input"
 
 #' Baixa arquivos do Google Drive
 #'
-#' @description Função para baixar arquivos de uma pasta no Google Drive para um diretório local. Esta função utiliza a API do Google Drive para listar e baixar arquivos de uma pasta específica. Os arquivos são filtrados com base no padrão fornecido e salvos no diretório local especificado.
+#' @description Função para baixar arquivos de uma pasta no Google Drive para um diretório local. 
+#' Esta função utiliza a API do Google Drive para listar e baixar arquivos de uma pasta específica. 
+#' Os arquivos são filtrados com base no padrão fornecido e salvos no diretório local especificado.
 #'
 #' @param drive_url URL da pasta no Google Drive de onde os arquivos serão baixados.
 #' @param pattern Padrão de correspondência para filtrar os arquivos a serem baixados.
