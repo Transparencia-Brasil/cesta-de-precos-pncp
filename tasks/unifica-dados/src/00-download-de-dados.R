@@ -43,7 +43,7 @@ download_from_googledrive <- function(drive_url, pattern, input_dir, local_files
 
 # COLETA I ---------------------------------------------------------------------
 
-# URL da pasta no Google Drive para a coleta II
+# URL da pasta no Google Drive para a coleta I
 coleta1_url <- "https://drive.google.com/drive/folders/1A9mNmKapHchsy9qqXCdg2xAh9pnnOWaJ"
 
 # Mapeamento dos arquivos a serem baixados e seus nomes locais
