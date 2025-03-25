@@ -54,3 +54,8 @@ coleta/resultados/temp/erros.csv
 coleta/resultados/temp/dados.csv
 coleta/itens/itens.csv
 coleta-resultados.log
+.vscode/settings.json
+coleta/itens/medicamentos.csv
+coleta/resultados/dados.csv
+coleta/resultados/erros.csv
+coleta/resultados/monitoramento.csv

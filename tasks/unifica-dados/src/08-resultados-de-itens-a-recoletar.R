@@ -12,4 +12,4 @@ recoleta_resultados <- medicamentos %>%
   anti_join(resultados, by = c("numeroControlePNCPCompra", "numeroItem"))
 
 recoleta_resultados %>%
-  write_csv(here("coleta/itens/itens.csv"))
+  write_csv(here("coleta/itens/medicamentos.csv"))
