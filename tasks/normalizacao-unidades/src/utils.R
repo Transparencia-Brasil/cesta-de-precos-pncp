@@ -6,8 +6,8 @@ library(stringi)      # String processing
 
 #' Limpeza de Texto
 #'
-#' Esta função realiza a limpeza de um texto, removendo acentos, convertendo para minúsculas,
-#' substituindo caracteres especiais por espaços e eliminando espaços extras.
+#' Esta função realiza a limpeza de um texto, removendo caracteres numéricos e acentos,
+#' convertendo para minúsculas, eliminando pontuações e espaços extras.
 #'
 #' @param texto Uma string ou vetor de strings a serem limpas.
 #' @return Uma string ou vetor de strings com o texto limpo.
@@ -16,15 +16,35 @@ library(stringi)      # String processing
 #' limpa_texto("Exemplo: João comprou pão (e leite) - incrível!")
 #' # Retorna: "exemplo joao comprou pao e leite incrivel"
 limpa_texto <- function(texto) {
-  result <- gsub("[-/()]", " ", texto) %>% # Substitui traços, barras e parênteses por espaço vazio
+  result <-  gsub("(?<!\\d)[[:punct:]]|[[:punct:]](?!\\d)", "", texto, perl = TRUE) %>% # Remover pontuações, exceto ponto e vírgula decimais
     tolower() %>%                              # Todas os caracteres ficam minúsculos
     stri_trans_general(id = "Latin-ASCII") %>% # Remove acentos
-    str_replace_all("[[:punct:]]", " ") %>%    # Substitui qualquer pontuação por espaço vazio
     str_squish()                               # Remove espaços em branco adicionais
   
   return(result)
 }
 
+
+tokeniza_unidades <- function(texto) {
+  # Lista de termos que devem manter o espaço
+  termos_preservados <- c("milheiro de cartelas", "mil cte", "milheiros de cartelas",
+                          "mil unid intern", "milhao unid intern", "milhoes unid intern",
+                          "milheiro unidintern", "mil ui", "milheiros unid itern",
+                          "unid internacional")
+  
+  # Substituir os espaços dentro dos termos por um marcador temporário
+  for (termo in termos_preservados) {
+    texto <- str_replace_all(texto, termo, str_replace_all(termo, " ", "_"))
+  }
+  
+  # Separar as palavras normalmente
+  palavras <- unlist(str_split(texto, " "))
+  
+  # Restaurar os espaços nos termos preservados
+  palavras <- str_replace_all(palavras, "_", " ")
+  
+  return(palavras)
+}
 
 #' Converte uma Lista Aninhada em uma Estrutura de Ambientes (hashtable).
 #'
