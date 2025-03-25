@@ -212,7 +212,7 @@ mapeamento_colunas_itens_coleta3 <- function(itens_coleta3) {
     )
 }
 
-# :: ITENS RESULTADOS ----------------------------------------------------------
+# :: RESULTADOS DOS ITENS ------------------------------------------------------
 
 #' Mapeamento de colunas para itens de resultados de coleta II
 #'
