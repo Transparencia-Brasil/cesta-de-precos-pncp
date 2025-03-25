@@ -20,7 +20,7 @@ CAMINHO_CATALOGO <- here("data/catmat/catmat.rds")
 CAMINHO_MEDICAMENTOS <- here("tasks/unifica-dados/output/medicamentos.csv")
 
 catmat <- readRDS(CAMINHO_CATALOGO)
-medicamentos <- read_csv(CAMINHO_MEDICAMENTOS) %>% select(-embedding) %>% sample_n(1000)
+medicamentos <- read_csv(CAMINHO_MEDICAMENTOS) %>% select(-embedding)
 
 
 # LIMPA OS TEXTOS DO CATMAT -----------------------------------------------
