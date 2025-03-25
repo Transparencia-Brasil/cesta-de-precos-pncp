@@ -16,7 +16,7 @@ library(stringr)
 library(readr)
 
 # os dados baixados serão guardados neste diretório
-INPUT_DIR <- "tasks/unifica-dados/input"
+INPUT_DIR <- here("tasks/unifica-dados/input")
 
 # Cria o diretório INPUT_DIR, caso não exista
 if (!dir.exists(INPUT_DIR)) { 
