@@ -15,7 +15,6 @@ library(tidyr)        # Organiza dados bagunçados
 library(dplyr)        # Manipulação de dados
 library(purrr)        # Ferramentas de Programação Funcional
 library(readr)        # Leitura de dados
-library(progressr)    # Atualizações de progresso
 library(stringr)      # Operações em string
 
 # Funções úteis
@@ -315,12 +314,17 @@ medicamentos$unidadeMedida_limpa <- limpa_texto(medicamentos$unidadeMedida)
 #' - Se apenas um token corresponder, ele será retornado como unidade de fornecimento detectada.  
 #' - Se mais de um token corresponder, a função retorna `NA`, indicando incerteza na detecção.  
 extrai_uf <- function(tokens) {
+  # Verifica se `tokens` é NA ou NULL
+  if (is.null(tokens) || (is.atomic(tokens) && length(tokens) == 1 && is.na(tokens))) {
+    return(NA)
+  }
+  
   count_uf <- 0  # Contagem de unidades de fornecimento
   uf <- NA       # Unidade de fornecimento
   
   # Verifica se o `texto` possui unidades de fornecimento
   for (token in tokens) {
-    if (!is.null(uf_env[[token]])) {
+    if (!is.null(token) && !is.na(token) && token != "" && !is.null(uf_env[[token]])) {
       uf <- token
       count_uf <- count_uf + 1
     }
@@ -353,12 +357,17 @@ extrai_uf <- function(tokens) {
 #' - Se apenas um token corresponder, ele será retornado como unidade de medida detectada.  
 #' - Se mais de um token corresponder, a função retorna `NA`, indicando incerteza na detecção.
 extrai_um <- function(tokens) {
+  # Verifica se `tokens` é NA ou NULL
+  if (is.null(tokens) || (is.atomic(tokens) && length(tokens) == 1 && is.na(tokens))) {
+    return(NA)
+  }
+  
   count_um <- 0  # Contagem de unidades de medida
   um <- NA       # nome da unidade de medida
   
   # Verifica se o `texto` possui unidades de medida
   for (token in tokens) {
-    if (!is.null(um_env[[token]])) {
+    if (!is.null(token) && !is.na(token) && token != "" && !is.null(um_env[[token]])) {
       um <- token
       count_um <- count_um + 1
     }
@@ -373,56 +382,56 @@ extrai_um <- function(tokens) {
 }
 
 # Executa o algoritmo de detecção e monitora o progresso
-with_progress({
-  # Define o total de passos (para atualizações de progresso)
-  p <- progressor(steps = nrow(medicamentos)) 
+for (i in seq_len(nrow(medicamentos))) {
+  # tokens da unidade de medida
+  tokens_um <- tokeniza_unidades(medicamentos$unidadeMedida_limpa[i])
   
-  for (i in seq_len(nrow(medicamentos))) {
-    # tokens da unidade de medida
-    tokens_um <- tokeniza_unidades(medicamentos$unidadeMedida_limpa[i])
-    
-    # tokens da descricao
-    tokens_desc <- tokeniza_unidades(medicamentos$descricao_limpa[i])
-    
-    # Procura a unidade de fornecimento no campo `unidadeMedida`
-    unidadeFornecimentoDetectada <- extrai_uf(tokens_um)
-    
-    # Se não encontrar, procura a unidade de fornecimento no campo `descricao`
-    if (is.na(unidadeFornecimentoDetectada)) {
-      unidadeFornecimentoDetectada <- extrai_uf(tokens_desc)
-    }
-    
-    # Define o nome padrão da unidade de fornecimento (NA caso não tenha econtrado)
-    if (is.na(unidadeFornecimentoDetectada)) {
-      nomeUnidadeFornecimento <- NA_character_
-    } else {
-      nomeUnidadeFornecimento <- uf_env[[unidadeFornecimentoDetectada]]
-    }
-    
-    # Procura a unidade de medida no campo `unidadeMedida`
-    unidadeMedidaDetectada <- extrai_um(tokens_um)
-    
-    # Se não encontrar, procura a unidade de medida no campo `descricao`
-    if (is.na(unidadeMedidaDetectada)) {
-      unidadeMedidaDetectada <- extrai_um(tokens_desc)
-    }
-    
-    # Define o nome padrão da unidade de medida (NA caso não tenha econtrado)
-    if (is.na(unidadeMedidaDetectada)) {
-      nomeUnidadeMedida <- NA_character_
-    } else {
-      nomeUnidadeMedida <- um_env[[unidadeMedidaDetectada]]
-    }
-    
-    # Insere os valores no dataframe
-    medicamentos[i, 'unidadeFornecimentoDetectada'] <- unidadeFornecimentoDetectada
-    medicamentos[i, 'nomeUnidadeFornecimento'] <- nomeUnidadeFornecimento
-    medicamentos[i, 'unidadeMedidaDetectada'] <- unidadeMedidaDetectada
-    medicamentos[i, 'nomeUnidadeMedida'] <- nomeUnidadeMedida
-    
-    p() # Atualiza o progresso a cada linha
+  # tokens da descricao
+  tokens_desc <- tokeniza_unidades(medicamentos$descricao_limpa[i])
+  
+  # Procura a unidade de fornecimento no campo `unidadeMedida`
+  unidadeFornecimentoDetectada <- extrai_uf(tokens_um)
+  
+  # Se não encontrar, procura a unidade de fornecimento no campo `descricao`
+  if (is.na(unidadeFornecimentoDetectada)) {
+    unidadeFornecimentoDetectada <- extrai_uf(tokens_desc)
   }
-})
+  
+  # Define o nome padrão da unidade de fornecimento (NA caso não tenha econtrado)
+  if (is.na(unidadeFornecimentoDetectada)) {
+    nomeUnidadeFornecimento <- NA_character_
+  } else {
+    nomeUnidadeFornecimento <- uf_env[[unidadeFornecimentoDetectada]]
+  }
+  
+  # Procura a unidade de medida no campo `unidadeMedida`
+  unidadeMedidaDetectada <- extrai_um(tokens_um)
+  
+  # Se não encontrar, procura a unidade de medida no campo `descricao`
+  if (is.na(unidadeMedidaDetectada)) {
+    unidadeMedidaDetectada <- extrai_um(tokens_desc)
+  }
+  
+  # Define o nome padrão da unidade de medida (NA caso não tenha econtrado)
+  if (is.na(unidadeMedidaDetectada)) {
+    nomeUnidadeMedida <- NA_character_
+  } else {
+    nomeUnidadeMedida <- um_env[[unidadeMedidaDetectada]]
+  }
+  
+  # Insere os valores no dataframe
+  medicamentos[i, 'unidadeFornecimentoDetectada'] <- unidadeFornecimentoDetectada
+  medicamentos[i, 'nomeUnidadeFornecimento'] <- nomeUnidadeFornecimento
+  medicamentos[i, 'unidadeMedidaDetectada'] <- unidadeMedidaDetectada
+  medicamentos[i, 'nomeUnidadeMedida'] <- nomeUnidadeMedida
+  
+  # Monitoramento do progresso
+  progresso <- round(i / nrow(medicamentos)*100, 1)
+  cat(sprintf("Detectando unidades: %.1f%% concluído", progresso),
+      "\r")
+  flush.console()
+}
+
 
 # IDENTIFICA CAPACIDADES DAS UNIDADES DE MEDIDA ---------------------------
 
