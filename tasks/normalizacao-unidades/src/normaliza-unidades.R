@@ -1,5 +1,14 @@
-#' Documentação do script
-#' 
+#' Este script extrai 3 informações a partir da descrição de itens do PNCP:
+#'  * A unidade de fornecimento do item
+#'  * A unidade de medida
+#'  * A capacidade da unidade de medida
+#'  
+#'  Exemplo: "frasco 1000 ml"
+#'  * unidade de fornecimento: frasco
+#'  * unidade de medida: mililitro
+#'  * capacidade: 1000
+#'  
+#'  As unidades de fornecimento e de medida padronizadas vêm do CATMAT.
 
 library(here)         # Referenciamento de arquivos
 library(tidyr)        # Organiza dados bagunçados
@@ -12,7 +21,8 @@ library(stringr)      # Operações em string
 # Funções úteis
 source(here("tasks/normalizacao-unidades/src/utils.R"))
 
-handlers(global = TRUE) # Ativa o progresso globalmente
+# Ativa atualizações de progresso globalmente
+handlers(global = TRUE) 
 
 # CARREGA OS DADOS --------------------------------------------------------
 
@@ -334,6 +344,7 @@ extrai_uf <- function(texto) {
 with_progress({
   p <- progressor(steps = nrow(medicamentos)) # Define o total de passos
   medicamentos <- medicamentos %>%
+    rowwise() %>%
     mutate(unidadeFornecimentoDetectada = {
       p() # Atualiza o progresso a cada linha
       extrai_uf(unidadeMedida_limpa)
@@ -344,6 +355,7 @@ with_progress({
 with_progress({
   p <- progressor(steps = nrow(medicamentos)) # Define o total de passos
   medicamentos <- medicamentos %>%
+    rowwise() %>%
     mutate(unidadeFornecimentoDetectada = {
       p() # Atualiza o progresso a cada linha
       ifelse(
@@ -377,7 +389,7 @@ medicamentos <- medicamentos %>%
 #' ou `NA` se nenhuma unidade for encontrada.
 extrai_um <- function(texto) {
   # Verifica se o parâmetro é vazio ou nulo
-  if (is.na(texto) | texto == "") {
+  if (is.na(texto) || texto == "") {
     return(NA)
   }
   
@@ -407,6 +419,7 @@ extrai_um <- function(texto) {
 with_progress({
   p <- progressor(steps = nrow(medicamentos)) # Define o total de passos
   medicamentos <- medicamentos %>%
+    rowwise() %>%
     mutate(unidadeMedidaDetectada = {
       p() # Atualiza o progresso a cada linha
       extrai_um(unidadeMedida_limpa)
@@ -417,6 +430,7 @@ with_progress({
 with_progress({
   p <- progressor(steps = nrow(medicamentos)) # Define o total de passos
   medicamentos <- medicamentos %>%
+    rowwise() %>%
     mutate(unidadeMedidaDetectada = {
       p() # Atualiza o progresso a cada linha
       ifelse(

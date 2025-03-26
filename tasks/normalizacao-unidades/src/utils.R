@@ -1,22 +1,41 @@
-#' Este arquivo contém funções para a limpeza textual do campo unidadeMedida
+#' Este arquivo contém funções úteis no destrinchamento das unidades
 
 library(dplyr)        # Data manipulation
 library(stringr)      # String processing
 library(stringi)      # String processing
 
-#' Limpeza de Texto
+#' Limpa e normaliza um texto
 #'
-#' Esta função realiza a limpeza de um texto, removendo caracteres numéricos e acentos,
-#' convertendo para minúsculas, eliminando pontuações e espaços extras.
+#' @description A função `limpa_texto` realiza a limpeza e normalização de um texto, 
+#' removendo pontuações (exceto as usadas em números decimais), convertendo para 
+#' minúsculas, removendo acentos e eliminando espaços extras e separando números de palavras.
 #'
-#' @param texto Uma string ou vetor de strings a serem limpas.
-#' @return Uma string ou vetor de strings com o texto limpo.
-#' @import stringi stringr dplyr
+#' @param texto `character` String de entrada que será processada.
+#'
+#' @return Um vetor de caracteres (`character vector`) contendo o texto limpo.
+#'
+#' @details
+#' O processamento da string ocorre em cinco etapas principais:
+#' 1. **Remoção de pontuação**: Remove caracteres de pontuação, exceto ponto (`.`) e vírgula (`,`) 
+#'    quando usados em números.
+#' 2. **Separação de números e palavras**: Adiciona um espaço entre letras e números para garantir 
+#'    que unidades de medida e valores numéricos sejam corretamente segmentados.
+#' 3. **Conversão para minúsculas**: Todos os caracteres são convertidos para letras minúsculas.
+#' 4. **Remoção de acentos**: Caracteres acentuados são convertidos para suas versões sem acento.
+#' 5. **Remoção de espaços extras**: Espaços desnecessários no início, no final ou múltiplos espaços são eliminados.
+#'
 #' @examples
-#' limpa_texto("Exemplo: João comprou pão (e leite) - incrível!")
-#' # Retorna: "exemplo joao comprou pao e leite incrivel"
+#' texto <- "Ácido Acetilsalicílico 500mg, comprimido!"
+#' texto_limpo <- limpa_texto(texto)
+#' print(texto_limpo)
+#' # Saída: "acido acetilsalicilico 500 mg comprimido"
+#'
+#' @import stringr
+#' @import stringi
 limpa_texto <- function(texto) {
-  result <-  gsub("(?<!\\d)[[:punct:]]|[[:punct:]](?!\\d)", "", texto, perl = TRUE) %>% # Remover pontuações, exceto ponto e vírgula decimais
+  result <-  gsub("(?<!\\d)[[:punct:]]|[[:punct:]](?!\\d)", "", texto, perl = TRUE) %>% # Remove pontuações, exceto em números
+    gsub("(?<=[a-zA-Z])(?=\\d)", " ", ., perl = TRUE) %>%  # Adiciona espaço entre letras e números
+    gsub("(?<=\\d)(?=[a-zA-Z])", " ", ., perl = TRUE) %>%  # Adiciona espaço entre números e letras
     tolower() %>%                              # Todas os caracteres ficam minúsculos
     stri_trans_general(id = "Latin-ASCII") %>% # Remove acentos
     str_squish()                               # Remove espaços em branco adicionais
@@ -24,7 +43,30 @@ limpa_texto <- function(texto) {
   return(result)
 }
 
-
+#' Tokeniza um texto preservando termos compostos específicos
+#'
+#' @description A função `tokeniza_unidades` recebe uma string e a divide em palavras, 
+#' preservando determinados termos compostos que devem manter o espaço entre suas palavras.
+#' Isso é útil para garantir que certas expressões não sejam separadas durante a tokenização.
+#'
+#' @param texto `character` String de entrada contendo a descrição a ser tokenizada.
+#'
+#' @return Um vetor de caracteres (`character vector`), onde cada elemento representa uma 
+#' palavra ou termo composto da string original.
+#'
+#' @details
+#' O funcionamento da função ocorre em três etapas principais:
+#' 1. **Lista de termos preservados**: Define uma lista de termos compostos que não devem ser separados.
+#' 2. **Substituição temporária**: Substitui os espaços dentro desses termos por um marcador temporário (`"_"`).
+#' 3. **Tokenização e restauração**: Divide o texto e substitui os marcadores temporários pelos espaços originais.
+#'
+#' @examples
+#' texto <- "fornecimento de mil ui por embalagem"
+#' tokens <- tokeniza_unidades(texto)
+#' print(tokens)
+#' # Saída: ["fornecimento", "de", "mil ui", "por", "embalagem"]
+#'
+#' @import stringr
 tokeniza_unidades <- function(texto) {
   # Lista de termos que devem manter o espaço
   termos_preservados <- c("milheiro de cartelas", "mil cte", "milheiros de cartelas",
@@ -44,50 +86,4 @@ tokeniza_unidades <- function(texto) {
   palavras <- str_replace_all(palavras, "_", " ")
   
   return(palavras)
-}
-
-#' Converte uma Lista Aninhada em uma Estrutura de Ambientes (hashtable).
-#'
-#' Esta função converte recursivamente uma lista aninhada em uma estrutura de 
-#' ambientes (environments), onde cada nível da lista é mapeado para um ambiente.
-#'
-#' @param lst Uma lista nomeada, que pode conter outras listas aninhadas.
-#' @return Um ambiente (`environment`) onde cada chave corresponde a um elemento 
-#'         da lista original. Listas aninhadas são transformadas em ambientes,
-#'         enquanto valores atômicos (ex.: vetores) são armazenados diretamente.
-#' @examples
-#' # Exemplo de lista aninhada
-#' lista_aninhada <- list(
-#'   "item1" = list(
-#'     "frasco" = list("ml" = c(20, 50)),
-#'     "cx" = list("kg" = c(10))
-#'   ),
-#'   "item2" = list(
-#'     "galão" = list("l" = c(5)),
-#'     "caixa" = list("un" = c(100))
-#'   )
-#' )
-#'
-#' # Converter a lista em uma estrutura de ambientes
-#' estrutura_env <- list_to_env(lista_aninhada)
-#'
-#' # Acessando valores
-#' get("item1", estrutura_env)  # Ambiente contendo "frasco" e "cx"
-#' get("frasco", get("item1", estrutura_env))  # Ambiente contendo "ml"
-#' get("ml", get("frasco", get("item1", estrutura_env)))  # c(20, 50)
-#' 
-list_to_env <- function(lst) {
-  env <- new.env(hash = TRUE, parent = emptyenv())
-  
-  for (key in names(lst)) {
-    value <- lst[[key]]
-    
-    if (is.list(value)) {
-      assign(key, list_to_env(value), envir = env)  # Recursão para sub-listas
-    } else {
-      assign(key, value, envir = env)  # Atribuição direta para valores simples
-    }
-  }
-  
-  return(env)
 }
