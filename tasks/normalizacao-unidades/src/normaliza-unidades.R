@@ -270,7 +270,7 @@ medicamentos$descricao_limpa <- limpa_texto(medicamentos$descricao)
 medicamentos$unidadeMedida_limpa <- limpa_texto(medicamentos$unidadeMedida)
 
 
-# IDENTIFICA UNIDADES DE FORNECIMENTO -------------------------------------
+# IDENTIFICA UNIDADES -----------------------------------------------------
 
 #' Explicação:
 #'
@@ -296,31 +296,25 @@ medicamentos$unidadeMedida_limpa <- limpa_texto(medicamentos$unidadeMedida)
 #' encontrado, usa-se o valor do campo `quantidade`.
 
 
-#' Extrai a unidade de fornecimento (UF) de um texto
+#' Extrai a unidade de fornecimento a partir de uma lista de tokens
 #'
-#' A função identifica e extrai a unidade de fornecimento (UF) de um texto,
-#' verificando tokens individuais em um ambiente (`uf_env`) que contém as unidades reconhecidas.
-#' Se mais de uma unidade for encontrada, retorna `"incerteza"`.
+#' @description A função `extrai_uf` identifica e extrai a unidade de fornecimento 
+#' a partir de um vetor de tokens. Caso mais de uma unidade de fornecimento seja encontrada, 
+#' a função retorna `NA` para indicar ambiguidade.
 #'
-#' @param texto Uma string contendo o texto a ser analisado.
-#' @return Uma string com a unidade de fornecimento identificada, `"incerteza"` caso haja múltiplas correspondências,
-#' ou `NA` se nenhuma unidade for encontrada.
-#' @examples
-#' # Supondo que uf_env contém "frasco" -> "frasco" e "caixa" -> "caixa"
-#' extrai_uf("frasco de 500ml")  # Retorna "frasco"
-#' extrai_uf("bolsa contendo 10 frascos")  # Retorna "incerteza"
-#' extrai_uf("produto sem unidade específica")  # Retorna NA
-#' @seealso tokeniza_unidades
-#' @export
-extrai_uf <- function(texto) {
-  # Verifica se o parâmetro é vazio ou nulo
-  if (is.na(texto) | texto == "") {
-    return(NA)
-  }
-  
-  # Separa o texto em tokens
-  tokens <- tokeniza_unidades(texto)
-  
+#' @param tokens `character vector` Vetor de palavras (tokens) extraídas de um texto.
+#'
+#' @return Um único valor `character` representando a unidade de fornecimento identificada, 
+#' ou `NA` caso nenhuma ou mais de uma unidade de fornecimento seja encontrada.
+#'
+#' @details
+#' A função percorre os tokens fornecidos e verifica se cada um deles corresponde 
+#' a uma unidade de fornecimento previamente mapeada na variável `uf_env` (um ambiente).  
+#' 
+#' - Se nenhum token corresponder a uma unidade de fornecimento, a função retorna `NA`.  
+#' - Se apenas um token corresponder, ele será retornado como unidade de fornecimento detectada.  
+#' - Se mais de um token corresponder, a função retorna `NA`, indicando incerteza na detecção.  
+extrai_uf <- function(tokens) {
   count_uf <- 0  # Contagem de unidades de fornecimento
   uf <- NA       # Unidade de fornecimento
   
@@ -332,70 +326,33 @@ extrai_uf <- function(texto) {
     }
   }
   
-  # Se houver mais de uma unidade de fornecimento, retorna "incerteza"
+  # Se houver mais de uma unidade de fornecimento, retorna NA
   if (count_uf > 1) {
-    uf <- "incerteza"
+    uf <- NA
   }
   
   return(uf)
 }
 
-# Detecta as unidades de fornecimento a partir do campo `unidadeMedida`
-with_progress({
-  p <- progressor(steps = nrow(medicamentos)) # Define o total de passos
-  medicamentos <- medicamentos %>%
-    rowwise() %>%
-    mutate(unidadeFornecimentoDetectada = {
-      p() # Atualiza o progresso a cada linha
-      extrai_uf(unidadeMedida_limpa)
-    })
-})
-
-# Detecta as unidades de fornecimento faltantes a partir do campo `descricao`
-with_progress({
-  p <- progressor(steps = nrow(medicamentos)) # Define o total de passos
-  medicamentos <- medicamentos %>%
-    rowwise() %>%
-    mutate(unidadeFornecimentoDetectada = {
-      p() # Atualiza o progresso a cada linha
-      ifelse(
-        is.na(unidadeFornecimentoDetectada),
-        extrai_uf(descricao_limpa),
-        unidadeFornecimentoDetectada
-      )
-    })
-})
-
-# Adiciona o nome padrão da unidade de fornecimento
-medicamentos <- medicamentos %>%
-  mutate(nomeUnidadeFornecimento = map_chr(unidadeFornecimentoDetectada, ~ {
-    if (is.na(.x))
-      NA_character_
-    else
-      uf_env[[.x]] %||% NA_character_
-  }))
-
-
-# IDENTIFICA UNIDADES DE MEDIDA -------------------------------------------
-
-#' Extrai a unidade de medida (UM) de um texto
+#' Extrai a unidade de medida a partir de uma lista de tokens
 #'
-#' A função identifica e extrai a unidade de medida (UM) de um texto,
-#' verificando tokens individuais em um ambiente (`um_env`) que contém as unidades reconhecidas.
-#' Se mais de uma unidade for encontrada, retorna `"incerteza"`.
+#' @description A função `extrai_um` identifica e extrai a unidade de medida 
+#' a partir de um vetor de tokens. Caso mais de uma unidade de medida seja encontrada, 
+#' a função retorna `NA` para indicar ambiguidade.
 #'
-#' @param texto Uma string contendo o texto a ser analisado.
-#' @return Uma string com a unidade de medida identificada, `"incerteza"` caso haja múltiplas correspondências,
-#' ou `NA` se nenhuma unidade for encontrada.
-extrai_um <- function(texto) {
-  # Verifica se o parâmetro é vazio ou nulo
-  if (is.na(texto) || texto == "") {
-    return(NA)
-  }
-  
-  # Separa o texto em tokens
-  tokens <- tokeniza_unidades(texto)
-  
+#' @param tokens `character vector` Vetor de palavras (tokens) extraídas de um texto.
+#'
+#' @return Um único valor `character` representando a unidade de medida identificada, 
+#' ou `NA` caso nenhuma ou mais de uma unidade de medida seja encontrada.
+#'
+#' @details
+#' A função percorre os tokens fornecidos e verifica se cada um deles corresponde 
+#' a uma unidade de medida previamente mapeada na variável `um_env` (um ambiente).  
+#' 
+#' - Se nenhum token corresponder a uma unidade de medida, a função retorna `NA`.  
+#' - Se apenas um token corresponder, ele será retornado como unidade de medida detectada.  
+#' - Se mais de um token corresponder, a função retorna `NA`, indicando incerteza na detecção.
+extrai_um <- function(tokens) {
   count_um <- 0  # Contagem de unidades de medida
   um <- NA       # nome da unidade de medida
   
@@ -407,49 +364,65 @@ extrai_um <- function(texto) {
     }
   }
   
-  # Se houver mais de uma unidade de medida, retorna "incerteza"
+  # Se houver mais de uma unidade de medida, retorna NA
   if (count_um > 1) {
-    um <- "incerteza"
+    um <- NA
   }
   
   return(um)
 }
 
-# Detecta as unidades de medida a partir do campo `unidadeMedida`
+# Executa o algoritmo de detecção e monitora o progresso
 with_progress({
-  p <- progressor(steps = nrow(medicamentos)) # Define o total de passos
-  medicamentos <- medicamentos %>%
-    rowwise() %>%
-    mutate(unidadeMedidaDetectada = {
-      p() # Atualiza o progresso a cada linha
-      extrai_um(unidadeMedida_limpa)
-    })
+  # Define o total de passos (para atualizações de progresso)
+  p <- progressor(steps = nrow(medicamentos)) 
+  
+  for (i in seq_len(nrow(medicamentos))) {
+    # tokens da unidade de medida
+    tokens_um <- tokeniza_unidades(medicamentos$unidadeMedida_limpa[i])
+    
+    # tokens da descricao
+    tokens_desc <- tokeniza_unidades(medicamentos$descricao_limpa[i])
+    
+    # Procura a unidade de fornecimento no campo `unidadeMedida`
+    unidadeFornecimentoDetectada <- extrai_uf(tokens_um)
+    
+    # Se não encontrar, procura a unidade de fornecimento no campo `descricao`
+    if (is.na(unidadeFornecimentoDetectada)) {
+      unidadeFornecimentoDetectada <- extrai_uf(tokens_desc)
+    }
+    
+    # Define o nome padrão da unidade de fornecimento (NA caso não tenha econtrado)
+    if (is.na(unidadeFornecimentoDetectada)) {
+      nomeUnidadeFornecimento <- NA_character_
+    } else {
+      nomeUnidadeFornecimento <- uf_env[[unidadeFornecimentoDetectada]]
+    }
+    
+    # Procura a unidade de medida no campo `unidadeMedida`
+    unidadeMedidaDetectada <- extrai_um(tokens_um)
+    
+    # Se não encontrar, procura a unidade de medida no campo `descricao`
+    if (is.na(unidadeMedidaDetectada)) {
+      unidadeMedidaDetectada <- extrai_um(tokens_desc)
+    }
+    
+    # Define o nome padrão da unidade de medida (NA caso não tenha econtrado)
+    if (is.na(unidadeMedidaDetectada)) {
+      nomeUnidadeMedida <- NA_character_
+    } else {
+      nomeUnidadeMedida <- um_env[[unidadeMedidaDetectada]]
+    }
+    
+    # Insere os valores no dataframe
+    medicamentos[i, 'unidadeFornecimentoDetectada'] <- unidadeFornecimentoDetectada
+    medicamentos[i, 'nomeUnidadeFornecimento'] <- nomeUnidadeFornecimento
+    medicamentos[i, 'unidadeMedidaDetectada'] <- unidadeMedidaDetectada
+    medicamentos[i, 'nomeUnidadeMedida'] <- nomeUnidadeMedida
+    
+    p() # Atualiza o progresso a cada linha
+  }
 })
-
-# Detecta as unidades de medida a partir do campo `descricao`
-with_progress({
-  p <- progressor(steps = nrow(medicamentos)) # Define o total de passos
-  medicamentos <- medicamentos %>%
-    rowwise() %>%
-    mutate(unidadeMedidaDetectada = {
-      p() # Atualiza o progresso a cada linha
-      ifelse(
-        is.na(unidadeMedidaDetectada),
-        extrai_um(descricao_limpa),
-        unidadeMedidaDetectada
-      )
-    })
-})
-
-# Adiciona o nome padrão da unidade de medida
-medicamentos <- medicamentos %>%
-  mutate(nomeUnidadeMedida = map_chr(unidadeMedidaDetectada, ~ {
-    if (is.na(.x))
-      NA_character_
-    else
-      um_env[[.x]] %||% NA_character_
-  }))
-
 
 # IDENTIFICA CAPACIDADES DAS UNIDADES DE MEDIDA ---------------------------
 
