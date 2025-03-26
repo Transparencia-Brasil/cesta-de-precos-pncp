@@ -20,9 +20,6 @@ library(stringr)      # Operações em string
 # Funções úteis
 source(here("tasks/normalizacao-unidades/src/utils.R"))
 
-# Ativa atualizações de progresso globalmente
-handlers(global = TRUE) 
-
 # CARREGA OS DADOS --------------------------------------------------------
 
 CAMINHO_CATALOGO <- here("data/catmat/catmat.rds")
@@ -487,6 +484,35 @@ medicamentos <- medicamentos %>%
     extrai_capacidade(descricao_limpa, unidadeMedidaDetectada),
     capacidadeUnidadeMedida
   ))
+
+
+# NORMALIZA UNIDADES DE MEDIDA --------------------------------------------
+
+medicamentos <- medicamentos %>%
+  mutate(
+    unidadeMedidaNormalizada = case_when(
+        nomeUnidadeMedida == "curie" ~ "milicurie",
+        nomeUnidadeMedida == "litro" ~ "mililitro",
+        nomeUnidadeMedida == "microlitro" ~ "mililitro",
+        nomeUnidadeMedida == "micrograma" ~ "grama",
+        nomeUnidadeMedida == "miligrama" ~ "grama",
+        nomeUnidadeMedida == "quilograma" ~ "grama",
+        nomeUnidadeMedida == "mil unid intern" ~ "unid internacional",
+        nomeUnidadeMedida == "milhao unid intern" ~ "unid internacional",
+        TRUE ~ nomeUnidadeMedida
+      ),
+    capacidadeNormalizada = case_when(
+      nomeUnidadeMedida == "curie" ~ capacidadeUnidadeMedida * 1000, # 1 curie = 1000 milicurie
+      nomeUnidadeMedida == "litro" ~ capacidadeUnidadeMedida * 1000, # 1 litro = 1000 mililitros
+      nomeUnidadeMedida == "microlitro" ~ capacidadeUnidadeMedida / 1000, # 1 microlitro = 0.001 mililitro
+      nomeUnidadeMedida == "micrograma" ~ capacidadeUnidadeMedida / 1e6, # 1 micrograma = 0.000001 grama
+      nomeUnidadeMedida == "miligrama" ~ capacidadeUnidadeMedida / 1000, # 1 miligrama = 0.001 grama
+      nomeUnidadeMedida == "quilograma" ~ capacidadeUnidadeMedida * 1000, # 1 quilograma = 1000 gramas
+      nomeUnidadeMedida == "mil unid intern" ~ capacidadeUnidadeMedida * 1000, # 1 mil unid = 1000 unid internacional
+      nomeUnidadeMedida == "milhao unid intern" ~ capacidadeUnidadeMedida * 1e6, # 1 milhão unid = 1.000.000 unid internacional
+      TRUE ~ capacidadeUnidadeMedida
+    )
+  ) 
 
 
 # SALVA OS RESULTADOS -----------------------------------------------------
