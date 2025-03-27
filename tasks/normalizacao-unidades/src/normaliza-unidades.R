@@ -501,18 +501,20 @@ medicamentos <- medicamentos %>%
         nomeUnidadeMedida == "milhao unid intern" ~ "unid internacional",
         TRUE ~ nomeUnidadeMedida
       ),
+    capacidadeAjustada = if_else(is.na(capacidadeUnidadeMedida), 1, capacidadeUnidadeMedida), # Ajusta NA para 1
     capacidadeNormalizada = case_when(
-      nomeUnidadeMedida == "curie" ~ capacidadeUnidadeMedida * 1000, # 1 curie = 1000 milicurie
-      nomeUnidadeMedida == "litro" ~ capacidadeUnidadeMedida * 1000, # 1 litro = 1000 mililitros
-      nomeUnidadeMedida == "microlitro" ~ capacidadeUnidadeMedida / 1000, # 1 microlitro = 0.001 mililitro
-      nomeUnidadeMedida == "micrograma" ~ capacidadeUnidadeMedida / 1e6, # 1 micrograma = 0.000001 grama
-      nomeUnidadeMedida == "miligrama" ~ capacidadeUnidadeMedida / 1000, # 1 miligrama = 0.001 grama
-      nomeUnidadeMedida == "quilograma" ~ capacidadeUnidadeMedida * 1000, # 1 quilograma = 1000 gramas
-      nomeUnidadeMedida == "mil unid intern" ~ capacidadeUnidadeMedida * 1000, # 1 mil unid = 1000 unid internacional
-      nomeUnidadeMedida == "milhao unid intern" ~ capacidadeUnidadeMedida * 1e6, # 1 milhão unid = 1.000.000 unid internacional
-      TRUE ~ capacidadeUnidadeMedida
+      nomeUnidadeMedida == "curie" ~ capacidadeAjustada * 1000, # 1 curie = 1000 milicurie
+      nomeUnidadeMedida == "litro" ~ capacidadeAjustada * 1000, # 1 litro = 1000 mililitros
+      nomeUnidadeMedida == "microlitro" ~ capacidadeAjustada / 1000, # 1 microlitro = 0.001 mililitro
+      nomeUnidadeMedida == "micrograma" ~ capacidadeAjustada / 1e6, # 1 micrograma = 0.000001 grama
+      nomeUnidadeMedida == "miligrama" ~ capacidadeAjustada / 1000, # 1 miligrama = 0.001 grama
+      nomeUnidadeMedida == "quilograma" ~ capacidadeAjustada * 1000, # 1 quilograma = 1000 gramas
+      nomeUnidadeMedida == "mil unid intern" ~ capacidadeAjustada * 1000, # 1 mil unid = 1000 unid internacional
+      nomeUnidadeMedida == "milhao unid intern" ~ capacidadeAjustada * 1e6, # 1 milhão unid = 1.000.000 unid internacional
+      TRUE ~ capacidadeUnidadeMedida # Se não for nenhum caso acima, fica como estava
     )
-  ) 
+  ) %>%
+  select(-capacidadeAjustada)
 
 
 # SALVA OS RESULTADOS -----------------------------------------------------
