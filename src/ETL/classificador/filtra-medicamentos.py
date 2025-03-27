@@ -2,14 +2,14 @@
 Este script identifica quais itens são medicamentos dentre uma lista de itens passada como argumento.
 
 Parâmetros:
-1. itens (obrigatório) - Caminho para um arquivo .csv contendo os itens a serem identificados. A descricao do item 
+1. itens (obrigatório) - Caminho para um arquivo .csv contendo os itens a serem identificados. A descricao do item
 deve estar em uma coluna chamada 'descricao'.
 
-2. Catálogo (obrigatório) - Caminho para um arquivo .csv contendo o catálogo de medicamentos que será utilizado 
+2. Catálogo (obrigatório) - Caminho para um arquivo .csv contendo o catálogo de medicamentos que será utilizado
 como referência para identificar os medicamentos dentre os itens.
 
 Método:
-1 - Primeiro os itens são varridos para verificar se sua descrição contém algum nome PDM do catálogo. 
+1 - Primeiro os itens são varridos para verificar se sua descrição contém algum nome PDM do catálogo.
 Isso agiliza identificar potenciais candidatos a medicamentos.
 2 - Um modelo LLM transforma as descrições dos itens candidatos a medicamentos em embeddings e faz o mesmo
 com as descrições dos medicamentos no catálogo.
@@ -19,21 +19,21 @@ párea do item candidato.
 4 - Os itens cujos páreas possuírem similaridade igual ou superior a 0.5 serão classificados como medicamento.
 O valor 0.5 foi definido experimentalmente como sendo o limite que rende os melhores resultados de acurácia.
 
-Por fim, os medicamentos idntificados são salvos em um arquivo chamado 'medicamentos.csv', junto com o código BR do item 
+Por fim, os medicamentos idntificados são salvos em um arquivo chamado 'medicamentos.csv', junto com o código BR do item
 mais similar do catálogo. Os embeddings do catálogo são salvos em um arquivo (catalogo-vetorizado.csv) para evitar calculá-los a
 cada execução do script.
 """
 
-import argparse     # Conversor para opções de linha de comando
-import os           # Sistema operacional
+import argparse  # Conversor para opções de linha de comando
+import json  # Codificador e decodificador JSON
+import os  # Sistema operacional
 import unicodedata  # Unicode Database
-import nltk         # Natural Language ToolKit
-import json         # Codificador e decodificador JSON
-import pandas as pd # Análise de dados
-import numpy as np  # Computação científica
 
-from sentence_transformers import SentenceTransformer
+import nltk  # Natural Language ToolKit
+import numpy as np  # Computação científica
+import pandas as pd  # Análise de dados
 from nltk.corpus import stopwords
+from sentence_transformers import SentenceTransformer
 
 # Baixa stopwords caso ainda não tenha
 nltk.download('stopwords')
@@ -126,7 +126,7 @@ for linha in catmat_df[['codigo_pdm', 'nome_pdm_limpo']].itertuples(index=False)
     palavras = linha.nome_pdm_limpo.split(' ')   # separa as palavras do nome pdm
     pdm = int(linha.codigo_pdm)
     for palavra in palavras:                     # para cada palavra adiciona o codigo pdm ao conjunto
-        if palavra in dic_consulta_pdm:          
+        if palavra in dic_consulta_pdm:
             dic_consulta_pdm[palavra].add(pdm)
         else:
             dic_consulta_pdm[palavra] = set([pdm])
@@ -136,7 +136,7 @@ def detecta_pdm(descricao):
     """
     Identifica o código PDM (Padrão Descritivo de Material) associado a uma descrição textual.
 
-    A função verifica quais palavras da descrição estão no dicionário `dic_consulta_pdm`, 
+    A função verifica quais palavras da descrição estão no dicionário `dic_consulta_pdm`,
     que mapeia palavras a conjuntos de códigos PDM. Se uma palavra estiver no dicionário,
     a função refina os possíveis códigos PDM por interseção até restar apenas um.
 
@@ -173,7 +173,7 @@ def detecta_pdm(descricao):
                 pdms = pdms.intersection(dic_consulta_pdm[palavra])
             if len(pdms) == 1:
                 break
-    
+
     return list(pdms)[0] if len(pdms) == 1 else None
 
 # Identifica, quando possível, um potencial código PDM (de medicamento) para um item do PNCP
@@ -213,7 +213,7 @@ if not os.path.exists(NOME_CATALOGO_VETORIZADO):
 
     # Salvando o catalogo vetorizado no formato CSV
     print(f'\rVetorização do catálogo completa. Resultados salvos em {NOME_CATALOGO_VETORIZADO}', end="")
-    catmat_df.to_csv(NOME_CATALOGO_VETORIZADO, index=False) 
+    catmat_df.to_csv(NOME_CATALOGO_VETORIZADO, index=False)
 else:
     catmat_df = pd.read_csv(NOME_CATALOGO_VETORIZADO)
 
@@ -230,7 +230,7 @@ print('\rCalculando os vetores das descrições dos itens do PNCP.', end="", flu
 
 # Computa os vetores (embeddings) das descrições dos itens
 consultas = medicamentos_df['descricao']
-embeddings = model.encode(consultas, prompt_name="query") 
+embeddings = model.encode(consultas, prompt_name="query")
 
 # Adiciona os embeddings como uma coluna no dataframe
 medicamentos_df['embedding'] = list(embeddings)
@@ -254,7 +254,7 @@ def mais_similar(medicamento):
     Parâmetros:
     ----------
     medicamento : object <class 'pandas.core.series.Series'>
-        Uma série pandas (possivelmente uma linha de um dataframe) que deve conter as dimensões 
+        Uma série pandas (possivelmente uma linha de um dataframe) que deve conter as dimensões
         'embedding' (vetor de números) e 'codigo_pdm'.
 
     Retorna:
@@ -265,7 +265,7 @@ def mais_similar(medicamento):
 
     # embedding da descrição do item no PNCP
     consulta = medicamento['embedding'].astype(np.float32)
-    
+
     # Código PDM do item no PNCP.
     codigoPDM = medicamento['codigo_pdm']
 
@@ -273,19 +273,20 @@ def mais_similar(medicamento):
     itens_pdm = catmat_df.loc[[codigoPDM]] # Use double brackets para forçar o resultado a ser um dataframe
 
     # Converte os embeddings para np.array e garante dtype float32
-    embeddings_array = np.vstack(itens_pdm['embedding'].apply(lambda x: np.array(x, dtype=np.float32)))
-    
+    embeddings_array = np.vstack(itens_pdm['embedding'].apply(lambda x: np.array(eval(x), dtype=np.float32)))
+
+
     # Computa a similaridade entre os embeddings da descrição do CATMAT e o embedding do item do PNCP
     similaridades = model.similarity(consulta, embeddings_array)
     itens_pdm['similaridade'] = similaridades.numpy()[0]
-    
+
     # Define o índice como o codigo_br para agilizar a próxima operação
     itens_pdm.set_index('codigo_br', inplace=True)
-    
+
     # Identifica o código BR do item do CATMAT com maior similaridade
     medicamento_mais_similar = itens_pdm.loc[itens_pdm['similaridade'].idxmax()].name
     similaridade = itens_pdm.loc[medicamento_mais_similar].similaridade
-    
+
     return medicamento_mais_similar, similaridade
 
 
@@ -299,7 +300,7 @@ medicamentos_df['medicamento'] = medicamentos_df['similaridade'] >= THRESHOLD
 medicamentos_df = medicamentos_df[medicamentos_df['medicamento']]
 
 # Remove colunas criadas desnecessárias
-medicamentos_df.drop(['descricao_limpa', 'embedding'], axis=1, inplace=True)
+medicamentos_df.drop(['descricao_limpa'], axis=1, inplace=True)
 
 # Converte o codigo_br em inteiro
 medicamentos_df['codigo_br'] = medicamentos_df['codigo_br'].astype(int)
