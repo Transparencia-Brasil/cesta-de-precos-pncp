@@ -97,6 +97,7 @@ salva_resultados <- function(output_dir) {
 #' @param endpoints Vetor de URLs ou identificadores dos endpoints a serem coletados.
 #' @param output_dir Caminho do diretório onde os resultados serão salvos. O padrão é `"coleta"` na raiz do projeto.
 #' @param tamanho_lote Número de requisições processadas antes de salvar os dados no disco. O padrão é 1000.
+#' @param template Dataframe template que define a estrutura dos dados a serem coletados. Cada template é gerado no script coletor em R.
 #'
 #' @details
 #' - A coleta é retomada de onde parou, verificando quais endpoints já foram processados.
@@ -110,7 +111,7 @@ salva_resultados <- function(output_dir) {
 #' # Coletar dados de uma lista de endpoints
 #' endpoints <- c("https://api.example.com/dado1", "https://api.example.com/dado2")
 #' coleta(endpoints, output_dir = "dados_coletados", tamanho_lote = 500)
-coleta <- function(endpoints, output_dir = here("coleta"), tamanho_lote = 1000) {
+coleta <- function(endpoints, output_dir = here("coleta"), tamanho_lote = 1000, template) {
 
   #' Verifica o progresso da coleta de dados e retorna endpoints pendentes
   #'
@@ -219,7 +220,10 @@ coleta <- function(endpoints, output_dir = here("coleta"), tamanho_lote = 1000) 
         duracao = as.numeric(difftime(fim_lote, inicio_lote, units = "secs")),
         stringsAsFactors = FALSE
       ))
-      
+
+      # formata o dataset conforme o template
+      df_dados <- bind_rows(template, df_dados)
+
       # Salva os resultados parciais
       fwrite(df_dados, PATH_DADOS, sep = ",", row.names = FALSE, col.names = !file.exists(PATH_DADOS), append = TRUE, quote = TRUE)
       fwrite(df_erros, PATH_ERROS, sep = ",", row.names = FALSE, col.names = !file.exists(PATH_ERROS), append = TRUE, quote = TRUE)
