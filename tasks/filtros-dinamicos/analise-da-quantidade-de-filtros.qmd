@@ -1,0 +1,183 @@
+---
+title: "Análise da distribuição da quantidade de características por medicamento"
+subtitle: "Para selecionar o número máximo de filtros da plataforma Medicamentos Transparentes."
+author: "Luiz Fonseca"
+date: "today"
+date-format: "D.MMM.YYYY"
+date-modified: "last-modified"
+lang: pt-BR
+format:
+  html:
+    other-links:
+      - text: Repositório no GitHub
+        icon: github
+        href: https://github.com/Transparencia-Brasil/cesta-de-precos-pncp
+    html-math-method: katex
+    css: style.css
+    anchor-sections: true
+    code-fold: true
+    code-tools: true
+    code-link: true
+    code-line-numbers: true
+    code-background: false
+    code-summary: "Código"
+    toc: true
+    toc-title: "Índice"
+    toc-depth: 4
+    toc-float: false
+    toc-collapsed: false
+    footnotes-hover: true
+    smooth-scroll: true
+    fig-width: 8
+    fig-height: 6
+    search: true
+    embed-resources: true
+    theme:
+          light: cosmo
+          dark: darkly
+knitr:
+  opts_chunk:
+    echo: true
+    collapse: true
+    message: false
+    warning: false
+    comment: "#>"
+editor_options:
+  chunk_output_type: inline
+execute:
+  cache: false
+  output:
+    dpi: 600       # Ajusta o DPI para gráficos de alta qualidade
+---
+
+```{r, message=FALSE, warning=FALSE}
+#| label: libs-and-sources
+library(dplyr)
+library(here)
+library(ggplot2)
+library(tidyr)
+library(purrr)
+```
+
+## Distribuição da quantidade de características por medicamento
+
+```{r}
+#| label: Distribuicao-da-quantidade-de-caracteristicas-por-medicamento
+# Lê o arquivo
+catmat <- readRDS(here("data/catmat/catmat.rds"))
+
+# Adicionando uma nova coluna com o número de características de cada PDM de medicamento
+catmat <- catmat %>%
+  mutate(num_caracteristicas = sapply(buscaItemCaracteristica, nrow))
+```
+
+```{r}
+# Cria uma tabela com a contagem e a frequência relativa
+freq_table <- catmat %>%
+  count(num_caracteristicas) %>%
+  mutate(perc = n / sum(n) * 100)  # Calculando porcentagem
+
+# Cria o gráfico
+ggplot(freq_table, aes(x = factor(num_caracteristicas), y = n)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  geom_text(aes(label = paste0(n, " (", round(perc, 1), "%)")), 
+            vjust = -0.5, size = 3) +  # Adiciona os rótulos acima das barras
+  labs(x = "Número de Características", 
+       y = "Quantidade de Medicamentos", 
+       title = "Distribuição de Características por Medicamento") +
+  theme_minimal()
+```
+
+
+## Remove características menos importantes
+
+Para os itens com mais de 3 características, serão selecionadas apenas as 3 características que possuem maior quantidade de instâncias com valores distintos. Por exemplo:
+
+O medicamento Paracetamol (PDM: 10422) possui 12 características diferentes, são elas:
+
+```{r}
+#| label: caracteristicas-do-paracetamol
+# Desaninhando a coluna "buscaItemCaracteristica"
+catmat <- catmat %>% unnest(buscaItemCaracteristica)
+
+catmat %>%
+  filter(nome_pdm == 'Paracetamol') %>%
+  group_by(codigoCaracteristica, nomeCaracteristica, codigo_pdm, nome_pdm) %>%
+  summarise(n_valores_unicos = n_distinct(nomeValorCaracteristica), .groups = "drop") %>%
+  arrange(desc(n_valores_unicos))
+```
+
+
+Cada característica possui diferentes valores possíveis. As características *concentração*, *dosagem* e *composição* são as que possuem mais valores distintos, diferente de *uso* que só possui 2 valores ("Solução Oral-Gotas" e "Solução Oral"). 
+
+Considerando que as características que possuem mais valores distintos especificam melhor o medicamento que o usuário gostaria de pesquisar, elas serão selecionadas para compor os filtros na plataforma Medicamentos Transparentes. Em suma, o critério de seleção de características utilizado será o **maior número de valores distintos**.
+
+
+```{r}
+#| label: remove-caracteristicas-menos-importantes
+
+# Contando valores distintos de características por codigoCaracteristica dentro de cada PDM
+df_contagem <- catmat %>%
+  group_by(codigo_pdm, codigoCaracteristica) %>%
+  summarise(n_valores_unicos = n_distinct(nomeValorCaracteristica), .groups = "drop")
+
+# Identifica as características que devem ser mantidas, isto é, aquelas que 
+# estão entre as 3 características com mais valores distintos
+df_filtrado <- df_contagem %>%
+  group_by(codigo_pdm) %>%
+  slice_max(n = 3, order_by = n_valores_unicos, with_ties = FALSE) %>%
+  filter(n_valores_unicos > 1) %>% # remove características com apenas 1 valor distinto 
+  mutate(manter = TRUE) # flag: Devemos manter essa caracteristica?
+
+# Marca no CATMAT as caracteristicas que não serão utilizadas 
+catmat <- catmat %>%
+  left_join(df_filtrado, by = c("codigo_pdm", "codigoCaracteristica")) %>%
+  select(-c(num_caracteristicas, n_valores_unicos))
+
+# Reaninha o CATMAT
+# Reaninha antes de excluir as características para não correr o risco de excluir
+# medicamentos que possuam apenas uma característica com um único valor. 
+# Exemplo: Hidróxido De Alumínio, Indicação:300mg (codigo br: 267271)
+catmat <- catmat %>%
+  group_by(codigo_br) %>%
+  nest(caracteristicas = c(codigoCaracteristica, codigoValorCaracteristica, nomeCaracteristica, 
+                           caracteristicaObrigatoria, statusCaracteristica, numeroCaracteristica, 
+                           nomeValorCaracteristica, siglaUnidadeMedida, statusValorCaracteristica, manter)) %>%
+  ungroup()
+
+# Filtra as características dentro do dataframe aninhado
+catmat <- catmat %>%
+  mutate(caracteristicas = map(caracteristicas, ~ filter(.x, manter == TRUE)))
+```
+
+
+## Nova distribuição da quantidade de características por medicamento
+
+```{r}
+# Adicionando uma nova coluna com o número de características de cada medicamento
+catmat <- catmat %>%
+  mutate(num_caracteristicas = sapply(caracteristicas, nrow))
+
+# Cria uma tabela com a contagem e a frequência relativa
+freq_table <- catmat %>%
+  count(num_caracteristicas) %>%
+  mutate(perc = n / sum(n) * 100)  # Calculando porcentagem
+
+# Cria o gráfico com rótulos
+ggplot(freq_table, aes(x = factor(num_caracteristicas), y = n)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  geom_text(aes(label = paste0(n, " (", round(perc, 1), "%)")), 
+            vjust = -0.5, size = 3) +  # Adiciona os rótulos acima das barras
+  labs(x = "Número de Características", 
+       y = "Quantidade de Medicamentos", 
+       title = "Distribuição de Características por Medicamento") +
+  theme_minimal()
+```
+
+
+
+
+
+
+
+
