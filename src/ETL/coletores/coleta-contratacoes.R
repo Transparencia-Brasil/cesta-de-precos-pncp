@@ -1,17 +1,17 @@
-#' Este script coleta os dados das contratações a partir da API do PNCP. 
+#' Este script coleta os dados das contratações a partir da API do PNCP.
 #' Os dados são coletados a partir do endpoint consultarContratacaoPorDataUltimaAtualizacao.
 #' Todas as contratações do mês anterior ao vigente são coletadas.
-#' 
-#' Há 1 parâmetros opcional de entrada: 
+#'
+#' Há 1 parâmetros opcional de entrada:
 #' PATH_OUTPUT_DIR - o caminho para o diretório de saída, onde serão salvos
 #' os arquivos de dados da coleta. Caso não seja passado, será criado um diretório
 #' chamado "coleta/contratacoes" na raiz do projeto.
-#' 
+#'
 #' Ao final da coleta 3 arquivos são salvos:
 #' 1. dados.csv - contém os dados das contratações.
 #' 2. erros.csv - contém os endpoints que retornaram erros ao consultar e a mensagem de erro.
 #' 3. monitoramento.csv - contém metadados sobre a duração da coleta para cada lote de dados.
-#' 
+#'
 #' https://pncp.gov.br/api/consulta/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/consultarContratacaoPorDataUltimaAtualizacao
 
 suppressPackageStartupMessages(library(dplyr))
@@ -65,17 +65,17 @@ monta_endpoint <- function(data_inicial,
                            codigo_modalidade_contratacao,
                            pagina,
                            tamanho_pagina) {
-  
+
   # Converte as datas para o formato yyyyMMdd
   data_inicial <- format(data_inicial, "%Y%m%d")
   data_final <- format(data_final, "%Y%m%d")
-  
+
   url_base = "https://pncp.gov.br/api/consulta/v1/contratacoes/atualizacao?"
   paste0(url_base,
          "dataInicial=", data_inicial,
          "&dataFinal=", data_final,
          "&codigoModalidadeContratacao=", codigo_modalidade_contratacao,
-         "&pagina=", pagina, 
+         "&pagina=", pagina,
          "&tamanhoPagina=", tamanho_pagina)
 }
 
@@ -86,7 +86,7 @@ paginas_por_modalidade = data.frame()
 # quantas páginas serão consultadas ao todo.
 for (i in MODALIDADES) {
   endpoint <- monta_endpoint(PRIMEIRO_DIA, ULTIMO_DIA, i, 1, TAMANHO_PAGINA)
- 
+
    # Tenta coletar os dados e lança erros caso haja
   tryCatch({
     resposta <- coleta_endpoint(endpoint)
@@ -95,7 +95,7 @@ for (i in MODALIDADES) {
     resposta$endpoint <- endpoint
     # Adiciona a resposta retornada ao dataframe `paginas_por_modalidade`
     paginas_por_modalidade <- bind_rows(paginas_por_modalidade, resposta)
-    
+
   }, error = function(e) {
     # Se houve erro, mostra a mensagem de erro e adiciona aos resultados
     print(e$message)
@@ -110,7 +110,7 @@ for (i in MODALIDADES) {
       )
     )
   })
-  
+
   # Acompanhamento das consultas
   cat(sprintf("Modalidade %d coletada", i), "\r")
   flush.console()
@@ -118,12 +118,12 @@ for (i in MODALIDADES) {
 
 # Salva um arquivo com as consultas que deram erro
 if (nrow(paginas_por_modalidade %>% filter(erro == TRUE)) > 0) {
-  if (!dir.exists(PATH_OUTPUT_DIR)) { 
-    dir.create(output_dir, recursive = TRUE) 
+  if (!dir.exists(PATH_OUTPUT_DIR)) {
+    dir.create(output_dir, recursive = TRUE)
   }
-  
-  paginas_por_modalidade %>% 
-    filter(erro == TRUE) %>% 
+
+  paginas_por_modalidade %>%
+    filter(erro == TRUE) %>%
     select(endpoint, mensagem_erro) %>%
     write_csv(here(PATH_OUTPUT_DIR, "erros.csv"))
 }
@@ -133,7 +133,7 @@ paginas_por_modalidade <- paginas_por_modalidade %>%
   select(codigoModalidade, totalRegistros, totalPaginas) %>%
   distinct() %>%
   arrange(codigoModalidade)
-  
+
 
 # LISTA DE ENDPOINTS A COLETAR --------------------------------------------
 
@@ -144,8 +144,10 @@ paginas_por_modalidade <- paginas_por_modalidade %>%
   unnest(pagina) %>%  # Expande a lista em várias linhas
   mutate(endpoint = monta_endpoint(PRIMEIRO_DIA, ULTIMO_DIA, codigoModalidade, pagina, TAMANHO_PAGINA))
 
-# Extrai só a coluna de endpoints  
+# Extrai só a coluna de endpoints
 endpoints <- paginas_por_modalidade %>% pull(endpoint)
+
+#
 
 
 # COLETA ------------------------------------------------------------------
