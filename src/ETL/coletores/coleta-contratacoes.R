@@ -147,10 +147,69 @@ paginas_por_modalidade <- paginas_por_modalidade %>%
 # Extrai só a coluna de endpoints
 endpoints <- paginas_por_modalidade %>% pull(endpoint)
 
-#
+# TEMPLATE ----------------------------------------------------------------
+
+template_contratacoes <-
+  # Mapeamento das colunas dos arquivos de contratações
+  mapeamento_colunas_contratacoes <- tibble(
+    # ids
+    "data.numeroControlePNCP" = character(),
+    "data.anoCompra" = character(),
+    "data.sequencialCompra" = character(),
+    # modalidade
+    "data.modalidadeId" = character(),
+    "data.modalidadeNome" = character(),
+    # modoDisputa
+    "data.modoDisputaId" = character(),
+    "data.modoDisputaNome" = character(),
+    # instrumentoConvocatorio
+    "data.tipoInstrumentoConvocatorioCodigo" = character(),
+    "data.tipoInstrumentoConvocatorioNome" = character(),
+    # dataAbertura e dataEncerramento
+    "data.dataAberturaProposta" = character(),
+    "data.dataEncerramentoProposta" = character(),
+    # valorEstimado e valorHomologado
+    "data.valorTotalEstimado" = character(),
+    "data.valorTotalHomologado" = character(),
+    # objetoCompra
+    "data.objetoCompra" = character(),
+    # srp
+    "data.srp" = character(),
+    # ampareLegal
+    "data.amparoLegal.codigo" = character(),
+    "data.amparoLegal.nome" = character(),
+    # orgaoEntidade
+    "data.orgaoEntidade.cnpj" = character(),
+    "data.orgaoEntidade.razaoSocial" = character(),
+    "data.orgaoEntidade.esferaId" = character(),
+    "data.orgaoEntidade.poderId" = character(),
+    # unidadeOrgao
+    "data.unidadeOrgao.codigoUnidade" = character(),
+    "data.unidadeOrgao.nomeUnidade" = character(),
+    "data.unidadeOrgao.codigoIbge" = character(),
+    "data.unidadeOrgao.municipioNome" = character(),
+    "data.unidadeOrgao.ufSigla" = character(),
+    "data.unidadeOrgao.ufNome" = character(),
+    # unidadeSubRogada
+    "data.unidadeSubRogada.codigoUnidade" = character(),
+    "data.unidadeSubRogada.nomeUnidade" = character(),
+    "data.unidadeSubRogada.codigoIbge" = character(),
+    "data.unidadeSubRogada.municipioNome" = character(),
+    "data.unidadeSubRogada.ufSigla" = character(),
+    "data.unidadeSubRogada.ufNome" = character(),
+    # orgaoSubRogado
+    "data.orgaoSubRogado.cnpj" = character(),
+    "data.orgaoSubRogado.razaoSocial" = character(),
+    "data.orgaoSubRogado.esferaId" = character(),
+    "data.orgaoSubRogado.poderId" = character(),
+  )
 
 
 # COLETA ------------------------------------------------------------------
 
 # Executa a coleta
-coleta(endpoints = endpoints, output_dir = PATH_OUTPUT_DIR)
+coleta(
+  endpoints = endpoints,
+  output_dir = PATH_OUTPUT_DIR,
+  template = template_contratacoes
+)
