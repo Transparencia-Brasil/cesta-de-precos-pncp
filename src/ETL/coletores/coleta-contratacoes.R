@@ -148,60 +148,60 @@ paginas_por_modalidade <- paginas_por_modalidade %>%
 endpoints <- paginas_por_modalidade %>% pull(endpoint)
 
 # TEMPLATE ----------------------------------------------------------------
+# Mapear todas as colunas que serão coletadas e garantir balanceamento do dataset
 
-template_contratacoes <-
-  # Mapeamento das colunas dos arquivos de contratações
-  mapeamento_colunas_contratacoes <- tibble(
+# referência: https://pncp.gov.br/api/consulta/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/consultarCompra
+template_contratacoes <- tibble(
     # ids
-    "data.numeroControlePNCP" = character(),
-    "data.anoCompra" = character(),
-    "data.sequencialCompra" = character(),
+    data.numeroControlePNCP = character(),
+    data.anoCompra = character(),
+    data.sequencialCompra = character(),
     # modalidade
-    "data.modalidadeId" = character(),
-    "data.modalidadeNome" = character(),
+    data.modalidadeId = character(),
+    data.modalidadeNome = character(),
     # modoDisputa
-    "data.modoDisputaId" = character(),
-    "data.modoDisputaNome" = character(),
+    data.modoDisputaId = character(),
+    data.modoDisputaNome = character(),
     # instrumentoConvocatorio
-    "data.tipoInstrumentoConvocatorioCodigo" = character(),
-    "data.tipoInstrumentoConvocatorioNome" = character(),
+    data.tipoInstrumentoConvocatorioCodigo = character(),
+    data.tipoInstrumentoConvocatorioNome = character(),
     # dataAbertura e dataEncerramento
-    "data.dataAberturaProposta" = character(),
-    "data.dataEncerramentoProposta" = character(),
+    data.dataAberturaProposta = character(),
+    data.dataEncerramentoProposta = character(),
     # valorEstimado e valorHomologado
-    "data.valorTotalEstimado" = character(),
-    "data.valorTotalHomologado" = character(),
+    data.valorTotalEstimado = character(),
+    data.valorTotalHomologado = character(),
     # objetoCompra
-    "data.objetoCompra" = character(),
+    data.objetoCompra = character(),
     # srp
-    "data.srp" = character(),
+    data.srp = character(),
     # ampareLegal
-    "data.amparoLegal.codigo" = character(),
-    "data.amparoLegal.nome" = character(),
+    data.amparoLegal.codigo = character(),
+    data.amparoLegal.nome = character(),
     # orgaoEntidade
-    "data.orgaoEntidade.cnpj" = character(),
-    "data.orgaoEntidade.razaoSocial" = character(),
-    "data.orgaoEntidade.esferaId" = character(),
-    "data.orgaoEntidade.poderId" = character(),
+    data.orgaoEntidade.cnpj = character(),
+    data.orgaoEntidade.razaoSocial = character(),
+    data.orgaoEntidade.esferaId = character(),
+    data.orgaoEntidade.poderId = character(),
     # unidadeOrgao
-    "data.unidadeOrgao.codigoUnidade" = character(),
-    "data.unidadeOrgao.nomeUnidade" = character(),
-    "data.unidadeOrgao.codigoIbge" = character(),
-    "data.unidadeOrgao.municipioNome" = character(),
-    "data.unidadeOrgao.ufSigla" = character(),
-    "data.unidadeOrgao.ufNome" = character(),
+    data.unidadeOrgao.codigoUnidade = character(),
+    data.unidadeOrgao.nomeUnidade = character(),
+    data.unidadeOrgao.codigoIbge = character(),
+    data.unidadeOrgao.municipioNome = character(),
+    data.unidadeOrgao.ufSigla = character(),
+    data.unidadeOrgao.ufNome = character(),
     # unidadeSubRogada
-    "data.unidadeSubRogada.codigoUnidade" = character(),
-    "data.unidadeSubRogada.nomeUnidade" = character(),
-    "data.unidadeSubRogada.codigoIbge" = character(),
-    "data.unidadeSubRogada.municipioNome" = character(),
-    "data.unidadeSubRogada.ufSigla" = character(),
-    "data.unidadeSubRogada.ufNome" = character(),
+    data.unidadeSubRogada.codigoUnidade = character(),
+    data.unidadeSubRogada.nomeUnidade = character(),
+    data.unidadeSubRogada.codigoIbge = character(),
+    data.unidadeSubRogada.municipioNome = character(),
+    data.unidadeSubRogada.ufSigla = character(),
+    data.unidadeSubRogada.ufNome = character(),
     # orgaoSubRogado
-    "data.orgaoSubRogado.cnpj" = character(),
-    "data.orgaoSubRogado.razaoSocial" = character(),
-    "data.orgaoSubRogado.esferaId" = character(),
-    "data.orgaoSubRogado.poderId" = character(),
+    data.orgaoSubRogado.cnpj = character(),
+    data.orgaoSubRogado.razaoSocial = character(),
+    data.orgaoSubRogado.esferaId = character(),
+    data.orgaoSubRogado.poderId = character(),
   )
 
 

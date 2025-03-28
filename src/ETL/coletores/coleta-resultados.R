@@ -58,46 +58,65 @@ endpoints_resultados <- paste0(itens_df$endpoint, "/", itens_df$numeroItem, "/re
 # TEMPLATE ----------------------------------------------------------------
 # Mapear todas as colunas que serão coletadas e garantir balanceamento do dataset
 
+# referência: https://pncp.gov.br/api/pncp/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/recuperarResultados
 template_resultados_itens <- tibble::tibble(
+  # ids
   numeroControlePNCPCompra = character(),
-  endpoint = character(),
-  situacaoCompraItemResultadoNome = character(),
-  porteFornecedorNome = character(),
-  sequencialResultado = character(),
-  naturezaJuridicaNome = character(),
-  dataAtualizacao = character(),
-  niFornecedor = character(),
-  tipoPessoa = character(),
-  dataInclusao = character(),
   numeroItem = character(),
-  valorTotalHomologado = character(),
-  timezoneCotacaoMoedaEstrangeira = character(),
-  moedaEstrangeira = character(),
-  valorNominalMoedaEstrangeira = character(),
-  dataCotacaoMoedaEstrangeira = character(),
+  endpoint = character(),
+  sequencialResultado = character(),
+  # Situação da compra
+  situacaoCompraItemResultadoId = character(),
+  situacaoCompraItemResultadoNome = character(),
+  # data inclusão e atualização
+  dataInclusao = character(),
+  dataAtualizacao = character(),
+  # Fornecedor
+  niFornecedor = character(),
   nomeRazaoSocialFornecedor = character(),
-  codigoPais = character(),
+  tipoPessoa = character(),
   porteFornecedorId = character(),
+  porteFornecedorNome = character(),
+  naturezaJuridicaId = character(),
+  naturezaJuridicaNome = character(),
+  codigoPais = character(),
+  # Quantidades e valores
   quantidadeHomologada = character(),
   valorUnitarioHomologado = character(),
+  valorTotalHomologado = character(),
   percentualDesconto = character(),
-  amparoLegalMargemPreferencia = character(),
-  amparoLegalCriterioDesempate = character(),
+  # País de origem
+  paisOrigemProdutoServico.id = character(),
+  paisOrigemProdutoServico.nome = character(),
+  # Moeda estrangeira
+  moedaEstrangeira.id = character(),
+  moedaEstrangeira.simbolo = character(),
+  moedaEstrangeira.nome = character(),
+  timezoneCotacaoMoedaEstrangeira = character(),
+  valorNominalMoedaEstrangeira = character(),
+  dataCotacaoMoedaEstrangeira = character(),
+  # Margem preferência + amparo legal
+  aplicacaoMargemPreferencia = character(),
+  amparoLegalMargemPreferencia.id = character(),
+  amparoLegalMargemPreferencia.nome = character(),
+  amparoLegalMargemPreferencia.descricao = character(),
+  amparoLegalMargemPreferencia.statusAtivo = character(),
+  # benefício ME/EPP
+  aplicacaoBeneficioMeEpp = character(),
+  # Critério de desempate + amparo legal
+  aplicacaoCriterioDesempate = character(),
   amparoLegalCriterioDesempate.id = character(),
   amparoLegalCriterioDesempate.nome = character(),
   amparoLegalCriterioDesempate.descricao = character(),
   amparoLegalCriterioDesempate.statusAtivo = character(),
-  paisOrigemProdutoServico = character(),
+  # subcontratação
   indicadorSubcontratacao = character(),
+  # classificação SRP
   ordemClassificacaoSrp = character(),
+  # resultado/cancelamento
   dataResultado = character(),
-  motivoCancelamento = character(),
   dataCancelamento = character(),
-  situacaoCompraItemResultadoId = character(),
-  aplicacaoMargemPreferencia = character(),
-  aplicacaoBeneficioMeEpp = character(),
-  aplicacaoCriterioDesempate = character(),
-  naturezaJuridicaId = character()
+  motivoCancelamento = character(),
 )
 
 # COLETA ------------------------------------------------------------------
