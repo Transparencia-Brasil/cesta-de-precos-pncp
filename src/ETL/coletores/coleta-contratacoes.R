@@ -12,7 +12,7 @@
 #' 2. erros.csv - contém os endpoints que retornaram erros ao consultar e a mensagem de erro.
 #' 3. monitoramento.csv - contém metadados sobre a duração da coleta para cada lote de dados.
 #'
-#' https://pncp.gov.br/api/consulta/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/consultarContratacaoPorDataUltimaAtualizacao
+#' https://pncp.gov.br/api/consulta/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/consultarContratacaoPorDataDePublicacao
 
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(tidyr))
@@ -65,51 +65,54 @@ monta_endpoint <- function(data_inicial,
                            codigo_modalidade_contratacao,
                            pagina,
                            tamanho_pagina) {
-
   # Converte as datas para o formato yyyyMMdd
   data_inicial <- format(data_inicial, "%Y%m%d")
   data_final <- format(data_final, "%Y%m%d")
 
-  url_base = "https://pncp.gov.br/api/consulta/v1/contratacoes/atualizacao?"
-  paste0(url_base,
-         "dataInicial=", data_inicial,
-         "&dataFinal=", data_final,
-         "&codigoModalidadeContratacao=", codigo_modalidade_contratacao,
-         "&pagina=", pagina,
-         "&tamanhoPagina=", tamanho_pagina)
+  url_base <- "https://pncp.gov.br/api/consulta/v1/contratacoes/atualizacao?"
+  paste0(
+    url_base,
+    "dataInicial=", data_inicial,
+    "&dataFinal=", data_final,
+    "&codigoModalidadeContratacao=", codigo_modalidade_contratacao,
+    "&pagina=", pagina,
+    "&tamanhoPagina=", tamanho_pagina
+  )
 }
 
 # Dataframe para guardar quantas páginas por modalidade serão consultadas
-paginas_por_modalidade = data.frame()
+paginas_por_modalidade <- data.frame()
 
 # Faz uma consulta inicial por modalidade e salva os resultados para saber
 # quantas páginas serão consultadas ao todo.
 for (i in MODALIDADES) {
   endpoint <- monta_endpoint(PRIMEIRO_DIA, ULTIMO_DIA, i, 1, TAMANHO_PAGINA)
 
-   # Tenta coletar os dados e lança erros caso haja
-  tryCatch({
-    resposta <- coleta_endpoint(endpoint)
-    resposta$erro <- FALSE
-    resposta$codigoModalidade <- i
-    resposta$endpoint <- endpoint
-    # Adiciona a resposta retornada ao dataframe `paginas_por_modalidade`
-    paginas_por_modalidade <- bind_rows(paginas_por_modalidade, resposta)
-
-  }, error = function(e) {
-    # Se houve erro, mostra a mensagem de erro e adiciona aos resultados
-    print(e$message)
-    paginas_por_modalidade <- bind_rows(
-      paginas_por_modalidade,
-      data.frame(
-        erro = TRUE,
-        codigoModalidade = i,
-        endpoint = endpoint,
-        mensagem_erro = as.character(e$message),
-        stringsAsFactors = FALSE
+  # Tenta coletar os dados e lança erros caso haja
+  tryCatch(
+    {
+      resposta <- coleta_endpoint(endpoint)
+      resposta$erro <- FALSE
+      resposta$codigoModalidade <- i
+      resposta$endpoint <- endpoint
+      # Adiciona a resposta retornada ao dataframe `paginas_por_modalidade`
+      paginas_por_modalidade <- bind_rows(paginas_por_modalidade, resposta)
+    },
+    error = function(e) {
+      # Se houve erro, mostra a mensagem de erro e adiciona aos resultados
+      print(e$message)
+      paginas_por_modalidade <- bind_rows(
+        paginas_por_modalidade,
+        data.frame(
+          erro = TRUE,
+          codigoModalidade = i,
+          endpoint = endpoint,
+          mensagem_erro = as.character(e$message),
+          stringsAsFactors = FALSE
+        )
       )
-    )
-  })
+    }
+  )
 
   # Acompanhamento das consultas
   cat(sprintf("Modalidade %d coletada", i), "\r")
@@ -140,8 +143,8 @@ paginas_por_modalidade <- paginas_por_modalidade %>%
 # Cria um endpoint para cada página a consultar para cada modalidade
 paginas_por_modalidade <- paginas_por_modalidade %>%
   rowwise() %>%
-  mutate(pagina = list(1:totalPaginas)) %>%  # Cria uma lista de páginas para cada modalidade
-  unnest(pagina) %>%  # Expande a lista em várias linhas
+  mutate(pagina = list(1:totalPaginas)) %>% # Cria uma lista de páginas para cada modalidade
+  unnest(pagina) %>% # Expande a lista em várias linhas
   mutate(endpoint = monta_endpoint(PRIMEIRO_DIA, ULTIMO_DIA, codigoModalidade, pagina, TAMANHO_PAGINA))
 
 # Extrai só a coluna de endpoints
@@ -150,59 +153,59 @@ endpoints <- paginas_por_modalidade %>% pull(endpoint)
 # TEMPLATE ----------------------------------------------------------------
 # Mapear todas as colunas que serão coletadas e garantir balanceamento do dataset
 
-# referência: https://pncp.gov.br/api/consulta/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/consultarCompra
+# referência: https://pncp.gov.br/api/consulta/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/consultarContratacaoPorDataDePublicacao
 template_contratacoes <- tibble(
-    # ids
-    data.numeroControlePNCP = character(),
-    data.anoCompra = character(),
-    data.sequencialCompra = character(),
-    # modalidade
-    data.modalidadeId = character(),
-    data.modalidadeNome = character(),
-    # modoDisputa
-    data.modoDisputaId = character(),
-    data.modoDisputaNome = character(),
-    # instrumentoConvocatorio
-    data.tipoInstrumentoConvocatorioCodigo = character(),
-    data.tipoInstrumentoConvocatorioNome = character(),
-    # dataAbertura e dataEncerramento
-    data.dataAberturaProposta = character(),
-    data.dataEncerramentoProposta = character(),
-    # valorEstimado e valorHomologado
-    data.valorTotalEstimado = character(),
-    data.valorTotalHomologado = character(),
-    # objetoCompra
-    data.objetoCompra = character(),
-    # srp
-    data.srp = character(),
-    # ampareLegal
-    data.amparoLegal.codigo = character(),
-    data.amparoLegal.nome = character(),
-    # orgaoEntidade
-    data.orgaoEntidade.cnpj = character(),
-    data.orgaoEntidade.razaoSocial = character(),
-    data.orgaoEntidade.esferaId = character(),
-    data.orgaoEntidade.poderId = character(),
-    # unidadeOrgao
-    data.unidadeOrgao.codigoUnidade = character(),
-    data.unidadeOrgao.nomeUnidade = character(),
-    data.unidadeOrgao.codigoIbge = character(),
-    data.unidadeOrgao.municipioNome = character(),
-    data.unidadeOrgao.ufSigla = character(),
-    data.unidadeOrgao.ufNome = character(),
-    # unidadeSubRogada
-    data.unidadeSubRogada.codigoUnidade = character(),
-    data.unidadeSubRogada.nomeUnidade = character(),
-    data.unidadeSubRogada.codigoIbge = character(),
-    data.unidadeSubRogada.municipioNome = character(),
-    data.unidadeSubRogada.ufSigla = character(),
-    data.unidadeSubRogada.ufNome = character(),
-    # orgaoSubRogado
-    data.orgaoSubRogado.cnpj = character(),
-    data.orgaoSubRogado.razaoSocial = character(),
-    data.orgaoSubRogado.esferaId = character(),
-    data.orgaoSubRogado.poderId = character(),
-  )
+  # ids
+  data.numeroControlePNCP = character(),
+  data.anoCompra = character(),
+  data.sequencialCompra = character(),
+  # modalidade
+  data.modalidadeId = character(),
+  data.modalidadeNome = character(),
+  # modoDisputa
+  data.modoDisputaId = character(),
+  data.modoDisputaNome = character(),
+  # instrumentoConvocatorio
+  data.tipoInstrumentoConvocatorioCodigo = character(),
+  data.tipoInstrumentoConvocatorioNome = character(),
+  # dataAbertura e dataEncerramento
+  data.dataAberturaProposta = character(),
+  data.dataEncerramentoProposta = character(),
+  # valorEstimado e valorHomologado
+  data.valorTotalEstimado = character(),
+  data.valorTotalHomologado = character(),
+  # objetoCompra
+  data.objetoCompra = character(),
+  # srp
+  data.srp = character(),
+  # ampareLegal
+  data.amparoLegal.codigo = character(),
+  data.amparoLegal.nome = character(),
+  # orgaoEntidade
+  data.orgaoEntidade.cnpj = character(),
+  data.orgaoEntidade.razaoSocial = character(),
+  data.orgaoEntidade.esferaId = character(),
+  data.orgaoEntidade.poderId = character(),
+  # unidadeOrgao
+  data.unidadeOrgao.codigoUnidade = character(),
+  data.unidadeOrgao.nomeUnidade = character(),
+  data.unidadeOrgao.codigoIbge = character(),
+  data.unidadeOrgao.municipioNome = character(),
+  data.unidadeOrgao.ufSigla = character(),
+  data.unidadeOrgao.ufNome = character(),
+  # unidadeSubRogada
+  data.unidadeSubRogada.codigoUnidade = character(),
+  data.unidadeSubRogada.nomeUnidade = character(),
+  data.unidadeSubRogada.codigoIbge = character(),
+  data.unidadeSubRogada.municipioNome = character(),
+  data.unidadeSubRogada.ufSigla = character(),
+  data.unidadeSubRogada.ufNome = character(),
+  # orgaoSubRogado
+  data.orgaoSubRogado.cnpj = character(),
+  data.orgaoSubRogado.razaoSocial = character(),
+  data.orgaoSubRogado.esferaId = character(),
+  data.orgaoSubRogado.poderId = character(),
+)
 
 
 # COLETA ------------------------------------------------------------------
