@@ -59,3 +59,5 @@ coleta/itens/medicamentos.csv
 coleta/resultados/dados.csv
 coleta/resultados/erros.csv
 coleta/resultados/monitoramento.csv
+tasks/unifica-dados/output/itens-resultados-medicamentos.csv
+tasks/unifica-dados/output/itens-resultados.csv.old
