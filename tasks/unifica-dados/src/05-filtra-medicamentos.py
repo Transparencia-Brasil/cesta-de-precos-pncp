@@ -46,8 +46,8 @@ print('\rValidando os argumentos.', end="", flush=True)
 # Simula os argumentos da linha de comando
 sys.argv = [
     "filtra-medicamentos.py",  # Nome do script (simulado)
-    "C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tasks/unifica-dados/output/itens-endpoint-recuperado.csv",  #
-    # "C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tasks/unifica-dados/output/itens.csv",  #
+    # "C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tasks/unifica-dados/output/itens-endpoint-recuperado.csv",  #
+    "C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tasks/unifica-dados/output/itens.csv",  #
     "C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/data/catmat/catmat.csv"  # Argumento para 'catalogo'
 ]
 
@@ -252,8 +252,9 @@ print('\rIdentificando os medicamentos', end="", flush=True)
 THRESHOLD = 0.5
 
 # Caminho do arquivo de saída ondes serão salvos os medicamentos
-# NOME_ARQUIVO_MEDICAMENTOS = dir_itens + "/medicamentos.csv"
-NOME_ARQUIVO_MEDICAMENTOS = dir_itens + "/medicamentos-endpoint-recuperado.csv"
+
+NOME_ARQUIVO_MEDICAMENTOS = dir_itens + "/medicamentos.csv"
+# NOME_ARQUIVO_MEDICAMENTOS = dir_itens + "/medicamentos-endpoint-recuperado.csv"
 
 def mais_similar(medicamento):
     """

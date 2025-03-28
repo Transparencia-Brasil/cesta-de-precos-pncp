@@ -323,6 +323,62 @@ mapeamento_colunas_resultado_coleta3 <- function(resultado_coleta3) {
     mutate(amparoLegalCriterioDesempate = if_else(!is.na(amparoLegalCriterioDesempate.id), TRUE, NA))
 }
 
+#' Mapeamento de colunas para itens de resultados da coleta remanescente
+#'
+#' Realiza o mapeamento das colunas de um conjunto de dados de resultados de coleta remanescentes. Usado somente no script (10-unifica-resultados-de-itens-das-contratacoes-apos-recoleta.R)
+#'
+#' @param resultado_novos Um data frame contendo os dados de resultados de coleta.
+#' @return Um data frame (resultado_coleta3) com as colunas mapeadas.
+mapeamento_colunas_resultado_coleta_remanescente <- function(resultado_coleta3) {
+  resultado_coleta3 %>%
+    select(
+      # colunas que existiam na coleta
+      situacaoCompraItemResultadoNome = situacaoCompraItemResultadoNome,
+      porteFornecedorNome = porteFornecedorNome,
+      sequencialResultado = sequencialResultado,
+      naturezaJuridicaNome = naturezaJuridicaNome,
+      dataAtualizacao = dataAtualizacao,
+      niFornecedor = niFornecedor,
+      tipoPessoa = tipoPessoa,
+      dataInclusao = dataInclusao,
+      numeroItem = numeroItem,
+      valorTotalHomologado = valorTotalHomologado,
+      timezoneCotacaoMoedaEstrangeira = timezoneCotacaoMoedaEstrangeira,
+      moedaEstrangeira = moedaEstrangeira,
+      valorNominalMoedaEstrangeira = valorNominalMoedaEstrangeira,
+      dataCotacaoMoedaEstrangeira = dataCotacaoMoedaEstrangeira,
+      nomeRazaoSocialFornecedor = nomeRazaoSocialFornecedor,
+      codigoPais = codigoPais,
+      porteFornecedorId = porteFornecedorId,
+      quantidadeHomologada = quantidadeHomologada,
+      valorUnitarioHomologado = valorUnitarioHomologado,
+      percentualDesconto = percentualDesconto,
+      amparoLegalMargemPreferencia = amparoLegalMargemPreferencia,
+      paisOrigemProdutoServico = paisOrigemProdutoServico,
+      indicadorSubcontratacao = indicadorSubcontratacao,
+      ordemClassificacaoSrp = ordemClassificacaoSrp,
+      dataResultado = dataResultado,
+      motivoCancelamento = motivoCancelamento,
+      dataCancelamento = dataCancelamento,
+      situacaoCompraItemResultadoId = situacaoCompraItemResultadoId,
+      aplicacaoMargemPreferencia = aplicacaoMargemPreferencia,
+      aplicacaoBeneficioMeEpp = aplicacaoBeneficioMeEpp,
+      aplicacaoCriterioDesempate = aplicacaoCriterioDesempate,
+      naturezaJuridicaId = naturezaJuridicaId,
+      endpoint = endpoint,
+      numeroControlePNCPCompra = numeroControlePNCPCompra,
+      amparoLegalCriterioDesempate = amparoLegalCriterioDesempate
+    ) %>%
+    mutate(
+      # colunas que foram criadas depois da coleta II
+      amparoLegalCriterioDesempate.statusAtivo = NA_character_,
+      amparoLegalCriterioDesempate.id = NA_character_,
+      amparoLegalCriterioDesempate.nome = NA_character_,
+      amparoLegalCriterioDesempate.descricao = NA_character_,
+      amparoLegalCriterioDesempate.statusAtivo = NA_character_
+    )
+}
+
 # :: HELPERS -------------------------------------------------------------------
 
 # FUNÇÃO PARA VALIDAR ---
