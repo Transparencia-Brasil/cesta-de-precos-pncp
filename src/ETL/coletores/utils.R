@@ -41,11 +41,13 @@ coleta_endpoint <- function(endpoint) {
   resposta <- request(endpoint) %>%
     req_method("GET") %>%
     req_headers(accept = "*/*") %>%
-    req_error() %>%  # Captura erros se houver
+    req_error() %>% # Captura erros se houver
     req_perform()
 
   # Converte a resposta da requisicao em um dataframe
-  df_itens <- resp_body_string(resposta) %>% fromJSON(flatten = TRUE) %>% as.data.frame()
+  df_itens <- resp_body_string(resposta) %>%
+    fromJSON(flatten = TRUE) %>%
+    as.data.frame()
   df_itens$endpoint <- endpoint
   return(df_itens)
 }
