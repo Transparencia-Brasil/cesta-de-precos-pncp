@@ -58,7 +58,7 @@ endpoints_resultados <- paste0(itens_df$endpoint, "/", itens_df$numeroItem, "/re
 # TEMPLATE ----------------------------------------------------------------
 # Mapear todas as colunas que serão coletadas e garantir balanceamento do dataset
 
-template_consultar_contratacoes <- tibble::tibble(
+template_resultados_itens <- tibble::tibble(
   numeroControlePNCPCompra = character(),
   endpoint = character(),
   situacaoCompraItemResultadoNome = character(),
@@ -106,5 +106,5 @@ template_consultar_contratacoes <- tibble::tibble(
 coleta(
   endpoints = endpoints_resultados,
   output_dir = PATH_OUTPUT_DIR,
-  template = template_consultar_contratacoes
+  template = template_resultados_itens
 )
