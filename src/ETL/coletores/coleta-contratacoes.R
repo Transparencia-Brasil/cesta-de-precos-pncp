@@ -25,16 +25,31 @@ source(here("src/ETL/coletores/utils.R"))
 
 # PARAMETROS --------------------------------------------------------------
 
+# captura os arqgumentos
 args <- commandArgs(trailingOnly = TRUE)
 
-# Verifica se o diretório de saída foi passado como argumento, caso contrário, define um padrão
-PATH_OUTPUT_DIR <- ifelse(length(args) >= 1, args[1], here("coleta", "contratacoes"))
+# Processa os argumentos
+for (arg in args) {
+  if (grepl("^PATH_OUTPUT_DIR=", arg)) {
+    PATH_OUTPUT_DIR <- here(sub("^PATH_OUTPUT_DIR=", "", arg))
+  } else if (grepl("^PRIMEIRO_DIA=", arg)) {
+    PRIMEIRO_DIA <- as_date(sub("^PRIMEIRO_DIA=", "", arg))
+  } else if (grepl("^ULTIMO_DIA=", arg)) {
+    ULTIMO_DIA <- as_date(sub("^ULTIMO_DIA=", "", arg))
+  }
+}
 
-# Obtém o primeiro dia do mês anterior
-PRIMEIRO_DIA <- floor_date(today() - months(1), "month")
 
-# Obtém o último dia do mês anterior
-ULTIMO_DIA <- ceiling_date(PRIMEIRO_DIA, "month") - days(1)
+# Exemplo de mensagem para verificar os valores
+message("\nPATH_OUTPUT_DIR: ", PATH_OUTPUT_DIR)
+message("\nPRIMEIRO_DIA: ", PRIMEIRO_DIA)
+message("\nULTIMO_DIA: ", ULTIMO_DIA, "\n")
+
+stopifnot({
+  dir.exists(PATH_OUTPUT_DIR)
+  is.Date(PRIMEIRO_DIA)
+  is.Date(ULTIMO_DIA)
+})
 
 # Os códigos das modalidades de contratações no PNCP vão de 1 a 14
 # Ref: https://pncp.gov.br/app/entidades-dominio
