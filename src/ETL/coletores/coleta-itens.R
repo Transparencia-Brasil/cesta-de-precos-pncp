@@ -141,9 +141,3 @@ template_itens <- tibble::tibble(
 
 # Executa a coleta
 coleta(endpoints = endpoints_itens, output_dir = PATH_OUTPUT_DIR)
-
-library(tidyverse)
-library(here)
-itens <- read_csv(here("tasks/unifica-dados/output/itens.csv"))
-
-itens %>% glimpse()
