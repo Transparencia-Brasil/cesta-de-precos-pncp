@@ -33,6 +33,15 @@ CAMINHO_CONTRATACOES_COLETA3 <- here(INPUT_DIR, "contratacoes3.rds")
 contratacoes_coleta2 <- readRDS(CAMINHO_CONTRATACOES_COLETA2)
 contratacoes_coleta3 <- readRDS(CAMINHO_CONTRATACOES_COLETA3)
 
+# :: ENDPOINTS -----------------------------------------------------------------
+
+# Define o endpoint da API do PNCP para consulta de contratações
+endp <- "https://pncp.gov.br/api/consulta/v1/contratacoes/atualizacao?dataInicial=%s&dataFinal=%s&codigoModalidadeContratacao=%s&pagina=%s&tamanhoPagina=%s"
+
+# Adiciona uma nova coluna ao dataframe contratacoes_coleta3 com o endpoint formatado
+contratacoes_coleta3 <- contratacoes_coleta3 %>%
+  mutate(pncp_endpoint = sprintf(endp, data_inicial, data_final, modalidade_contratacao, pagina, tamanho_pagina))
+
 # :: MAPPING -------------------------------------------------------------------
 
 # Renomeia as colunas e seleciona somente as necessárias
