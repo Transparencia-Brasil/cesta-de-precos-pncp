@@ -20,7 +20,7 @@ echo ""
 
 # Verifica se os argumentos foram fornecidos
 if [ -z "$1" ]; then
-  echo "Erro: O parâmetro DATA_COLETA é obrigatório."
+  echo "Erro: O parâmetro ALIAS_COLETA é obrigatório."
   exit 1
 fi
 
@@ -35,7 +35,7 @@ if [ -z "$3" ]; then
 fi
 
 # Caminho para o diretório de saída
-DATA_COLETA=$1
+ALIAS_COLETA=$1
 
 # Data inicial
 PRIMEIRO_DIA=$2
@@ -47,16 +47,16 @@ ULTIMO_DIA=$3
 echo "Parâmetros: "
 echo " - '$PRIMEIRO_DIA'"
 echo " - '$ULTIMO_DIA'"
-echo " - '$DATA_COLETA'"
+echo " - '$ALIAS_COLETA'"
 echo ""
 
 
 # SET OUTPUT DIR ---------------------------------------------------------------
 
-# Aponta para o dirtório com a nova DATA_COLETA
-# Remove o prefixo "DATA_COLETA=" e mantém só a data YYYY-MM-DD
-DATA_COLETA=$(echo "$DATA_COLETA" | sed 's/^[^=]*=//')
-PATH_OUTPUT_DIR="coleta/contratacoes/${DATA_COLETA}"
+# Aponta para o dirtório com a nova ALIAS_COLETA
+# Remove o prefixo "ALIAS_COLETA=" e mantém só a data YYYY-MM-DD
+ALIAS_COLETA=$(echo "$ALIAS_COLETA" | sed 's/^[^=]*=//')
+PATH_OUTPUT_DIR="coleta/contratacoes/${ALIAS_COLETA}"
 
 # Cria o diretório de saída, se não existir
 mkdir -p "$PATH_OUTPUT_DIR"

@@ -12,7 +12,7 @@ echo -e "\nDiretório:"
 pwd
 echo ""
 
-DATA_COLETA="TESTE"
+ALIAS_COLETA="TESTE"
 PRIMEIRO_DIA="2025-01-01"
 ULTIMO_DIA="2025-01-2"
 
@@ -20,7 +20,7 @@ ULTIMO_DIA="2025-01-2"
 echo "PARÂMETROS: "
 echo " - '$PRIMEIRO_DIA'"
 echo " - '$ULTIMO_DIA'"
-echo " - '$DATA_COLETA'"
+echo " - '$ALIAS_COLETA'"
 echo ""
 
 # SCREENS ----------------------------------------------------------------------
@@ -63,7 +63,7 @@ echo ""
 echo -e "## CONTRATAÇÃO\n"
 
 # Executa o coletor de contratações
-bash "$COLETOR_CONTRATACOES" DATA_COLETA="$DATA_COLETA" PRIMEIRO_DIA="$PRIMEIRO_DIA" ULTIMO_DIA="$ULTIMO_DIA"
+bash "$COLETOR_CONTRATACOES" ALIAS_COLETA="$ALIAS_COLETA" PRIMEIRO_DIA="$PRIMEIRO_DIA" ULTIMO_DIA="$ULTIMO_DIA"
 
 # Aguarda a screen do coletor de contratações encerrar
 echo -e "\nAguardando a screen '$SCREEN_CONTRATACOES' encerrar..."
@@ -77,7 +77,7 @@ echo -e "Screen '$SCREEN_CONTRATACOES' encerrada.\n"
 echo -e "## ITENS\n"
 
 # Executa o coletor de itens somente após o termino da task de contratações
-bash "$COLETOR_ITENS" DATA_COLETA="$DATA_COLETA" PRIMEIRO_DIA="$PRIMEIRO_DIA" ULTIMO_DIA="$ULTIMO_DIA"
+bash "$COLETOR_ITENS" ALIAS_COLETA="$ALIAS_COLETA" PRIMEIRO_DIA="$PRIMEIRO_DIA" ULTIMO_DIA="$ULTIMO_DIA"
 
 # Aguarda a screen do coletor de itens encerrar
 echo -e "\nAguardando a screen '$SCREEN_ITENS' encerrar..."
@@ -91,7 +91,7 @@ echo -e "Screen '$SCREEN_ITENS' encerrada.\n"
 echo -e "## CLASSIFICADOR - FILTRA MEDICAMENTOS\n"
 
 # Executa o classificador somente após o termino da task de contratações
-bash "$CLASSIFICADOR" DATA_COLETA="$DATA_COLETA" PRIMEIRO_DIA="$PRIMEIRO_DIA" ULTIMO_DIA="$ULTIMO_DIA"
+bash "$CLASSIFICADOR" ALIAS_COLETA="$ALIAS_COLETA" PRIMEIRO_DIA="$PRIMEIRO_DIA" ULTIMO_DIA="$ULTIMO_DIA"
 
 
 # Aguarda a screen do coletor de itens encerrar
