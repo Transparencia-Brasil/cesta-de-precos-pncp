@@ -1,18 +1,10 @@
 #!/bin/bash
 
-echo "---"
-echo "ITENS"
-echo ""
-
 
 # SCRIPT -----------------------------------------------------------------------
 
 # Garante que o script será executado a partir do diretório root do projeto
 cd "$(dirname "$0")/../../.." || exit 1
-
-echo "Diretório:"
-pwd
-echo ""
 
 
 # SCRIPTS ----------------------------------------------------------------------
@@ -54,13 +46,10 @@ PRIMEIRO_DIA=$2
 ULTIMO_DIA=$3
 
 # Mensagens de confirmação
-echo "Iniciando coleta com:"
-echo "- '$SCRIPT_R_COLETA_ITENS'"
-echo ""
 echo "Parâmetros: "
-echo " - ´$PRIMEIRO_DIA´"
-echo " - ´$ULTIMO_DIA´"
-echo " - ´$DATA_COLETA´"
+echo " - '$PRIMEIRO_DIA'"
+echo " - '$ULTIMO_DIA'"
+echo " - '$DATA_COLETA'"
 echo ""
 
 
@@ -75,7 +64,8 @@ PATH_OUTPUT_DIR="coleta/itens/${DATA_COLETA}"
 mkdir -p "$PATH_OUTPUT_DIR"
 
 # saída
-echo "Diretório de saída: ´$PATH_OUTPUT_DIR´"
+echo "Diretório de saída:"
+echo " - '$PATH_OUTPUT_DIR'"
 echo ""
 
 
@@ -84,7 +74,8 @@ echo ""
 INPUT_FILE="coleta/contratacoes/${DATA_COLETA}/dados.csv"
 
 # saída
-echo "Parâmetro de entrada no script em R: ´$INPUT_FILE"
+echo "Parâmetro de entrada no script em R:"
+echo " - '$INPUT_FILE'"
 echo ""
 
 
@@ -99,7 +90,8 @@ ULTIMO_DIA_LOG=$(echo "$ULTIMO_DIA" | sed 's/^[^=]*=//')
 SCREEN_NAME="coletor-itens-${PRIMEIRO_DIA_LOG}-ate-${ULTIMO_DIA_LOG}"
 
 # Mensagem de confirmação
-echo "Screen '$SCREEN_NAME' criada para coletar contratações."
+echo "Screen criada para coletar contratações:"
+echo " - '$SCREEN_NAME'"
 echo ""
 
 # - LOG FILE
@@ -107,22 +99,21 @@ echo ""
 LOG_FILE="${PATH_OUTPUT_DIR}/run-coletor-itens-${PRIMEIRO_DIA_LOG}-ate-${ULTIMO_DIA_LOG}.log"
 
 # Mensagem de confirmação
-echo "Saída sendo registrada em '$LOG_FILE'."
+echo "Saída sendo registrada em:"
+echo " - '$LOG_FILE'."
 echo ""
 
 # - RUN SCRIPT
 # Cria screen e roda o script de coletas
-screen -dmS "$SCREEN_NAME" bash -c "Rscript \"$SCRIPT_R_COLETA_ITENS\" \"$INPUT_FILE\" \"$PATH_OUTPUT_DIR\" > \"$LOG_FILE\" 2>&1"
+# screen -dmS "$SCREEN_NAME" bash -c "Rscript \"$SCRIPT_R_COLETA_ITENS\" \"$INPUT_FILE\" \"$PATH_OUTPUT_DIR\" > \"$LOG_FILE\" 2>&1"
+screen -dmS "$SCREEN_NAME" bash -c "/mnt/c/Program\ Files/R/R-4.4.2/bin/Rscript.exe \"$SCRIPT_R_COLETA_ITENS\" \"$INPUT_FILE\" \"$PATH_OUTPUT_DIR\" > \"$LOG_FILE\" 2>&1"
 
 # Mensagem de confirmação
-echo "Coleta de ITENS em execução"
-echo ""
+echo "Coleta de ITENS em execução..."
 
+echo ""
 screen -ls
-
-echo ""
-echo "---"
 echo ""
 
 # Exibe uma mensagem ao final
-echo "Execução da coleta de ITENS concluída."
+echo "Execução da coleta de ITENS concluída!"
