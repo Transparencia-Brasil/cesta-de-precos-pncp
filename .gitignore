@@ -68,3 +68,4 @@ tasks/unifica-dados/output/itens-resultados-medicamentos.csv
 tasks/unifica-dados/output/itens-resultados.csv.old
 
 coleta/**/*.csv
+*.log
