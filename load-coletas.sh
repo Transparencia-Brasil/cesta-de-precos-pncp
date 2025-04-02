@@ -1,1 +1,0 @@
- ./src/ETL/coletores/coletor.sh DATA_COLETA="TESTE" PRIMEIRO_DIA="01-01-2025" ULTIMO_DIA="01-01-2025"
