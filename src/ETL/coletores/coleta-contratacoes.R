@@ -38,7 +38,6 @@ for (arg in args) {
   }
 }
 
-
 # Exemplo de mensagem para verificar os valores
 message("\nPATH_OUTPUT_DIR: ", PATH_OUTPUT_DIR)
 message("\nPRIMEIRO_DIA: ", PRIMEIRO_DIA)
