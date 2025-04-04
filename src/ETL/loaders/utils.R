@@ -5,10 +5,19 @@
 #'  * Consultas de inserção no banco.
 #'  * Função para se conectar ao banco.
 #'  * Função para inserir dados no banco a partir de um dataframe.
+#'  
+#'  Para conectar-se ao banco insira um arquivo .env na raiz do projeto com 
+#'  o seguinte conteúdo:
+#'  
+#'  DB_HOST=seu_host_aqui
+#'  1DB_USER=seu_usuario_aqui
+#'  DB_PASS=sua_senha_aqui
+#'  DB_PORT=sua_porta_aqui
 #'
 
 suppressPackageStartupMessages(library(DBI))
 suppressPackageStartupMessages(library(RPostgres))
+suppressPackageStartupMessages(library(dotenv))
 
 # Mapeamento entre colunas dos arquivos do PNCP e colunas do banco de dados
 {
@@ -355,11 +364,14 @@ suppressPackageStartupMessages(library(RPostgres))
 #' DBI::dbDisconnect(con)
 #' @import DBI RPostgres
 conecta_bd_medicamentos_transparentes <- function() {
-  NOME_BD <- "medicamentos-transparentes"
-  HOST <- "localhost"
-  USUARIO <- "postgres"
-  SENHA <- "postgres"
-  PORTA <- 5432
+  # Lê o arquivo .env
+  load_dot_env()  
+  
+  NOME_BD <- "medicamentos_transparentes"
+  HOST <- Sys.getenv("DB_HOST")
+  USUARIO <- Sys.getenv("DB_USER")
+  SENHA <- Sys.getenv("DB_PASS")
+  PORTA <- Sys.getenv("DB_PORT")
   
   con <- dbConnect(
     RPostgres::Postgres(),
