@@ -2,6 +2,8 @@
 
 echo -e "---\n# COLETORES\n---"
 
+AGORA=$(date +"%d-%b-%Y %H:%M:%S")
+echo -e "\nINÍCIO DA COLETA ÀS '$AGORA'"
 
 # SET DIR ----------------------------------------------------------------------
 
@@ -12,97 +14,152 @@ echo -e "\nDiretório:"
 pwd
 echo ""
 
-ALIAS_COLETA="TESTE"
-PRIMEIRO_DIA="2025-01-01"
-ULTIMO_DIA="2025-01-2"
+# PARÂMETROS DO BASH -----------------------------------------------------------
+
+# Verifica se os argumentos foram fornecidos
+if [ -z "$1" ]; then
+  echo "Erro: O parâmetro ALIAS_COLETA é obrigatório."
+  exit 1
+fi
+
+if [ -z "$2" ]; then
+  echo "Erro: O parâmetro PRIMEIRO_DIA é obrigatório."
+  exit 1
+fi
+
+if [ -z "$3" ]; then
+  echo "Erro: O parâmetro ULTIMO_DIA é obrigatório."
+  exit 1
+fi
+
+# Recebe parâmetros
+ALIAS_COLETA=$1
+PRIMEIRO_DIA=$2
+ULTIMO_DIA=$3
 
 # Mensagens de confirmação
 echo "PARÂMETROS: "
-echo " - '$PRIMEIRO_DIA'"
-echo " - '$ULTIMO_DIA'"
-echo " - '$ALIAS_COLETA'"
+echo " - PRIMEIRO_DIA='$PRIMEIRO_DIA' - é a data de início da coleta"
+echo " - ULTIMO_DIA='$ULTIMO_DIA' - é a data final da coleta"
+echo " - ALIAS_COLETA='$ALIAS_COLETA' - é um alias para identificar a coleta e apontar um destino no diretório de /coletas"
 echo ""
 
 # SCREENS ----------------------------------------------------------------------
+# cada etapa deve gerar uma screen
 
-# Nome da screen criada pelo coletor de contratações
 SCREEN_CONTRATACOES="coletor-contratacoes-${PRIMEIRO_DIA}-ate-${ULTIMO_DIA}"
-
-# Nome da screen criada pelo coletor de itens
 SCREEN_ITENS="coletor-itens-${PRIMEIRO_DIA}-ate-${ULTIMO_DIA}"
-
-# Nome da screen criada pelo classificador
 SCREEN_CLASSIFICADOR="classificador-itens-${PRIMEIRO_DIA}-ate-${ULTIMO_DIA}"
-
-echo "SCREENS:"
-echo " - '$SCREEN_CONTRATACOES': executa o coletor de contratações"
-echo " - '$SCREEN_ITENS': executa o coletor de itens"
-echo " - '$SCREEN_CLASSIFICADOR': executa a filtragem e classificação de itens"
-echo ""
+SCREEN_RESULTADOS="coletor-resultados-${PRIMEIRO_DIA}-ate-${ULTIMO_DIA}"
 
 # SCRIPTS ----------------------------------------------------------------------
+# cada etapa possui um script coletor/classificador
 
-# Script em bash para coletor de contratações
 COLETOR_CONTRATACOES="src/ETL/coletores/coletor-contratacoes.sh"
-
-# Script em bash para coletor de itens
 COLETOR_ITENS="src/ETL/coletores/coletor-itens.sh"
-
-# Script em bash para filtragem e classificação de medicamentos
 CLASSIFICADOR="src/ETL/classificador/filtra-medicamentos.sh"
+COLETOR_RESULTADOS="src/ETL/coletores/coletor-resultados.sh"
 
-echo "SCRIPTS:"
-echo " - '$COLETOR_CONTRATACOES': executa o coletor de contratações"
-echo " - '$COLETOR_ITENS': executa o coletor de itens"
-echo " - '$CLASSIFICADOR': executa a filtragem e classificação de itens"
-echo ""
+# FILEPATHS --------------------------------------------------------------------
+# os itens de saída são utilizados para checar o término da execução
+
+CONTRATACOES_PATH="coleta/contratacoes/$ALIAS_COLETA/dados.csv"
+ITENS_PATH="coleta/itens/$ALIAS_COLETA/dados.csv"
+MEDICAMENTOS_PATH="coleta/itens/${ALIAS_COLETA}/medicamentos.csv"
+
+# FUNÇÃO -----------------------------------------------------------------------
+
+# Função: executar_coletor
+# Descrição:
+#   Esta função gerencia a execução de um coletor de dados. Ela verifica se o arquivo de dados coletados já existe
+#   e solicita ao usuário confirmação para sobrescrevê-lo. Caso o arquivo não exista ou o usuário opte por sobrescrever,
+#   o coletor é executado. Além disso, se um nome de screen for fornecido, a função aguarda a finalização da screen
+#   antes de concluir.
+#
+# Parâmetros:
+#   1. DADOS_COLETADOS (string): Caminho para o arquivo de dados coletados.
+#   2. RODAR_COLETOR (string): Comando para executar o coletor.
+#   3. SCREEN_NAME (string): Nome da screen associada ao coletor (opcional).
+#
+# Comportamento:
+#   - Se o arquivo especificado em DADOS_COLETADOS já existir, o usuário será solicitado a confirmar se deseja
+#     sobrescrevê-lo. Caso a resposta seja negativa, a execução do coletor será ignorada.
+#   - Se o arquivo não existir ou o usuário optar por sobrescrevê-lo, o coletor será executado.
+#   - Se um SCREEN_NAME for fornecido, a função aguardará até que a screen correspondente seja encerrada antes
+#     de concluir a execução.
+#
+# Dependências:
+#   - O comando `screen` deve estar disponível no sistema para gerenciar e verificar a existência de screens.
+#
+# Exemplo de uso:
+#   executar_coletor "/caminho/para/dados.csv" "comando_para_executar_coletor" "nome_da_screen"
+executar_coletor() {
+  local DADOS_COLETADOS=$1
+  local RODAR_COLETOR=$2
+  local SCREEN_NAME=$3
+
+  if [ -f "$DADOS_COLETADOS" ] && [[ "$RODAR_COLETOR" =~ coletor-resultados.sh ]]; then
+    eval "$RODAR_COLETOR"
+    echo "coletando resultados das contratações de medicamentos"
+  else
+    if [ -f "$DADOS_COLETADOS" ]; then
+      # Exibe a mensagem no terminal e no log
+      echo "O arquivo '$DADOS_COLETADOS' já existe. Deseja executar o coletor/classificador novamente? (s/n): "
+      read resposta
+      echo -e "Resposta: $resposta\n"
+
+      if [[ "$resposta" =~ ^[Ss]$ ]]; then
+        rm -f "$(dirname "$DADOS_COLETADOS")"/*.csv
+        eval "$RODAR_COLETOR"
+      else
+        echo "Execução do coletor ignorada."
+        return
+      fi
+    else
+      eval "$RODAR_COLETOR"
+    fi
+  fi
+
+  # Aguarda a screen encerrar, se aplicável
+  if [ -n "$SCREEN_NAME" ]; then
+    echo -e "\nAguardando a screen '$SCREEN_NAME' encerrar..."
+    while screen -list | grep -q "$SCREEN_NAME"; do
+      sleep 10
+    done
+    sleep 20
+    echo -e "Screen '$SCREEN_NAME' encerrada"
+  fi
+}
 
 # EXECUÇÃO ---------------------------------------------------------------------
 
-# :: CONTRATAÇÃO\n
-echo -e "## CONTRATAÇÃO\n"
-
-# Executa o coletor de contratações
-bash "$COLETOR_CONTRATACOES" ALIAS_COLETA="$ALIAS_COLETA" PRIMEIRO_DIA="$PRIMEIRO_DIA" ULTIMO_DIA="$ULTIMO_DIA"
-
-# Aguarda a screen do coletor de contratações encerrar
-echo -e "\nAguardando a screen '$SCREEN_CONTRATACOES' encerrar..."
-while screen -list | grep -q "$SCREEN_CONTRATACOES"; do
-  sleep 10  # Aguarda 10 segundos antes de verificar novamente
-done
-echo -e "Screen '$SCREEN_CONTRATACOES' encerrada.\n"
-
+# :: CONTRATAÇÃO
+echo -e "---\n## CONTRATAÇÃO\n"
+executar_coletor "$CONTRATACOES_PATH" "bash \"$COLETOR_CONTRATACOES\" ALIAS_COLETA=\"$ALIAS_COLETA\" PRIMEIRO_DIA=\"$PRIMEIRO_DIA\" ULTIMO_DIA=\"$ULTIMO_DIA\"" "$SCREEN_CONTRATACOES"
+echo -e "\nColeta de CONTRATAÇÕES concluída!\n"
 
 # :: ITENS
-echo -e "## ITENS\n"
-
-# Executa o coletor de itens somente após o termino da task de contratações
-bash "$COLETOR_ITENS" ALIAS_COLETA="$ALIAS_COLETA" PRIMEIRO_DIA="$PRIMEIRO_DIA" ULTIMO_DIA="$ULTIMO_DIA"
-
-# Aguarda a screen do coletor de itens encerrar
-echo -e "\nAguardando a screen '$SCREEN_ITENS' encerrar..."
-while screen -list | grep -q "$SCREEN_ITENS"; do
-  sleep 10  # Aguarda 10 segundos antes de verificar novamente
-done
-echo -e "Screen '$SCREEN_ITENS' encerrada.\n"
-
+echo -e "---\n## ITENS\n"
+executar_coletor "$ITENS_PATH" "bash \"$COLETOR_ITENS\" ALIAS_COLETA=\"$ALIAS_COLETA\" PRIMEIRO_DIA=\"$PRIMEIRO_DIA\" ULTIMO_DIA=\"$ULTIMO_DIA\"" "$SCREEN_ITENS"
+echo -e "\nColeta de ITENS concluída!\n"
 
 # :: CLASSIFICADOR - FILTRA MEDICAMENTOS
-echo -e "## CLASSIFICADOR - FILTRA MEDICAMENTOS\n"
+echo -e "---\n## CLASSIFICADOR - FILTRA MEDICAMENTOS\n"
+executar_coletor "$MEDICAMENTOS_PATH" "bash \"$CLASSIFICADOR\" ALIAS_COLETA=\"$ALIAS_COLETA\" PRIMEIRO_DIA=\"$PRIMEIRO_DIA\" ULTIMO_DIA=\"$ULTIMO_DIA\""
 
-# Executa o classificador somente após o termino da task de contratações
-bash "$CLASSIFICADOR" ALIAS_COLETA="$ALIAS_COLETA" PRIMEIRO_DIA="$PRIMEIRO_DIA" ULTIMO_DIA="$ULTIMO_DIA"
-
-
-# Aguarda a screen do coletor de itens encerrar
-echo -e "\nAguardando a screen '$SCREEN_CLASSIFICADOR' encerrar...\n"
-while screen -list | grep -q "$SCREEN_CLASSIFICADOR"; do
-  sleep 10  # Aguarda 10 segundos antes de verificar novamente
+# Aguarda o arquivo 'medicamentos.csv' ser criado
+echo -e "\nAguardando o arquivo '$MEDICAMENTOS_PATH' ser criado...\n"
+while [ ! -f "$MEDICAMENTOS_PATH" ]; do
+  sleep 10
 done
-echo -e "\nScreen '$SCREEN_CLASSIFICADOR' encerrada.\n"
+echo -e "Arquivo '$MEDICAMENTOS_PATH' criado.\nClassificação e filtragem de MEDICAMENTOS de ITENS concluída!\n"
 
+# :: RESULTADOS
+echo -e "---\n## RESULTADOS\n"
+executar_coletor "$MEDICAMENTOS_PATH" "bash \"$COLETOR_RESULTADOS\" ALIAS_COLETA=\"$ALIAS_COLETA\" PRIMEIRO_DIA=\"$PRIMEIRO_DIA\" ULTIMO_DIA=\"$ULTIMO_DIA\"" "$SCREEN_RESULTADOS"
+echo -e "\nColeta de RESULTADOS de MEDICAMENTOS concluída!\n"
 
 # FINALIZA COLETA --------------------------------------------------------------
 
-AGORA=$(date +"%d-%m-%Y %H:%M:%S")
+AGORA=$(date +"%d-%b-%Y %H:%M:%S")
 echo -e "\nCOLETA ENCERRADA ÀS '$AGORA'!"
