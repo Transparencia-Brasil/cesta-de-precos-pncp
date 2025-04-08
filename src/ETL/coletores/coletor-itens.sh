@@ -1,24 +1,13 @@
 #!/bin/bash
 
 
-# SCRIPT -----------------------------------------------------------------------
+# SET DIR ----------------------------------------------------------------------
 
 # Garante que o script será executado a partir do diretório root do projeto
 cd "$(dirname "$0")/../../.." || exit 1
 
 
-# SCRIPTS ----------------------------------------------------------------------
-
-# Nome do script R
-SCRIPT_R_COLETA_ITENS="src/ETL/coletores/coleta-itens.R"
-
-# Mensagem de confirmação
-echo "Script:"
-echo " - '$SCRIPT_R_COLETA_ITENS'"
-echo ""
-
-
-# PARAMETROS -------------------------------------------------------------------
+# PARÂMETROS DO BASH -----------------------------------------------------------
 
 # Verifica se os argumentos foram fornecidos
 if [ -z "$1" ]; then
@@ -45,11 +34,19 @@ PRIMEIRO_DIA=$2
 # Data inicial
 ULTIMO_DIA=$3
 
-# Mensagens de confirmação
-echo "Parâmetros: "
-echo " - '$PRIMEIRO_DIA'"
-echo " - '$ULTIMO_DIA'"
-echo " - '$ALIAS_COLETA'"
+# Caminho para o arquivo de log
+PRIMEIRO_DIA_LOG=$(echo "$PRIMEIRO_DIA" | sed 's/^[^=]*=//')
+ULTIMO_DIA_LOG=$(echo "$ULTIMO_DIA" | sed 's/^[^=]*=//')
+
+
+# SCRIPTS ----------------------------------------------------------------------
+
+# Nome do script R
+SCRIPT_R_COLETA_ITENS="src/ETL/coletores/coleta-itens.R"
+
+# Mensagem de confirmação
+echo "Script:"
+echo " - '$SCRIPT_R_COLETA_ITENS'"
 echo ""
 
 
@@ -69,32 +66,19 @@ echo " - '$PATH_OUTPUT_DIR'"
 echo ""
 
 
-# SET INFUPT FILE --------------------------------------------------------------
+# SCREEN -----------------------------------------------------------------------
 
-INPUT_FILE="coleta/contratacoes/${ALIAS_COLETA}/dados.csv"
-
-# saída
-echo "Parâmetro de entrada no script em R:"
-echo " - '$INPUT_FILE'"
-echo ""
-
-
-# RODAR SCRIPT -----------------------------------------------------------------
-
-# Caminho para o arquivo de log
-PRIMEIRO_DIA_LOG=$(echo "$PRIMEIRO_DIA" | sed 's/^[^=]*=//')
-ULTIMO_DIA_LOG=$(echo "$ULTIMO_DIA" | sed 's/^[^=]*=//')
-
-# - SCREEN
 # Nome da screen (concatena o nome do script com PRIMEIRO_DIA e ULTIMO_DIA)
 SCREEN_NAME="coletor-itens-${PRIMEIRO_DIA_LOG}-ate-${ULTIMO_DIA_LOG}"
 
 # Mensagem de confirmação
-echo "Screen criada para coletar contratações:"
+echo "Screen criada para coletar itens:"
 echo " - '$SCREEN_NAME'"
 echo ""
 
-# - LOG FILE
+
+# LOG --------------------------------------------------------------------------
+
 # Nome do arquivo onde ficarão salvas as logs do script
 LOG_FILE="${PATH_OUTPUT_DIR}/run-coletor-itens-${PRIMEIRO_DIA_LOG}-ate-${ULTIMO_DIA_LOG}.log"
 
@@ -103,17 +87,26 @@ echo "Saída sendo registrada em:"
 echo " - '$LOG_FILE'."
 echo ""
 
+
+# PARÂMETROS DO COLETOR --------------------------------------------------------
+
+CONTRATACOES="coleta/contratacoes/${ALIAS_COLETA}/dados.csv"
+
+# saída
+echo "Parâmetro do coletor:"
+echo " - CONTRATACOES='$CONTRATACOES'"
+echo ""
+
+
+# RODAR SCRIPT -----------------------------------------------------------------
+
 # - RUN SCRIPT
 # Cria screen e roda o script de coletas
 # screen -dmS "$SCREEN_NAME" bash -c "Rscript \"$SCRIPT_R_COLETA_ITENS\" \"$INPUT_FILE\" \"$PATH_OUTPUT_DIR\" > \"$LOG_FILE\" 2>&1"
-screen -dmS "$SCREEN_NAME" bash -c "/mnt/c/Program\ Files/R/R-4.4.2/bin/Rscript.exe \"$SCRIPT_R_COLETA_ITENS\" \"$INPUT_FILE\" \"$PATH_OUTPUT_DIR\" > \"$LOG_FILE\" 2>&1"
+screen -dmS "$SCREEN_NAME" bash -c "/mnt/c/Program\ Files/R/R-4.4.2/bin/Rscript.exe \"$SCRIPT_R_COLETA_ITENS\" \"$CONTRATACOES\" \"$PATH_OUTPUT_DIR\" > \"$LOG_FILE\" 2>&1"
 
 # Mensagem de confirmação
 echo "Coleta de ITENS em execução..."
 
 echo ""
 screen -ls
-echo ""
-
-# Exibe uma mensagem ao final
-echo "Execução da coleta de ITENS concluída!"
