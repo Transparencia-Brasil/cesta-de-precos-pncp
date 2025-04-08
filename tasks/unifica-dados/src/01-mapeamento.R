@@ -53,7 +53,8 @@ mapeamento_colunas_contratacoes <- c(
   "data.amparoLegal.nome" = "amparoLegal_nome",
   # modoDisputa
   "data.modoDisputaId" = "modoDisputaId",
-  "data.modoDisputaNome" = "modoDisputaNome"
+  "data.modoDisputaNome" = "modoDisputaNome",
+  "endpoint" = "pncp_endpoint"
 )
 
 # :: ITENS ---------------------------------------------------------------------

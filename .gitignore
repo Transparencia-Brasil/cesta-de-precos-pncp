@@ -70,3 +70,6 @@ tasks/unifica-dados/output/itens-resultados.csv.old
 coleta/**/*.csv
 *.log
 src/ETL/run-coletores.old.sh
+
+# Variáveis de ambiente
+.env

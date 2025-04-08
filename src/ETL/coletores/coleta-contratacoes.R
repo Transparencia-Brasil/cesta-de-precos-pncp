@@ -12,7 +12,8 @@
 #' 2. erros.csv - contém os endpoints que retornaram erros ao consultar e a mensagem de erro.
 #' 3. monitoramento.csv - contém metadados sobre a duração da coleta para cada lote de dados.
 #'
-#' https://pncp.gov.br/api/consulta/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/consultarContratacaoPorDataDePublicacao
+#' https://pncp.gov.br/api/consulta/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/consultarContratacaoPorDataUltimaAtualizacao
+
 
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(tidyr))
