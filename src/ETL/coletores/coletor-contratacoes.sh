@@ -1,22 +1,13 @@
 #!/bin/bash
 
+
 # SET DIR ----------------------------------------------------------------------
 
 # Garante que o script será executado a partir do diretório root do projeto
 cd "$(dirname "$0")/../../.." || exit 1
 
-# SCRIPTS ----------------------------------------------------------------------
 
-# Nome do script R
-SCRIPT_R_COLETA_CONTRATACOES="src/ETL/coletores/coleta-contratacoes.R"
-
-# Mensagem de confirmação
-echo "Script:"
-echo " - '$SCRIPT_R_COLETA_CONTRATACOES'"
-echo ""
-
-
-# PARÂMETROS -------------------------------------------------------------------
+# PARÂMETROS DO BASH -----------------------------------------------------------
 
 # Verifica se os argumentos foram fornecidos
 if [ -z "$1" ]; then
@@ -43,11 +34,19 @@ PRIMEIRO_DIA=$2
 # Data inicial
 ULTIMO_DIA=$3
 
-# Mensagens de confirmação
-echo "Parâmetros: "
-echo " - '$PRIMEIRO_DIA'"
-echo " - '$ULTIMO_DIA'"
-echo " - '$ALIAS_COLETA'"
+# Caminho para o arquivo de log
+PRIMEIRO_DIA_LOG=$(echo "$PRIMEIRO_DIA" | sed 's/^[^=]*=//')
+ULTIMO_DIA_LOG=$(echo "$ULTIMO_DIA" | sed 's/^[^=]*=//')
+
+
+# SCRIPTS ----------------------------------------------------------------------
+
+# Nome do script R
+SCRIPT_R_COLETA_CONTRATACOES="src/ETL/coletores/coleta-contratacoes.R"
+
+# Mensagem de confirmação
+echo "Script:"
+echo " - '$SCRIPT_R_COLETA_CONTRATACOES'"
 echo ""
 
 
@@ -67,13 +66,8 @@ echo " - '$PATH_OUTPUT_DIR'"
 echo ""
 
 
-# RODAR SCRIPT -----------------------------------------------------------------
+# SCREEN -----------------------------------------------------------------------
 
-# Caminho para o arquivo de log
-PRIMEIRO_DIA_LOG=$(echo "$PRIMEIRO_DIA" | sed 's/^[^=]*=//')
-ULTIMO_DIA_LOG=$(echo "$ULTIMO_DIA" | sed 's/^[^=]*=//')
-
-# - SCREEN
 # Nome da screen (concatena o nome do script com PRIMEIRO_DIA e ULTIMO_DIA)
 SCREEN_NAME="coletor-contratacoes-${PRIMEIRO_DIA_LOG}-ate-${ULTIMO_DIA_LOG}"
 
@@ -82,7 +76,9 @@ echo "Screen criada para coletar contratações:"
 echo " - '$SCREEN_NAME'"
 echo ""
 
-# - LOG FILE
+
+# LOG --------------------------------------------------------------------------
+
 # Nome do arquivo onde ficarão salvas as logs do script
 LOG_FILE="${PATH_OUTPUT_DIR}/run-coletor-contratacoes-${PRIMEIRO_DIA_LOG}-ate-${ULTIMO_DIA_LOG}.log"
 
@@ -90,6 +86,19 @@ LOG_FILE="${PATH_OUTPUT_DIR}/run-coletor-contratacoes-${PRIMEIRO_DIA_LOG}-ate-${
 echo "Saída sendo registrada em:"
 echo " - '$LOG_FILE'."
 echo ""
+
+
+# PARÂMETROS DO COLETOR --------------------------------------------------------
+
+# Mensagens de confirmação
+echo "Parâmetros do coletor: "
+echo " - PATH_OUTPUT_DIR=\"$PATH_OUTPUT_DIR\""
+echo " - PRIMEIRO_DIA=\"$PRIMEIRO_DIA_LOG\""
+echo " - ULTIMO_DIA=\"$ULTIMO_DIA_LOG\""
+echo ""
+
+
+# RODAR SCRIPT -----------------------------------------------------------------
 
 # - RUN SCRIPT
 # Cria screen e roda o script de coletas
@@ -103,5 +112,3 @@ echo "Coleta de CONTRATAÇÕES em execução..."
 echo ""
 screen -ls
 echo ""
-
-echo "Coleta de CONTRATAÇÕES concluída!"
