@@ -98,25 +98,30 @@ executar_coletor() {
   local RODAR_COLETOR=$2
   local SCREEN_NAME=$3
 
+  # Se DADOS_COLETADOS existe e RODAR_COLETOR for o de resultados das contratações, rodar coletor.
   if [ -f "$DADOS_COLETADOS" ] && [[ "$RODAR_COLETOR" =~ coletor-resultados.sh ]]; then
     eval "$RODAR_COLETOR"
     echo "coletando resultados das contratações de medicamentos"
   else
+    # para os demais coletores, verifica:
+    #  se DADOS_COLETADOS já existe, perguntar se deseja sobreescrever
     if [ -f "$DADOS_COLETADOS" ]; then
-      # Exibe a mensagem no terminal e no log
       echo "O arquivo '$DADOS_COLETADOS' já existe. Deseja executar o coletor/classificador novamente? (s/n): "
       read resposta
       echo -e "Resposta: $resposta\n"
 
+      # se deseja sobrescrever, remove o arquivo existente inicia nova coleta
       if [[ "$resposta" =~ ^[Ss]$ ]]; then
         rm -f "$(dirname "$DADOS_COLETADOS")"/*.csv
         eval "$RODAR_COLETOR"
       else
+        # se não deseja sobreescrever, ignora a execução do coletor
         echo "Execução do coletor ignorada."
         return
       fi
+    #  se DADOS_COLETADOS não existe, o coletor é executado normalmente
     else
-      eval "$RODAR_COLETOR"
+        eval "$RODAR_COLETOR"
     fi
   fi
 
@@ -133,19 +138,29 @@ executar_coletor() {
 
 # EXECUÇÃO ---------------------------------------------------------------------
 
+BASH_COLETA_CONTRATACOES="bash \"$COLETOR_CONTRATACOES\" ALIAS_COLETA=\"$ALIAS_COLETA\" PRIMEIRO_DIA=\"$PRIMEIRO_DIA\" ULTIMO_DIA=\"$ULTIMO_DIA\""
+BASH_COLETA_ITENS="bash \"$COLETOR_ITENS\" ALIAS_COLETA=\"$ALIAS_COLETA\" PRIMEIRO_DIA=\"$PRIMEIRO_DIA\" ULTIMO_DIA=\"$ULTIMO_DIA\""
+BASH_CLASSIFICADOR="bash \"$CLASSIFICADOR\" ALIAS_COLETA=\"$ALIAS_COLETA\" PRIMEIRO_DIA=\"$PRIMEIRO_DIA\" ULTIMO_DIA=\"$ULTIMO_DIA\""
+BASH_RESULTADOS="bash \"$COLETOR_RESULTADOS\" ALIAS_COLETA=\"$ALIAS_COLETA\" PRIMEIRO_DIA=\"$PRIMEIRO_DIA\" ULTIMO_DIA=\"$ULTIMO_DIA\""
+
 # :: CONTRATAÇÃO
+
 echo -e "---\n## CONTRATAÇÃO\n"
-executar_coletor "$CONTRATACOES_PATH" "bash \"$COLETOR_CONTRATACOES\" ALIAS_COLETA=\"$ALIAS_COLETA\" PRIMEIRO_DIA=\"$PRIMEIRO_DIA\" ULTIMO_DIA=\"$ULTIMO_DIA\"" "$SCREEN_CONTRATACOES"
+executar_coletor "$CONTRATACOES_PATH" "$BASH_COLETA_CONTRATACOES" "$SCREEN_CONTRATACOES"
 echo -e "\nColeta de CONTRATAÇÕES concluída!\n"
 
 # :: ITENS
+
 echo -e "---\n## ITENS\n"
-executar_coletor "$ITENS_PATH" "bash \"$COLETOR_ITENS\" ALIAS_COLETA=\"$ALIAS_COLETA\" PRIMEIRO_DIA=\"$PRIMEIRO_DIA\" ULTIMO_DIA=\"$ULTIMO_DIA\"" "$SCREEN_ITENS"
+executar_coletor "$ITENS_PATH" "$BASH_COLETA_ITENS" "$SCREEN_ITENS"
 echo -e "\nColeta de ITENS concluída!\n"
 
 # :: CLASSIFICADOR - FILTRA MEDICAMENTOS
+
 echo -e "---\n## CLASSIFICADOR - FILTRA MEDICAMENTOS\n"
-executar_coletor "$MEDICAMENTOS_PATH" "bash \"$CLASSIFICADOR\" ALIAS_COLETA=\"$ALIAS_COLETA\" PRIMEIRO_DIA=\"$PRIMEIRO_DIA\" ULTIMO_DIA=\"$ULTIMO_DIA\""
+executar_coletor "$MEDICAMENTOS_PATH" "$BASH_CLASSIFICADOR"
+
+# :: RESULTADOS
 
 # Aguarda o arquivo 'medicamentos.csv' ser criado
 echo -e "\nAguardando o arquivo '$MEDICAMENTOS_PATH' ser criado...\n"
@@ -154,9 +169,8 @@ while [ ! -f "$MEDICAMENTOS_PATH" ]; do
 done
 echo -e "Arquivo '$MEDICAMENTOS_PATH' criado.\nClassificação e filtragem de MEDICAMENTOS de ITENS concluída!\n"
 
-# :: RESULTADOS
 echo -e "---\n## RESULTADOS\n"
-executar_coletor "$MEDICAMENTOS_PATH" "bash \"$COLETOR_RESULTADOS\" ALIAS_COLETA=\"$ALIAS_COLETA\" PRIMEIRO_DIA=\"$PRIMEIRO_DIA\" ULTIMO_DIA=\"$ULTIMO_DIA\"" "$SCREEN_RESULTADOS"
+executar_coletor "$MEDICAMENTOS_PATH" "$BASH_RESULTADOS" "$SCREEN_RESULTADOS"
 echo -e "\nColeta de RESULTADOS de MEDICAMENTOS concluída!\n"
 
 # FINALIZA COLETA --------------------------------------------------------------
