@@ -10,7 +10,7 @@ Este repositório comporta processamento dos dados de contratações do PNCP par
 
 ## Replicação
 
-### Coletores (`/src/ETL`)
+### COLETORES (`/src/ETL`)
 
 #### Coleta, filtragem e classificação de contratações de medicamentos no PNCP
 
