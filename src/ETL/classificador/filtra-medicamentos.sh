@@ -4,7 +4,7 @@
 # SET DIR ----------------------------------------------------------------------
 
 # Garante que o script será executado a partir do diretório root do projeto
-cd "$(dirname "$0")/../../.." || exit 1
+cd "$(dirname "$0")/../../.." || { echo "Erro: Não foi possível acessar o diretório do projeto."; exit 1; }
 
 
 # PARÂMETROS DO BASH -----------------------------------------------------------
