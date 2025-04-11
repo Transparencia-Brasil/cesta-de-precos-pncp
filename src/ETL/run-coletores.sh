@@ -113,6 +113,7 @@ executar_coletor() {
       # se deseja sobrescrever, remove o arquivo existente inicia nova coleta
       if [[ "$resposta" =~ ^[Ss]$ ]]; then
         rm -f "$(dirname "$DADOS_COLETADOS")"/*.csv
+        echo "Arquivo '$DADOS_COLETADOS' removido."
         eval "$RODAR_COLETOR"
       else
         # se não deseja sobreescrever, ignora a execução do coletor
