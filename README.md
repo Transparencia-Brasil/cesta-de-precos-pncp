@@ -24,6 +24,15 @@ Este repositório comporta processamento dos dados de contratações do PNCP par
 
   4. **Resultado das contratações de medicamentos**: Realizada pelo script `src/ETL/coletores/coleta-resultados.R`, gerenciado por `rsc/ETL/coletor-resultados.sh`, com os mesmos parâmetros de data e *alias*.
 
+##### Fluxograma do pipeline de coleta
+
+```mermaid
+graph LR
+A[Coleta Contratações] --> B[Coleta Itens]
+B --> C[Filtra/Classifica Medicamentos]
+C --> D[Coleta Resultados]
+```
+
 ##### Exemplo de execução
 
 ```bash
