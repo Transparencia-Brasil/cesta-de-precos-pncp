@@ -5,6 +5,7 @@ echo -e "---\n# COLETORES\n---"
 AGORA=$(date +"%d-%b-%Y %H:%M:%S")
 echo -e "\nINÍCIO DA COLETA ÀS '$AGORA'"
 
+
 # SET DIR ----------------------------------------------------------------------
 
 # Garante que o script será executado a partir do diretório root do projeto
@@ -14,21 +15,22 @@ echo -e "\nDiretório:"
 pwd
 echo ""
 
+
 # PARÂMETROS DO BASH -----------------------------------------------------------
 
 # Verifica se os argumentos foram fornecidos
 if [ -z "$1" ]; then
-  echo "Erro: O parâmetro ALIAS_COLETA é obrigatório."
+  echo "Erro: O parâmetro 'ALIAS_COLETA' é obrigatório."
   exit 1
 fi
 
 if [ -z "$2" ]; then
-  echo "Erro: O parâmetro PRIMEIRO_DIA é obrigatório."
+  echo "Erro: O parâmetro 'PRIMEIRO_DIA' é obrigatório."
   exit 1
 fi
 
 if [ -z "$3" ]; then
-  echo "Erro: O parâmetro ULTIMO_DIA é obrigatório."
+  echo "Erro: O parâmetro 'ULTIMO_DIA' é obrigatório."
   exit 1
 fi
 
@@ -44,6 +46,7 @@ echo " - ULTIMO_DIA='$ULTIMO_DIA' - é a data final da coleta"
 echo " - ALIAS_COLETA='$ALIAS_COLETA' - é um alias para identificar a coleta e apontar um destino no diretório de /coletas"
 echo ""
 
+
 # SCREENS ----------------------------------------------------------------------
 # cada etapa deve gerar uma screen
 
@@ -51,6 +54,7 @@ SCREEN_CONTRATACOES="coletor-contratacoes-${PRIMEIRO_DIA}-ate-${ULTIMO_DIA}"
 SCREEN_ITENS="coletor-itens-${PRIMEIRO_DIA}-ate-${ULTIMO_DIA}"
 SCREEN_CLASSIFICADOR="classificador-itens-${PRIMEIRO_DIA}-ate-${ULTIMO_DIA}"
 SCREEN_RESULTADOS="coletor-resultados-${PRIMEIRO_DIA}-ate-${ULTIMO_DIA}"
+
 
 # SCRIPTS ----------------------------------------------------------------------
 # cada etapa possui um script coletor/classificador
@@ -60,12 +64,14 @@ COLETOR_ITENS="src/ETL/coletores/coletor-itens.sh"
 CLASSIFICADOR="src/ETL/classificador/filtra-medicamentos.sh"
 COLETOR_RESULTADOS="src/ETL/coletores/coletor-resultados.sh"
 
+
 # FILEPATHS --------------------------------------------------------------------
 # os itens de saída são utilizados para checar o término da execução
 
 CONTRATACOES_PATH="coleta/contratacoes/${ALIAS_COLETA}/dados.csv"
 ITENS_PATH="coleta/itens/${ALIAS_COLETA}/dados.csv"
 MEDICAMENTOS_PATH="coleta/itens/${ALIAS_COLETA}/medicamentos.csv"
+
 
 # FUNÇÃO -----------------------------------------------------------------------
 
@@ -133,9 +139,10 @@ executar_coletor() {
       sleep 10
     done
     sleep 20
-    echo -e "Screen '$SCREEN_NAME' encerrada"
+    echo -e "Screen $SCREEN_NAME encerrada"
   fi
 }
+
 
 # EXECUÇÃO ---------------------------------------------------------------------
 
@@ -144,11 +151,13 @@ BASH_COLETA_ITENS="bash $COLETOR_ITENS ALIAS_COLETA=$ALIAS_COLETA PRIMEIRO_DIA=$
 BASH_CLASSIFICADOR="bash $CLASSIFICADOR ALIAS_COLETA=$ALIAS_COLETA PRIMEIRO_DIA=$PRIMEIRO_DIA ULTIMO_DIA=$ULTIMO_DIA"
 BASH_RESULTADOS="bash $COLETOR_RESULTADOS ALIAS_COLETA=$ALIAS_COLETA PRIMEIRO_DIA=$PRIMEIRO_DIA ULTIMO_DIA=$ULTIMO_DIA"
 
+
 # :: CONTRATAÇÃO
 
 echo -e "---\n## CONTRATAÇÃO\n"
 executar_coletor "$CONTRATACOES_PATH" "$BASH_COLETA_CONTRATACOES" "$SCREEN_CONTRATACOES"
 echo -e "\nColeta de CONTRATAÇÕES concluída!\n"
+
 
 # :: ITENS
 
@@ -156,10 +165,12 @@ echo -e "---\n## ITENS\n"
 executar_coletor "$ITENS_PATH" "$BASH_COLETA_ITENS" "$SCREEN_ITENS"
 echo -e "\nColeta de ITENS concluída!\n"
 
+
 # :: CLASSIFICADOR - FILTRA MEDICAMENTOS
 
 echo -e "---\n## CLASSIFICADOR - FILTRA MEDICAMENTOS\n"
 executar_coletor "$MEDICAMENTOS_PATH" "$BASH_CLASSIFICADOR"
+
 
 # :: RESULTADOS
 
@@ -168,11 +179,12 @@ echo -e "\nAguardando o arquivo '$MEDICAMENTOS_PATH' ser criado...\n"
 while [ ! -f "$MEDICAMENTOS_PATH" ]; do
   sleep 10
 done
-echo -e "Arquivo '$MEDICAMENTOS_PATH' criado.\nClassificação e filtragem de MEDICAMENTOS de ITENS concluída!\n"
+echo -e "Arquivo $MEDICAMENTOS_PATH criado.\nClassificação e filtragem de MEDICAMENTOS de ITENS concluída!\n"
 
 echo -e "---\n## RESULTADOS\n"
 executar_coletor "$MEDICAMENTOS_PATH" "$BASH_RESULTADOS" "$SCREEN_RESULTADOS"
 echo -e "\nColeta de RESULTADOS de MEDICAMENTOS concluída!\n"
+
 
 # FINALIZA COLETA --------------------------------------------------------------
 
