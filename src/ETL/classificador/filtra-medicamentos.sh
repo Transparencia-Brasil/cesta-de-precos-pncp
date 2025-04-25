@@ -110,6 +110,3 @@ echo "Filtragem e classificação de MEDICAMENTOS em execução..."
 echo ""
 screen -ls
 echo ""
-
-# Exibe uma mensagem ao final
-echo "Execução do classificador concluída!"
