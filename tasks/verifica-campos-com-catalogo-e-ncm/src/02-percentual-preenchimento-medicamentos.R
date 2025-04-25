@@ -13,8 +13,14 @@ PATH_MEDICAMENTOS_2025 <- list.files(
   pattern = "medicamentos.csv",
   recursive = TRUE,
   full.names = TRUE
-)[-5]
+)[-6]
 
+PATH_RESULTADOS_2025 <- list.files(
+  path = here("coleta/resultados"),
+  pattern = "dados.csv",
+  recursive = TRUE,
+  full.names = TRUE
+)[-6]
 
 # READ DATA --------------------------------------------------------------------
 
@@ -399,3 +405,46 @@ resultados_preenchimento %>%
   arrange(var) %>%
   gt::gt() %>%
   gt::fmt_missing()
+
+medicamentos_2025 <- map_df(PATH_MEDICAMENTOS_2025, read_csv, col_types = list(.default = col_character())) %>%
+  select(
+    endpoint, numeroItem,
+    descricao, unidadeMedida, valorTotal, quantidade,
+    codigo_pdm, codigo_br
+    # contains("atalogo"),
+    # informacaoComplementar,
+    # starts_with("ncm"),
+  )
+
+medicamentos_2025 <- medicamentos_2025 %>%
+  mutate(endpoint = sprintf("%s/%s/resultados", endpoint, numeroItem))
+
+resultados_2025 <- map_df(PATH_RESULTADOS_2025, read_csv, col_types = list(.default = col_character())) %>%
+  select(
+    endpoint, numeroItem, sequencialResultado, quantidadeHomologada,
+    valorUnitarioHomologado, valorTotalHomologado
+  )
+
+
+medicamentos_2025 %>% glimpse()
+resultados_2025 %>% glimpse()
+
+left_join(distinct(medicamentos_2025), resultados_2025) %>%
+  filter(!is.na(sequencialResultado)) %>%
+  rename(endpointResultado = endpoint) %>%
+  mutate(endpointItem = str_remove(endpointResultado, "/resultados")) %>%
+  relocate(contains("endpoint"), .after = everything()) %>%
+  googlesheets4::write_sheet(
+    "https://docs.google.com/spreadsheets/d/1flrHYL0np5liCciJRXROARa9AlhQDSvwmhmmWvqdu7g"
+  )
+
+
+resultados_2025 %>%
+  slice(1385) %>%
+  pull(endpoint)
+
+medicamentos_2025 %>%
+  filter(endpoint == "https://pncp.gov.br/api/pncp/v1/orgaos/46374500000194/compras/2024/11085/itens/3/resultados")
+
+resultados_2025$endpoint[1]
+medicamentos_2025$endpoint[1]

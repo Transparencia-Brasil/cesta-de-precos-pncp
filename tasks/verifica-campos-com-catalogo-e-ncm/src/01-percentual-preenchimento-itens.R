@@ -3,6 +3,8 @@ library(here)
 
 source(here("setup/rsetup.R"))
 
+# vou buscar a função `make_id()` aqui
+source(here("tasks/unifica-dados/src/01-mapeamento.R"))
 
 # FILEPATHS --------------------------------------------------------------------
 
@@ -13,44 +15,64 @@ PATH_ITENS_2025 <- list.files(
   pattern = "dados.csv",
   recursive = TRUE,
   full.names = TRUE
-)[-5]
+)
+PATH_ITENS_2025 <- PATH_ITENS_2025[!grepl("TESTE", PATH_ITENS_2025)]
 
 
 # READ DATA --------------------------------------------------------------------
 
 itens_2024 <- read_csv(PATH_ITENS_2024, col_types = list(.default = col_character())) %>%
+  mutate(
+    endpoint = sprintf("%s/%s", endpoint, numeroItem),
+  ) %>%
   select(
-    endpoint, numeroControlePNCPCompra,
+    endpoint,
+    numeroControlePNCPCompra, numeroItem,
     dataInclusao, dataAtualizacao,
-    numeroItem, descricao, unidadeMedida, valorTotal, quantidade,
-    categoriaItemCatalogo,
-    catalogo,
-    catalogoCodigoItem,
-    informacaoComplementar,
-    ncmNbsCodigo,
-    ncmNbsDescricao
-  )
-
-itens_2025 <- map_df(PATH_ITENS_2025, read_csv, col_types = list(.default = col_character())) %>%
-  select(
-    endpoint, numeroItem, dataInclusao, dataAtualizacao,
     descricao, unidadeMedida, valorTotal, quantidade,
-    unidadeMedida,
-    contains("atalogo"),
     informacaoComplementar,
-    starts_with("ncm"),
+    contains("atalogo"),
+    starts_with("ncm")
   )
 
 itens_2024 <- itens_2024 %>%
   mutate(
-    endpoint = sprintf("%s/%s", endpoint, numeroItem),
-    id = "itens_2024"
+    file = PATH_ITENS_2024,
+    coleta = "2024",
+    data_coleta = ym("2024-12"),
+    atual = FALSE
   )
 
+atual <- file.info(PATH_ITENS_2025) %>%
+  rownames_to_column("file") %>%
+  transmute(
+    file,
+    coleta = basename(dirname(file)),
+    coleta = str_remove(coleta, "-Q.*[12]$"),
+    data_coleta = ym(coleta),
+    atual = data_coleta == max(data_coleta)
+  )
+
+itens_2025 <- map(PATH_ITENS_2025, read_csv, col_types = list(.default = col_character())) %>%
+  set_names(PATH_ITENS_2025) %>%
+  enframe(name = "file", value = "data") %>%
+  left_join(atual)
+
 itens_2025 <- itens_2025 %>%
+  unnest(cols = c(data)) %>%
   mutate(
     endpoint = sprintf("%s/%s", endpoint, numeroItem),
-    id = "itens_2025"
+    numeroControlePNCPCompra = make_id(str_remove(endpoint, "\\/\\d+$")),
+  ) %>%
+  select(
+    endpoint,
+    numeroControlePNCPCompra, numeroItem,
+    dataInclusao, dataAtualizacao,
+    descricao, unidadeMedida, valorTotal, quantidade,
+    informacaoComplementar,
+    contains("atalogo"),
+    starts_with("ncm"),
+    file, coleta, data_coleta, atual
   )
 
 glimpse(itens_2024)
@@ -61,27 +83,31 @@ glimpse(itens_2025)
 
 itens <- bind_rows(itens_2024, itens_2025)
 
+glimpse(itens)
+
 quantidades <- itens %>%
-  count(id, ano = year(dataInclusao), mes = month(dataInclusao)) %>%
-  mutate(data = my(sprintf("%s/%s", mes, ano))) %>%
-  summarise(.by = c(id, data), n = sum(n))
+  mutate(coleta = fct_reorder(coleta, data_coleta)) %>%
+    count(coleta, atual, ano = year(dataInclusao), mes = month(dataInclusao)) %>%
+    mutate(mesInclusao = my(sprintf("%s/%s", mes, ano))) %>%
+    summarise(.by = c(coleta, atual, mesInclusao), n = sum(n))
 
 quantidades %>%
-  mutate(id = fct_reorder(id, -as.numeric(str_remove(id, "itens_")))) %>%
-  ggplot(aes(x = data, y = n, fill = id)) +
-  geom_col() +
+  ggplot(aes(x = mesInclusao, y = n, fill = coleta)) +
+  geom_col(aes(color = after_scale(darken(fill, .4)))) +
   labs(
     title = "Quantidade de itens coletados do PNCP - por mês",
-    subtitle = "Ex: https:\\/\\/pncp.gov.br\\/api\\/pncp\\/v1\\/orgaos\\/**{cnpj}**\\/compras\\/**{ano}**\\/**{sequencial}**\\/itens/**{numeroItem}**",
-    x = NULL,
-    y = "<br>Quantidade de itens coletados", fill = "Coleta"
+    subtitle = "Ex: https:\\/\\/pncp.gov.br\\/api\\/pncp\\/v1\\/orgaos\\/**{cnpj}**\\/compras\\/**{ano}**\\/**{sequencial}**\\/itens/**{numeroItem}**<br><br>Dados são coletados por data de atualização do item",
+    x = "<br>dataInclusao do item no PNCP",
+    y = "<br>Quantidade de itens coletados",
+    fill = "Ano/mês da coleta<br>(quanto mais escuro mais atual)"
   ) +
   scale_x_date(date_labels = "%b-%y", date_breaks = "1 months", expand = c(0, 0)) +
-  scale_y_continuous(labels = numero, breaks = seq(0, 2.5e5, length.out = 6), limits = c(0, 3e5), expand = c(0, 0), position = "right") +
+  scale_y_continuous(labels = numero, breaks = seq(0, 3e5, length.out = 6), limits = c(0, 3.8e5), expand = c(0, 0), position = "right") +
+  scale_fill_brewer(palette = "Purples") +
   theme(
     axis.text.x = ggtext::element_markdown(angle = 45, hjust = 1),
-    legend.position = c(.15, .92),
-    legend.direction = "horizontal",
+    legend.position = c(.15, .82),
+    legend.direction = "vertical",
     legend.title.position = "top"
   )
 
