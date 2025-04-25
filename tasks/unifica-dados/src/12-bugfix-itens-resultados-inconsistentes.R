@@ -45,7 +45,7 @@ resultados$recoleta <- distinct(resultados$recoleta)
 # separa os itens que estão inconsistentes no arquivo de itens-resultados.csv inconsistentes
 
 # separa as coletas que estão ruins
-inconsistentes <- resultados$itens_resultados %>% anti_join(coleta1)
+inconsistentes <- anti_join(resultados$itens_resultados, coleta1)
 
 # salva os itens inconsistentes em um arquivo temporário
 write_csv(inconsistentes, PATH_TMP)
@@ -55,7 +55,7 @@ write_csv(inconsistentes, PATH_TMP)
 # :: RESULTADOS CONSISTENTES ---------------------------------------------------
 
 # separa as coletas que estão boas
-coleta1_tratados <- resultados$itens_resultados %>% semi_join(coleta1)
+coleta1_tratados <- semi_join(resultados$itens_resultados, coleta1)
 
 # recolete os inconsistentes na VM
 # faça o download do resultado da recoleta e salve na pasta OUTPUT_DIR
@@ -82,7 +82,6 @@ write_csv(itens_resultados_consistentes, PATH_RESULTADOS_UNIFICADOS)
 medicamentos <- read_csv(here("tasks/unifica-dados/output/medicamentos.csv")) %>%
   transmute(endpoint = str_glue("{endpoint}/{numeroItem}/resultados"))
 
-medicamentos_resultados <- itens_resultados_consistentes %>%
-  semi_join(medicamentos)
+medicamentos_resultados <- semi_join(itens_resultados_consistentes, medicamentos)
 
 write_csv(medicamentos_resultados, here(OUTPUT_DIR, "resultados-medicamentos.csv"))

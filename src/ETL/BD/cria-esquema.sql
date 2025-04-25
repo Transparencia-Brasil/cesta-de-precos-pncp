@@ -33,7 +33,7 @@ CREATE TABLE contratante (
 );
 
 CREATE TABLE fornecedor (
-    ni BIGINT PRIMARY KEY,
+    ni VARCHAR(100) PRIMARY KEY,
     nome VARCHAR(1000) NOT NULL,
     codigo_pais CHAR(3),
     tipo_pessoa CHAR(2),
@@ -72,7 +72,7 @@ CREATE TABLE item_homologado (
     codigo_unidade_contratante VARCHAR(100),
     cnpj_contratante_subrogado BIGINT,
     codigo_unidade_contratante_subrogado VARCHAR(100),
-    ni_fornecedor BIGINT,
+    ni_fornecedor VARCHAR(100),
     numero_item INTEGER NOT NULL,
     descricao TEXT,
     unidade_medida VARCHAR(1000),
