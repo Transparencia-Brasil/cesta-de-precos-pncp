@@ -130,3 +130,6 @@ count_medicines %>%
   geom_col() +
   scale_fill_manual(values = c("gray50", "darkred")) +
   scale_x_continuous(expand = c(0.01, 0))
+
+count_medicines %>%
+  filter(str_detect(nome_item, "Insulina"))
