@@ -454,7 +454,8 @@ get_query <- function(qry, conectar = FALSE, quiet = FALSE) {
 insere_tabela <- function(con, tabela, consulta) {
   for (i in seq_len(nrow(tabela))) {
     tryCatch({
-      dbExecute(con, consulta, params = as.list(unname(tabela[i, ])))
+      params <- unname(as.list(tb_catalogo[i, ]))
+      dbExecute(con, consulta, params = params)
     }, error = function(e) {
       nome_tabela <- deparse(substitute(tabela))
       message(sprintf(
