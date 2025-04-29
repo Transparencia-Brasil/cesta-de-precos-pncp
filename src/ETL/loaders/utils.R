@@ -379,7 +379,7 @@ suppressPackageStartupMessages(library(dotenv))
 #'
 #' # Verificar se a conexão está ativa
 #' DBI::dbIsValid(con)
-#' 
+#'
 #' # Lembre-se de fechar a conexão ao finalizar o uso
 #' DBI::dbDisconnect(con)
 #' @import DBI RPostgres
