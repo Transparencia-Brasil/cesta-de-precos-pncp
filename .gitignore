@@ -70,3 +70,4 @@ tasks/unifica-dados/output/itens-resultados.csv.old
 coleta/**/*.csv
 src/ETL/run-coletores.old.sh
 **/_recoletas
+.env
