@@ -1,14 +1,14 @@
 #' Este script insere os dados do catálogo de itens no banco de dados configurado.
-#' 
-#' O parâmetro de entrada obrigatório é o caminho para o arquivo do catálogo em 
+#'
+#' O parâmetro de entrada obrigatório é o caminho para o arquivo do catálogo em
 #' formato .rds.
-#' 
+#'
 #' O catálogo foi obtido a partir da seguinte API:
 #' https://cnbs.estaleiro.serpro.gov.br/cnbs-api/swagger-ui/index.html#/
-#' 
+#'
 #' Utilizando o seguinte script:
 #' https://github.com/Transparencia-Brasil/pncp-analises/tree/main/tasks/scrap-catmat
-#' 
+#'
 
 suppressPackageStartupMessages(library(readr))
 suppressPackageStartupMessages(library(tidyr))
@@ -40,9 +40,10 @@ if (tolower(tools::file_ext(arg)) != ".rds") {
   stop("Erro: O arquivo do catálogo deve ser no formato .rds.")
 }
 
-# Lê os arquivos de dados
-catalogo <- read_csv(CAMINHO_CATALOGO, show_col_types = FALSE)
+CAMINHO_CATALOGO <- here("data/catmat/catmat.rds")
 
+# Lê os arquivos de dados
+catalogo <- readRDS(CAMINHO_CATALOGO)
 
 # SELECIONA CARACTERÍSTICAS DOS MEDICAMENTOS ------------------------------
 
@@ -103,7 +104,8 @@ catalogo <- catalogo %>%
 
 # TRANSFORMA A TABELA -----------------------------------------------------
 
-tb_catalogo <- catalogo %>% select(all_of(COLUNAS_CATALOGO)) %>%
+tb_catalogo <- catalogo %>%
+  select(all_of(COLUNAS_CATALOGO)) %>%
   mutate( # Seleciona atributos de interesse
     caracteristicas = map(buscaItemCaracteristica, ~ select(.x, nomeCaracteristica, nomeValorCaracteristica))
   ) %>%
