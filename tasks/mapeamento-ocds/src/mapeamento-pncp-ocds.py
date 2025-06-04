@@ -58,7 +58,6 @@ for idx, row in tqdm(contratacoes.iterrows(), total=len(contratacoes)):
         # Filtra a lista de contratações para manter apenas as que têm itens correspondentes
         # Assim, criamos o json apenas para as contratações que relativas aos itens filtrados (medicamentos)
         contratacoes_filtradas.append(row)
-        break
 
 contratacoes_filtradas_df = pd.DataFrame(contratacoes_filtradas)
 
