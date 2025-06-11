@@ -11,7 +11,7 @@ ITENS_RESULTADOS2_PATH <- "tasks/unifica-dados/input/itens2-resultados.rds"
 ITENS_RESULTADOS3_PATH <- "tasks/unifica-dados/input/itens3-resultados.rds"
 
 # itens-resultados remanescentes coletados nesta task com o script 09-run-coleta-resultados.sh
-PATH_RESULTADOS_NOVOS <- here("coleta/resultados/remanescentes/dados.csv")
+PATH_RESULTADOS_NOVOS <- here("coleta/resultados/dados.csv")
 
 # CSV com as coletas unificadas
 OUTPUT_DIR <- "tasks/unifica-dados/output"

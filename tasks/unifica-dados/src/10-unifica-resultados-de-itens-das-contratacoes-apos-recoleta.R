@@ -14,7 +14,7 @@ OUTPUT_DIR <- "tasks/unifica-dados/output"
 PATH_RESULTADOS_UNIFICADOS <- here(OUTPUT_DIR, "itens-resultados.csv")
 
 # itens-resultados remanescentes
-PATH_RESULTADOS_NOVOS <- here("coleta/resultados/remanescentes/dados.csv")
+PATH_RESULTADOS_NOVOS <- here("coleta/resultados/dados.csv")
 
 # dados de teste
 CAMINHO_DADOS_DE_TESTE <- here("src/ETL/dados-de-teste/amostra_resultados.csv")

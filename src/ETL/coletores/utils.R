@@ -222,7 +222,6 @@ coleta <- function(endpoints, output_dir = here("coleta"), tamanho_lote = 1000, 
       ))
 
       # formata o dataset conforme o template
-      df_dados <- mutate(df_dados, across(everything(), \(x) as.character(x)))
       df_dados <- bind_rows(template, df_dados)
 
       # Salva os resultados parciais
