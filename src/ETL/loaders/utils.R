@@ -5,10 +5,10 @@
 #'  * Consultas de inserção no banco.
 #'  * Função para se conectar ao banco.
 #'  * Função para inserir dados no banco a partir de um dataframe.
-#'  
-#'  Para conectar-se ao banco insira um arquivo .env na raiz do projeto com 
+#'
+#'  Para conectar-se ao banco insira um arquivo .env na raiz do projeto com
 #'  o seguinte conteúdo:
-#'  
+#'
 #'  DB_HOST=seu_host_aqui
 #'  1DB_USER=seu_usuario_aqui
 #'  DB_PASS=sua_senha_aqui
@@ -34,7 +34,7 @@ suppressPackageStartupMessages(library(dotenv))
     "buscaItemCaracteristica",
     "unidadeFornecimento"
   )
-  
+
   COLUNAS_CONTRATANTE <- c(
     "data.orgaoEntidade.cnpj",
     "data.orgaoEntidade.razaoSocial",
@@ -47,7 +47,7 @@ suppressPackageStartupMessages(library(dotenv))
     "data.unidadeOrgao.ufSigla",
     "data.unidadeOrgao.ufNome"
   )
-  
+
   COLUNAS_CONTRATANTE_SUBROGADO <- c(
     "data.orgaoSubRogado.cnpj",
     "data.orgaoSubRogado.razaoSocial",
@@ -60,7 +60,7 @@ suppressPackageStartupMessages(library(dotenv))
     "data.unidadeSubRogada.ufSigla",
     "data.unidadeSubRogada.ufNome"
   )
-  
+
   COLUNAS_FORNECEDOR <- c(
     "niFornecedor",
     "nomeRazaoSocialFornecedor",
@@ -71,7 +71,7 @@ suppressPackageStartupMessages(library(dotenv))
     "naturezaJuridicaId",
     "naturezaJuridicaNome"
   )
-  
+
   COLUNAS_CONTRATACAO <- c(
     "data.numeroControlePNCP",
     "data.anoCompra",
@@ -91,7 +91,7 @@ suppressPackageStartupMessages(library(dotenv))
     "data.modoDisputaId",
     "data.modoDisputaNome"
   )
-  
+
   COLUNAS_ITEM_HOMOLOGADO <- c(
     "data.numeroControlePNCP",
     "codigo_br",
@@ -136,7 +136,7 @@ suppressPackageStartupMessages(library(dotenv))
     "urlAPI",
     "urlPNCP"
   )
-  
+
   COLUNAS_ITEM_LICITADO <- c(
     "data.numeroControlePNCP",
     "codigo_br",
@@ -174,6 +174,7 @@ suppressPackageStartupMessages(library(dotenv))
 
 # Consultas de inserção no banco
 {
+
   # Insere um item do catálogo
   CONSULTA_INSERIR_CATALOGO <- "
     INSERT INTO catalogo (codigo_classe, nome_classe, codigo_pdm, nome_pdm,
@@ -181,21 +182,40 @@ suppressPackageStartupMessages(library(dotenv))
     unidades_fornecimento)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11::jsonb)
     ON CONFLICT (codigo_item) DO NOTHING;"
-  
+
+  # Insere um item do catálogo
+  CONSULTA_UPDATE_CATALOGO <- "
+    INSERT INTO catalogo (codigo_classe, nome_classe, codigo_pdm, nome_pdm,
+    codigo_item, nome_item, item_suspenso, item_ativo, item_sustentavel, características,
+    unidades_fornecimento)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11::jsonb)
+    ON CONFLICT (codigo_item)
+    DO UPDATE SET
+      codigo_classe = $1,
+      nome_classe = $2,
+      codigo_pdm = $3,
+      nome_pdm = $4,
+      nome_item = $6,
+      item_suspenso = $7,
+      item_ativo = $8,
+      item_sustentavel = $9,
+      características = $10::jsonb,
+      unidades_fornecimento = $11::jsonb;"
+
   # Insere um contratante
   CONSULTA_INSERIR_CONTRATANTE <- "
     INSERT INTO contratante (cnpj, razao_social, esfera, poder, codigo_unidade,
     nome_unidade, codigo_ibge_municipio, nome_municipio, sigla_uf, nome_uf)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     ON CONFLICT (cnpj, codigo_unidade) DO NOTHING"
-  
+
   # Insere um fornecedor
   CONSULTA_INSERIR_FORNECEDOR <- "
     INSERT INTO fornecedor (ni, nome, codigo_pais, tipo_pessoa, codigo_porte,
     nome_porte, codigo_natureza_juridica, nome_natureza_juridica)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     ON CONFLICT (ni) DO NOTHING"
-  
+
   # Insere uma contratação nova ou, caso a contratação já exista no banco, atualiza os campos
   CONSULTA_INSERIR_CONTRATACAO <- "
     INSERT INTO contratacao (
@@ -208,7 +228,7 @@ suppressPackageStartupMessages(library(dotenv))
         codigo_modo_disputa, nome_modo_disputa
     )
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
-    ON CONFLICT (numero_controle_pncp) 
+    ON CONFLICT (numero_controle_pncp)
     DO UPDATE SET
         objeto_compra = $4,
         data_abertura_proposta = $5,
@@ -224,7 +244,7 @@ suppressPackageStartupMessages(library(dotenv))
         nome_amparo_legal = $15,
         codigo_modo_disputa = $16,
         nome_modo_disputa = $17;"
-  
+
   # Insere um item homologado novo ou, caso o item já exista no banco, atualiza os campos
   CONSULTA_INSERIR_ITEM_HOMOLOGADO <- "
     INSERT INTO item_homologado (
@@ -254,45 +274,45 @@ suppressPackageStartupMessages(library(dotenv))
         $21, $22, $23, $24, $25, $26, $27, $28, $29, $30,
         $31, $32, $33, $34, $35, $36, $37, $38, $39, $40,
         $41, $42)
-    ON CONFLICT (numero_controle_pncp, numero_item) 
+    ON CONFLICT (numero_controle_pncp, numero_item)
     DO UPDATE SET
         codigo_item_catalogo = $2,
-        cnpj_contratante_subrogado = $5, 
+        cnpj_contratante_subrogado = $5,
         codigo_unidade_contratante_subrogado = $6,
         ni_fornecedor = $7,
-        descricao = $9, 
-        unidade_medida = $10, 
+        descricao = $9,
+        unidade_medida = $10,
         material_servico = $11,
-        codigo_categoria_item = $12, 
+        codigo_categoria_item = $12,
         nome_categoria_item = $13,
         codigo_catalogo = $14,
         nome_catalogo = $15,
-        codigo_categoria_item_catalogo = $16, 
+        codigo_categoria_item_catalogo = $16,
         nome_categoria_item_catalogo = $17,
         codigo_item_catalogo_pncp = $18,
-        codigo_ncm_nbs = $19, 
+        codigo_ncm_nbs = $19,
         descricao_ncm_nbs = $20,
-        codigo_criterio_julgamento = $21, 
+        codigo_criterio_julgamento = $21,
         nome_criterio_julgamento = $22,
-        codigo_situacao_item = $23, 
+        codigo_situacao_item = $23,
         nome_situacao_item = $24,
-        codigo_tipo_beneficio = $25, 
+        codigo_tipo_beneficio = $25,
         nome_tipo_beneficio = $26,
         orcamento_sigiloso = $27,
-        valor_unitario_estimado = $28, 
-        valor_total_estimado = $29, 
+        valor_unitario_estimado = $28,
+        valor_total_estimado = $29,
         quantidade_estimada = $30,
-        codigo_situacao_resultado = $31, 
+        codigo_situacao_resultado = $31,
         nome_situacao_resultado = $32,
-        valor_unitario_homologado = $33, 
-        valor_total_homologado = $34, 
+        valor_unitario_homologado = $33,
+        valor_total_homologado = $34,
         quantidade_homologada = $35,
-        moeda_estrangeira = $36, 
+        moeda_estrangeira = $36,
         valor_nominal_moeda_estrangeira = $37,
-        data_resultado = $38, 
-        data_cancelamento = $39, 
+        data_resultado = $38,
+        data_cancelamento = $39,
         motivo_cancelamento = $40;"
-  
+
   # Insere um item licitado novo ou, caso o item já exista no banco, atualiza os campos
   CONSULTA_INSERIR_ITEM_LICITADO <- "
     INSERT INTO item_licitado (
@@ -318,107 +338,124 @@ suppressPackageStartupMessages(library(dotenv))
     ON CONFLICT (numero_controle_pncp, numero_item)
     DO UPDATE SET
         codigo_item_catalogo = $2,
-        cnpj_contratante_subrogado = $5, 
+        cnpj_contratante_subrogado = $5,
         codigo_unidade_contratante_subrogado = $6,
-        descricao = $8, 
-        unidade_medida = $9, 
+        descricao = $8,
+        unidade_medida = $9,
         material_servico = $10,
-        codigo_categoria_item = $11, 
+        codigo_categoria_item = $11,
         nome_categoria_item = $12,
         codigo_catalogo = $13,
         nome_catalogo = $14,
-        codigo_categoria_item_catalogo = $15, 
+        codigo_categoria_item_catalogo = $15,
         nome_categoria_item_catalogo = $16,
         codigo_item_catalogo_pncp = $17,
-        codigo_ncm_nbs = $18, 
+        codigo_ncm_nbs = $18,
         descricao_ncm_nbs = $19,
-        codigo_criterio_julgamento = $20, 
+        codigo_criterio_julgamento = $20,
         nome_criterio_julgamento = $21,
-        codigo_situacao_item = $22, 
+        codigo_situacao_item = $22,
         nome_situacao_item = $23,
-        codigo_tipo_beneficio = $24, 
+        codigo_tipo_beneficio = $24,
         nome_tipo_beneficio = $25,
         orcamento_sigiloso = $26,
-        valor_unitario_estimado = $27, 
-        valor_total_estimado = $28, 
+        valor_unitario_estimado = $27,
+        valor_total_estimado = $28,
         quantidade_estimada = $29;"
 }
 
 
 #' Conecta ao banco de dados "medicamentos-transparentes"
 #'
-#' Esta função estabelece uma conexão com o banco de dados PostgreSQL chamado 
-#' "medicamentos-transparentes", localizado no host "localhost" com as credenciais 
+#' Esta função estabelece uma conexão com o banco de dados PostgreSQL chamado
+#' "medicamentos-transparentes", localizado no host "localhost" com as credenciais
 #' padrão de usuário e senha ("postgres").
 #'
-#' @return Um objeto de conexão do tipo `DBI::DBIConnection`, que pode ser utilizado para 
+#' @return Um objeto de conexão do tipo `DBI::DBIConnection`, que pode ser utilizado para
 #' executar consultas SQL no banco de dados.
 #' @examples
 #' # Criar conexão com o banco de dados
 #' con <- conecta_bd_medicamentos_transparentes()
-#' 
+#'
 #' # Verificar se a conexão está ativa
 #' DBI::dbIsValid(con)
-#' 
+#'
 #' # Lembre-se de fechar a conexão ao finalizar o uso
 #' DBI::dbDisconnect(con)
 #' @import DBI RPostgres
 conecta_bd_medicamentos_transparentes <- function() {
   # Lê o arquivo .env
-  load_dot_env()  
-  
+  load_dot_env()
+
   NOME_BD <- "medicamentos_transparentes"
   HOST <- Sys.getenv("DB_HOST")
   USUARIO <- Sys.getenv("DB_USER")
   SENHA <- Sys.getenv("DB_PASS")
   PORTA <- Sys.getenv("DB_PORT")
-  
+
   con <- dbConnect(
     RPostgres::Postgres(),
-    dbname = NOME_BD ,
+    dbname = NOME_BD,
     host = HOST,
     user = USUARIO,
     password = SENHA,
     port = PORTA
   )
-  
+
   return(con)
 }
 
+#' @title Função para chamar tabelas no banco postgres
+#' @param qry comando mysql, exemplo "select * from coletas;"
+#' @param conectar marque TRUE para conectar ao banco de dados antes de fazer a query.
+#' @param quiet ao rodar a função uma mensagem aparece no console, quiet=TRUE desabilita essa mensagem.
+get_query <- function(qry, conectar = FALSE, quiet = FALSE) {
+  # se quiser reiniciar a comunicação basta indicar `conectar = TRUE`
+  if (conectar) conecta_bd_medicamentos_transparentes()
+
+  # Se não quiser ver essa mensagem printada no console defina `quiet = TRUE`
+  dbname <- DBI::dbGetInfo(con)$dbname
+  if (!quiet) message(sprintf("dbname: %s\n %s", dbname, qry))
+
+  # envia a query para o banco de dados e retorna uma tibble
+  df <- DBI::dbGetQuery(con, qry) |> tibble::as_tibble()
+  return(df)
+}
 
 #' Insere os dados de um dataframe em um banco de dados PostgreSQL
 #'
-#' Esta função percorre todas as linhas de um dataframe e executa uma consulta SQL 
-#' para inseri-las no banco de dados. Se ocorrer um erro ao inserir uma linha, 
+#' Esta função percorre todas as linhas de um dataframe e executa uma consulta SQL
+#' para inseri-las no banco de dados. Se ocorrer um erro ao inserir uma linha,
 #' uma mensagem de aviso é exibida com o índice da linha e o nome da tabela de origem.
 #'
 #' @param con Conexão ativa com o banco de dados, criada com `DBI::dbConnect()`.
 #' @param tabela Dataframe contendo os dados a serem inseridos no banco.
-#' @param consulta Consulta SQL parametrizada (`INSERT INTO ... VALUES ($1, $2, ...)`) 
+#' @param consulta Consulta SQL parametrizada (`INSERT INTO ... VALUES ($1, $2, ...)`)
 #' para inserção dos dados.
 #'
-#' @return Nenhum valor é retornado explicitamente. As inserções são feitas diretamente 
+#' @return Nenhum valor é retornado explicitamente. As inserções são feitas diretamente
 #' no banco de dados.
 #'
 #' @examples
 #' \dontrun{
 #' con <- DBI::dbConnect(RPostgres::Postgres(), dbname = "meubanco", user = "usuario", password = "senha")
-#' 
+#'
 #' df <- data.frame(id = 1:3, nome = c("A", "B", "C"))
-#' 
+#'
 #' query <- "INSERT INTO minha_tabela (id, nome) VALUES ($1, $2)"
-#' 
+#'
 #' insere_tabela(con, df, query)
-#' 
+#'
 #' DBI::dbDisconnect(con)
 #' }
-#' 
+#'
 #' @import DBI
 #' @import RPostgres
 insere_tabela <- function(con, tabela, consulta) {
   for (i in seq_len(nrow(tabela))) {
     tryCatch({
-      dbExecute(con, consulta, params = as.list(unname(tabela[i, ])))
+      params <- unname(as.list(tb_catalogo[i, ]))
+      dbExecute(con, consulta, params = params)
     }, error = function(e) {
       nome_tabela <- deparse(substitute(tabela))
       message(sprintf(
