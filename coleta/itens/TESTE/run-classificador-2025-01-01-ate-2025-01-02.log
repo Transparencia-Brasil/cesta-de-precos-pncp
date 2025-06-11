@@ -1,28 +1,0 @@
-[nltk_data] Downloading package stopwords to
-[nltk_data]     C:\Users\rdurl\AppData\Roaming\nltk_data...
-Validando os argumentos.[nltk_data]   Package stopwords is already up-to-date!
-Detectando nomes PDM nos itens.Carregando o modelo.Calculando os vetores das descrições dos itens do PNCP.Identificando os medicamentosC:\Users\rdurl\OneDrive\Documentos\cesta-de-precos-pncp\src\ETL\classificador\filtra-medicamentos.py:235: SettingWithCopyWarning: 
-A value is trying to be set on a copy of a slice from a DataFrame.
-Try using .loc[row_indexer,col_indexer] = value instead
-
-See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
-  medicamentos_df['embedding'] = list(embeddings)
-C:\Users\rdurl\OneDrive\Documentos\cesta-de-precos-pncp\src\ETL\classificador\filtra-medicamentos.py:293: SettingWithCopyWarning: 
-A value is trying to be set on a copy of a slice from a DataFrame.
-Try using .loc[row_indexer,col_indexer] = value instead
-
-See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
-  medicamentos_df[['codigo_br', 'similaridade']] = medicamentos_df.apply(mais_similar, axis=1, result_type='expand')
-C:\Users\rdurl\OneDrive\Documentos\cesta-de-precos-pncp\src\ETL\classificador\filtra-medicamentos.py:293: SettingWithCopyWarning: 
-A value is trying to be set on a copy of a slice from a DataFrame.
-Try using .loc[row_indexer,col_indexer] = value instead
-
-See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
-  medicamentos_df[['codigo_br', 'similaridade']] = medicamentos_df.apply(mais_similar, axis=1, result_type='expand')
-C:\Users\rdurl\OneDrive\Documentos\cesta-de-precos-pncp\src\ETL\classificador\filtra-medicamentos.py:296: SettingWithCopyWarning: 
-A value is trying to be set on a copy of a slice from a DataFrame.
-Try using .loc[row_indexer,col_indexer] = value instead
-
-See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
-  medicamentos_df['medicamento'] = medicamentos_df['similaridade'] >= THRESHOLD
-Fim da execução. Medicamentos salvos em coleta/itens/TESTE/medicamentos.csv

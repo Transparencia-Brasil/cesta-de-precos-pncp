@@ -9,4 +9,4 @@ O script `tasks/unifica-dados/src/12-bugfix-itens-resultados-inconsistentes.R` f
 
 A recoleta na máquina virtual foi feita usando os scripts que estão na pasta `coleta/_recoletas/coleta-resultados-inconsistentes/src`
 
-Depois de recoletados, os dados foram abertos novamente em `12-bugfix-itens-resultados-inconsistentes.R` e unificados com os dados originais. Eles foram transferidos para o Google Drive, [nesta pasta](https://drive.google.com/drive/folders/1OHGfJ2Sz8YtwluLnkRzeIj2jaX-bJ0lK).
+Depois de recoletados, os dados foram abertos novamente em `12-bugfix-itens-resultados-inconsistentes.R` e unificados com os dados originais.
