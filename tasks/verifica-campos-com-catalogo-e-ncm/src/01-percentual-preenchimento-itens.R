@@ -282,6 +282,17 @@ itens %>%
 
 # ---
 
+# categoriaItemCatalogo.dataAtualizacao
+categoriaItemCatalogo_descicao <- conta_preenchimento(itens, "categoriaItemCatalogo.descricao", quantidades_ano)
+
+itens %>% distinct(categoriaItemCatalogo.descricao)
+
+itens %>%
+  filter(!is.na(categoriaItemCatalogo.descicao)) %>%
+  select(endpoint, categoriaItemCatalogo.descricao)
+
+# ---
+
 # categoriaItemCatalogo.dataInclusao
 categoriaItemCatalogo_dataInclusao <- conta_preenchimento(itens, "categoriaItemCatalogo.dataInclusao", quantidades_ano)
 
