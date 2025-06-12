@@ -2,10 +2,15 @@ import json
 from datetime import datetime, timezone
 import pandas as pd
 from tqdm import tqdm
+import zipfile
 
 contratacoes = pd.read_csv('input/contratacoes.csv')
 itens = pd.read_csv('input/itens-medicamentos.csv')
 resultados = pd.read_csv('input/resultados.csv')
+
+# TODO Pegar essa informação por variável de ambiente
+mes_coleta = 1
+ano_coleta = 2025
 
 # Função para converter data para o formato OCDS
 # Formato esperado: 'YYYY-MM-DDTHH:MM:SSZ'
@@ -15,7 +20,17 @@ def to_ocds_dt(data):
         ocds_dt = dt.strftime('%Y-%m-%dT%H:%M:%SZ')
         return ocds_dt
     except Exception as e:
-        print(f"Erro ao converter data: {e}")
+        print(f"Erro ao converter data: {e}: {data}: {type(data)}")
+        return None
+
+def duracao_em_dias(data_inicio, data_fim):
+    try:
+        inicio = datetime.fromisoformat(data_inicio)
+        fim = datetime.fromisoformat(data_fim)
+        duracao = (fim - inicio).days
+        return duracao
+    except Exception as e:
+        print(f"Erro ao calcular duração: {e}")
         return None
 
 # Extrai cnpj, ano e sequencial da coluna numeroControlePNCP
@@ -64,6 +79,9 @@ contratacoes_filtradas_df = pd.DataFrame(contratacoes_filtradas)
 # Junta todos os itens encontrados
 itens_filtrados = pd.concat(itens_filtrados_por_contratacao, ignore_index=True)
 
+# Vamos organizar as releases como dicionário cujo o Estado será a chave
+releases = {}
+
 print("PROCESSANDO CONTRATAÇÕES...")
 for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_filtradas_df)):
     ocid = str(row['data.orgaoEntidade.cnpj']) + '_' + str(row['data.anoCompra']) + '_' + str(row['data.sequencialCompra'])
@@ -71,15 +89,23 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
     # Itens relacionados - filtramos pelo número de controle do PNCP
     itens_rel = itens_filtrados[itens_filtrados['numeroControlePNCP'] == row['data.numeroControlePNCP']]
     items = []
+    items_by_id = {}
+    lots = []
+    award_criteria = {
+        "1": "priceOnly",  # Menor preço
+        "2": "priceOnly",  # Maior desconto
+        "3": "qualityOnly",  # Melhor técnica ou conteúdo artístico
+        "4": "ratedCriteria",  # Técnica e preço
+        "5": "priceOnly",  # Maior lance
+        "6": "costOnly",  # Maior retorno econômico
+        "7": None,  # Não se aplica
+        "8": "qualityOnly"  # Melhor técnica
+    }
+    
     for _, item in itens_rel.iterrows():
-        items.append({
+        i = {
             "id": str(item['numeroItem']),
             "description": item['descricao'],
-            "classification": {
-                    "scheme": "MaterialOuServico",
-                    "id": str(item['materialOuServico']) if pd.notna(item['materialOuServico']) else None,
-                    "description": item['materialOuServicoNome'] if pd.notna(item['materialOuServicoNome']) else None,
-                },
             "quantity": int(item['quantidade']),
             "unit": {
                 "name": item['unidadeMedida'],
@@ -88,254 +114,387 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
                     "currency": "BRL"
                 }
             },
-            "additionalClassifications": [
-                {
-                    "scheme": "orcamentoSigiloso",
-                    "description": str(item['orcamentoSigiloso']) if pd.notna(item['orcamentoSigiloso']) else None
-                },
-                {
-                "scheme": "ItemCategoria",
-                "id": str(item['itemCategoriaId']),
-                "description": item['itemCategoriaNome'],
+            "relatedLot": 'lot-' + str(item['numeroItem'])
+        }
+
+        items.append(i)
+        items_by_id[str(item['numeroItem'])] = i  # A fim de facilitar a rastreabilidade em awards
+
+        lots.append({
+            "id": 'lot-' + str(item['numeroItem']),
+            "statusDetailsId": str(item['situacaoCompraItem']),
+            "statusDetails": item['situacaoCompraItemNome'] if pd.notna(item['situacaoCompraItemNome']) else None,
+            "confidentialBudget": item['orcamentoSigiloso'] if pd.notna(item['orcamentoSigiloso']) else None,
+            "asset": item['patrimonio'] if pd.notna(item['patrimonio']) else None,
+            "realEstateRegistrationCode": item['codigoRegistroImobiliario'] if pd.notna(item['codigoRegistroImobiliario']) else None,
+            "standardPreferenceMarginApplicability": item['aplicabilidadeMargemPreferenciaNormal'] if pd.notna(item['aplicabilidadeMargemPreferenciaNormal']) else None,
+            "standardPreferenceMarginPercentage": item['percentualMargemPreferenciaNormal'] if pd.notna(item['percentualMargemPreferenciaNormal']) else None,
+            "additionalPreferenceMarginApplicability": item['aplicabilidadeMargemPreferenciaAdicional'] if pd.notna(item['aplicabilidadeMargemPreferenciaAdicional']) else None,
+            "additionalPreferenceMarginPercentage": item['percentualMargemPreferenciaAdicional'] if pd.notna(item['percentualMargemPreferenciaAdicional']) else None,
+            "benefitType": str(int(item['tipoBeneficio'])) if pd.notna(item['tipoBeneficio']) else None,
+            "benefitTypeName": item['tipoBeneficioNome'] if pd.notna(item['tipoBeneficioNome']) else None,
+            "ncmNbsCode": item['ncmNbsCodigo'] if pd.notna(item['ncmNbsCodigo']) else None,
+            "ncmNbsDescription": item['ncmNbsDescricao'] if pd.notna(item['ncmNbsDescricao']) else None,
+            "catalogItemCategoryId": item['categoriaItemCatalogo.id'] if pd.notna(item['categoriaItemCatalogo.id']) else None,
+            "catalogItemCategoryName": item['categoriaItemCatalogo.nome'] if pd.notna(item['categoriaItemCatalogo.nome']) else None,
+            "catalogItemCategoryDescription": item['categoriaItemCatalogo.descricao'] if pd.notna(item['categoriaItemCatalogo.descricao']) else None,
+            "catalogItemCode": item['catalogoCodigoItem'] if pd.notna(item['catalogoCodigoItem']) else None,
+            "awardCriteria": award_criteria[str(item['criterioJulgamentoId'])] if pd.notna(item['criterioJulgamentoId']) else None,
+            "awardCriteriaDetails": item['criterioJulgamentoNome'] if pd.notna(item['criterioJulgamentoNome']) else None,
+            "value": {
+                "amount": item['valorTotal'],
+                "currency": "BRL",
             },
-                {
-                    "scheme": "patrimonio",
-                    "description": str(item['patrimonio']) if pd.notna(item['patrimonio']) else None,
-                },
-                {
-                    "scheme": "codigoRegistroImobiliario",
-                    "description": str(item['codigoRegistroImobiliario']) if pd.notna(item['codigoRegistroImobiliario']) else None,
-                },
-                {
-                    "scheme": "tipoBeneficio",
-                    "description": str(int(item['tipoBeneficio'])) if pd.notna(item['tipoBeneficio']) else None,
-                },
-                {
-                    "scheme": "aplicacaoMargemPreferenciaNormal",
-                    "description": str(item['aplicabilidadeMargemPreferenciaNormal']) if pd.notna(item['aplicabilidadeMargemPreferenciaNormal']) else None
-                },
-                {
-                    "scheme": "aplicacaoMargemPreferenciaAdicional",
-                    "description": str(item['aplicabilidadeMargemPreferenciaAdicional']) if pd.notna(item['aplicabilidadeMargemPreferenciaAdicional']) else None
-                },
-                {
-                    "scheme": "percentualMargemPreferenciaNormal",
-                    "description": str(item['percentualMargemPreferenciaNormal']) if pd.notna(item['percentualMargemPreferenciaNormal']) else None
-                },
-                {
-                    "scheme": "percentualMargemPreferenciaAdicional",
-                    "description": str(item['percentualMargemPreferenciaAdicional']) if pd.notna(item['percentualMargemPreferenciaAdicional']) else None
-                },
-                {
-                    "scheme": "BR-NCM-NBS",
-                    "id": str(item['ncmNbsCodigo']) if pd.notna(item['ncmNbsCodigo']) else None,
-                    "description": str(item['ncmNbsDescricao']) if pd.notna(item['ncmNbsDescricao']) else None,
-                },
-                {
-                    "scheme": "BR-CategoriaItemCatalogo",
-                    "id": str(item['categoriaItemCatalogo.id']) if pd.notna(item['categoriaItemCatalogo.id']) else None,
-                    "description": str(item['categoriaItemCatalogo.nome']) if pd.notna(item['categoriaItemCatalogo.nome']) else None,
-                    "details": item['categoriaItemCatalogo.descricao'] if pd.notna(item['categoriaItemCatalogo.descricao']) else None,
-                },
-                {
-                    "scheme": "BR-Catalogo",
-                    "id": str(item['catalogoCodigoItem']) if pd.notna(item['catalogoCodigoItem']) else None,
-                },
-            ],
-            "date": to_ocds_dt(item['dataInclusao']),
-            "dateModified": to_ocds_dt(item['dataAtualizacao']),
-            "relatedDocuments": [{
-                "title": item['catalogo.nome'] if pd.notna(item['catalogo.nome']) else None,
-                "description": str(item['catalogo.descricao']) if pd.notna(item['catalogo.descricao']) else None,
-                "datePublished": to_ocds_dt(item['catalogo.dataInclusao']) if pd.notna(item['catalogo.dataInclusao']) else None,
-                "dateModified": to_ocds_dt(item['catalogo.dataAtualizacao']) if pd.notna(item['catalogo.dataAtualizacao']) else None,
-                "url": item['catalogo.url'] if pd.notna(item['catalogo.url']) else None,
-            }]
+            "sustainability": {
+                "description":
+                    'tipoBeneficio: ' + str(int(item['tipoBeneficio']))
+                    + '; tipoBeneficioNome: ' + item['tipoBeneficioNome'],
+                "goal": item['incentivoProdutivoBasico'],
+            }
         })
 
     # Resultados relacionados
     res_rel = resultados[resultados['numeroControlePNCPCompra'] == row['data.numeroControlePNCP']]
     awards = []
+    lista_niFornecedor = []
+    suppliers = []
+    
+    tipoPessoa = {
+        "PF": "Pessoa Física",
+        "PJ": "Pessoa Jurídica",
+        "PE": "Pessoa Estrangeira",
+    }
+
+    porte_fornecedor = {
+        "ME": "Micro",
+        "EPP": "Small",
+        "Demais": "Large",
+        "Não se aplica": "Self-Employed",
+        "Não Informado": None
+    }
+
+    lots_awards = []
+
     for idx, res in res_rel.iterrows():
-        awards.append({
-            "id": str(idx + 1),  # substituindo res['sequencialResultado'], pois não possui um ID único para cada award
-            "date": to_ocds_dt(res['dataInclusao']),
-            "dateModified": to_ocds_dt(res['dataAtualizacao']),
-            "status": "pending" if str(row['data.situacaoCompraId']) == '1' else "cancelled",
-            "statusDetails": res['situacaoCompraItemResultadoNome'],
-            "value": {
-                "amount": res['valorTotalHomologado'],
-                "currency": "BRL"
-            },
-            "x-foreignValue": {
-                "id": str(res['moedaEstrangeira.id']) if pd.notna(res['moedaEstrangeira.id']) else None,
-                "currency": res['moedaEstrangeira.simbolo'] if pd.notna(res['moedaEstrangeira.simbolo']) else None,
-                "description": str(res['moedaEstrangeira.nome']) if pd.notna(res['moedaEstrangeira.nome']) else None,
-                "amount": res['valorNominalMoedaEstrangeira'] if pd.notna(res['valorNominalMoedaEstrangeira']) else None,
-                "exchangeDate": to_ocds_dt(res['dataCotacaoMoedaEstrangeira']) if pd.notna(res['dataCotacaoMoedaEstrangeira']) else None,
-            },
-            "suppliers": [{
+        # Listando fornecedores únicos para o campo "parties"
+        if str(res['niFornecedor']) not in lista_niFornecedor:
+            lista_niFornecedor.append(str(res['niFornecedor']))
+            suppliers.append({
+                "id": "BR-CNPJ-" + str(res['niFornecedor']),
                 "name": res['nomeRazaoSocialFornecedor'],
-                    "scheme": "BR-CNPJ" if len(str(res['niFornecedor'])) == 14 else "BR-CPF",
+                "identifier": {
+                    "scheme": "BR-CNPJ",
                     "id": str(res['niFornecedor']),
+                    "legalName": res['nomeRazaoSocialFornecedor'],
+                },
                 "address": {
                     "countryName": res['codigoPais']
                 },
+                "roles": ["supplier"],
                 "details": {
-                    "classification": {
-                        "id": str(res['naturezaJuridicaId']) if pd.notna(res['naturezaJuridicaId']) else None,
-                        "description": str(res['naturezaJuridicaNome']) if pd.notna(res['naturezaJuridicaNome']) else None,
-                        "scheme": "naturezaJuridicaId",
+                    "scale": porte_fornecedor[res['porteFornecedorNome']],
+                    "classification": [{
+                        "scheme": "BRA-TIPO-PESSOA",
+                        "id": str(res['tipoPessoa']),
+                        "description": tipoPessoa[res['tipoPessoa']] if pd.notna(tipoPessoa[res['tipoPessoa']]) else None,
                     },
-                    "additionalClassifications": [
                         {
-                            "id": str(res['tipoPessoa']),
-                            "scheme": "tipoPessoa",
+                            "scheme": "BRA-NATUREZA-JURIDICA",
+                            "id": str(int(res['naturezaJuridicaId'])) if pd.notna(res['naturezaJuridicaId']) else None,
+                            "description": str(res['naturezaJuridicaNome']) if pd.notna(res['naturezaJuridicaNome']) else None,
                         },
                         {
-                            "id": str(int(res['ordemClassificacaoSrp'])),
-                            "scheme": "ordemClassificacaoSrp",
-                        },
-                    ],
-                },
-                "scale": res['porteFornecedorNome'],
+                            "scheme": "ORDEM DE CLASSIFICACAO SRP",
+                            "id": str(int(res['ordemClassificacaoSrp'])) if pd.notna(res['ordemClassificacaoSrp']) else None,
+                        }]
+                }
+            })
+
+        awards.append({
+            "id": str(idx + 1),  # substituindo res['sequencialResultado'], pois não possui um ID único para cada award
+            "title": row['data.tipoInstrumentoConvocatorioNome'] + ' - ' + str(row['data.processo']),
+            "description": row['data.objetoCompra'],
+            "date": to_ocds_dt(res['dataResultado']),
+            "hasSubcontracting": res['indicadorSubcontratacao'],
+            "value": {
+            "amount": res['valorTotalHomologado'],
+            "currency": "BRL"
+            },
+            "suppliers": [{
+            "id": "BR-CNPJ-" + str(res['niFornecedor']),
+            "name": res['nomeRazaoSocialFornecedor'],
             }],
             "items": [{
-                "id": str(res['numeroItem']),
-                "status": str(res['situacaoCompraItemResultadoId']),
-                "classification": {
-                    "scheme": "amparoLegalMargemPreferencia",
-                    "id": str(res['amparoLegalMargemPreferencia.id']) if pd.notna(res['amparoLegalMargemPreferencia.id']) else None,
-                    "description": str(res['amparoLegalMargemPreferencia.nome']) if pd.notna(res['amparoLegalMargemPreferencia.nome']) else None,
-                    "details": res['amparoLegalMargemPreferencia.descricao'] if pd.notna(res['amparoLegalMargemPreferencia.descricao']) else None,
-                },
-                "additionalClassifications": [
-                    {"scheme": "aplicacaoMargemPreferencia",
-                        "description": str(res['aplicacaoMargemPreferencia']) if pd.notna(res['aplicacaoMargemPreferencia']) else None},
-                    {"scheme": "aplicacaoBeneficioMeEpp",
-                        "description": str(res['aplicacaoBeneficioMeEpp']) if pd.notna(res['aplicacaoBeneficioMeEpp']) else None},
-                    {"scheme": "aplicacaoCriterioDesempate",
-                        "description": str(res['aplicacaoCriterioDesempate']) if pd.notna(res['aplicacaoCriterioDesempate']) else None},
-                    {
-                        "scheme": "amparoLegalCriterioDesempate",
-                        "id": str(res['amparoLegalCriterioDesempate.id']) if pd.notna(res['amparoLegalCriterioDesempate.id']) else None,
-                        "description": str(res['amparoLegalCriterioDesempate.nome']) if pd.notna(res['amparoLegalCriterioDesempate.nome']) else None,
-                        "details": res['amparoLegalCriterioDesempate.descricao'] if pd.notna(res['amparoLegalCriterioDesempate.descricao']) else None,
-                    },
-                ],
-                "deliveryLocation": {
-                    "id": str(res['paisOrigemProdutoServico.id']) if pd.notna(res['paisOrigemProdutoServico.id']) else None,
-                    "description": str(res['paisOrigemProdutoServico.nome']) if pd.notna(res['paisOrigemProdutoServico.nome']) else None,
-                },
-                "quantity": res['quantidadeHomologada'],
-                "unit": {
-                    "value": {
-                        "amount": res['valorUnitarioHomologado'],
-                        "currency": "BRL"
-                    }
-                },
-                "hasSubcontracting": res['indicadorSubcontratacao'],
-            }]
+            "id": str(res['numeroItem']),
+            "description": items_by_id[str(res['numeroItem'])]['description'],
+            "status": res['situacaoCompraItemResultadoNome'],
+            "statusDetails": res['motivoCancelamento'] if pd.notna(res['motivoCancelamento']) else None,
+            "quantity": int(res['quantidadeHomologada']),
+            "unit": {
+                "name": items_by_id[str(res['numeroItem'])]['unit']['name'],
+                "value": {
+                "amount": res['valorUnitarioHomologado'],
+                "currency": "BRL"
+                }
+            },
+            "deliveryLocation": {
+                "description": str(res['paisOrigemProdutoServico.nome']) if pd.notna(res['paisOrigemProdutoServico.nome']) else None,
+            },
+            "relatedLot": 'lot-' + str(res['numeroItem']),
+            }],
+            "lots": {
+            "id": 'lot-' + str(res['numeroItem']),
+            "preferenceMarginApplication": str(res['aplicacaoMargemPreferencia']),
+            "smallBusinessBenefitApplication": str(res['aplicacaoBeneficioMeEpp']),
+            "tiebreakCriterionApplication": str(res['aplicacaoCriterioDesempate']),
+            "updateDate": to_ocds_dt(res['dataAtualizacao']),
+            "inclusionDate": to_ocds_dt(res['dataInclusao']),
+            "foreignCurrencyQuoteTimezone": str(res['timezoneCotacaoMoedaEstrangeira']) if pd.notna(res['timezoneCotacaoMoedaEstrangeira']) else None,
+            "foreignCurrencyId": str(res['moedaEstrangeira.id']) if pd.notna(res['moedaEstrangeira.id']) else None,
+            "foreignCurrencySymbol": str(res['moedaEstrangeira.simbolo']) if pd.notna(res['moedaEstrangeira.simbolo']) else None,
+            "foreignCurrencyName": str(res['moedaEstrangeira.nome']) if pd.notna(res['moedaEstrangeira.nome']) else None,
+            "foreignCurrencyNominalValue": str(res['valorNominalMoedaEstrangeira']) if pd.notna(res['valorNominalMoedaEstrangeira']) else None,
+            "foreignCurrencyQuoteDate": to_ocds_dt(res['dataCotacaoMoedaEstrangeira']) if pd.notna(res['dataCotacaoMoedaEstrangeira']) else None,
+            "preferenceMarginLegalBasisId": str(res['amparoLegalMargemPreferencia.id']) if pd.notna(res['amparoLegalMargemPreferencia.id']) else None,
+            "preferenceMarginLegalBasisName": str(res['amparoLegalMargemPreferencia.nome']) if pd.notna(res['amparoLegalMargemPreferencia.nome']) else None,
+            "preferenceMarginLegalBasisDescription": str(res['amparoLegalMargemPreferencia.descricao']) if pd.notna(res['amparoLegalMargemPreferencia.descricao']) else None,
+            "preferenceMarginLegalBasisActiveStatus": str(res['amparoLegalMargemPreferencia.statusAtivo']) if pd.notna(res['amparoLegalMargemPreferencia.statusAtivo']) else None,
+            "tiebreakCriterionLegalBasisId": str(res['amparoLegalCriterioDesempate.id']) if pd.notna(res['amparoLegalCriterioDesempate.id']) else None,
+            "tiebreakCriterionLegalBasisName": str(res['amparoLegalCriterioDesempate.nome']) if pd.notna(res['amparoLegalCriterioDesempate.nome']) else None,
+            "tiebreakCriterionLegalBasisDescription": str(res['amparoLegalCriterioDesempate.descricao']) if pd.notna(res['amparoLegalCriterioDesempate.descricao']) else None,
+            "tiebreakCriterionLegalBasisActiveStatus": str(res['amparoLegalCriterioDesempate.statusAtivo']) if pd.notna(res['amparoLegalCriterioDesempate.statusAtivo']) else None,
+            "cancellationDate": to_ocds_dt(res['dataCancelamento']),
+        }
         })
-        
+
+
+    poder_id = {
+    "E": "Executivo",
+    "L": "Legislativo",
+    "J": "Judiciário",
+    "N": "alguma coisa"
+    }
+
+    esfera_id = {
+    "F": "Federal",
+    "E": "Estadual",
+    "M": "Municipal",
+    "D": "Distrital",
+    }
+
+    tipo_instrumento_convocatorio = {
+    "1": "open",  # Edital
+    "2": "limited",  # Aviso de Contratação Direta
+    "3": "direct",  # Ato que autoriza a contratação direta
+    }
+
+    modalidade_contratacao = {
+    "1": "electronicAuction",  # Leilão - Eletrônico
+    "2": None,  # Diálogo Competitivo
+    "3": None,  # Concurso
+    "4": "electronicSubmission",  # Concorrência - Eletrônica
+    "5": "written",  # Concorrência - Presencial
+    "6": "electronicSubmission",  # Pregão - Eletrônico
+    "7": "written",  # Pregão - Presencial
+    "8": None,  # Dispensa
+    "9": None,  # Inexigibilidade
+    "10": None,  # Manifestação de Interesse
+    }
 
     # Montagem do release
     release = {
-        "ocid": 'ocds-xyz-' + ocid, # aqui falta definir o prefixo correto, mas vamos usar um exemplo genérico
-        "id": ocid,
-        "initiationType": "tender", # creio que o ideal seria row['data.tipoInstrumentoConvocatorioNome'], mas este campo só permite o valor "tender"
+        "ocid": 'ocds-ye9ov3-' + ocid,
+        "id": row['data.numeroControlePNCP'],
+        "date": to_ocds_dt(row['data.dataPublicacaoPncp']),
         "tag": ["tender", "award"],
-        "tender": {
+        "initiationType": "tender",
+        "buyer": {
+            "id": "BR-CNPJ-" + str(row['data.orgaoSubRogado.cnpj']) if pd.notna(row['data.orgaoSubRogado.cnpj']) else "BR-CNPJ-" + str(row['data.orgaoEntidade.cnpj']),
+            "name": row['data.orgaoSubRogado.razaoSocial'] if pd.notna(row['data.orgaoSubRogado.razaoSocial']) else row['data.orgaoEntidade.razaoSocial'],
+        },
+        "language": "pt",
+    }
+    
+    release['parties'] = []
+
+    # O órgão subrogado, quando existente, ocupa a função de buyer
+    # E o órgão é adicionado como originalBuyer
+    # Quando não, o próprio órgão é o buyer e originalBuyer não existe
+    release['parties'].append({
+        # BUYER
+        "id": "BR-CNPJ-" + str(row['data.orgaoSubRogado.cnpj']) if pd.notna(row['data.orgaoSubRogado.cnpj']) else "BR-CNPJ-" + str(row['data.orgaoEntidade.cnpj']),
+        "name": row['data.orgaoSubRogado.razaoSocial'] if pd.notna(row['data.orgaoSubRogado.razaoSocial']) else row['data.orgaoEntidade.razaoSocial'],
+        "identifier": {
+            "scheme": "BR-CNPJ",
+            "id": str(row['data.orgaoSubRogado.cnpj']) if pd.notna(row['data.orgaoSubRogado.cnpj']) else str(row['data.orgaoEntidade.cnpj']),
+            "legalName": row['data.orgaoSubRogado.razaoSocial'] if pd.notna(row['data.orgaoSubRogado.razaoSocial']) else row['data.orgaoEntidade.razaoSocial'],
+        },
+        "additionalIdentifiers": [
+            {
+                "id": str(row['data.unidadeSubRogada.codigoUnidade']) if pd.notna(row['data.unidadeSubRogada.codigoUnidade']) else str(row['data.unidadeOrgao.codigoUnidade']),
+                "legalName": row['data.unidadeSubRogada.nomeUnidade'] if pd.notna(row['data.unidadeSubRogada.nomeUnidade']) else row['data.unidadeOrgao.nomeUnidade'],
+            }
+        ],
+        "address": {
+            "region": row['data.unidadeSubRogada.ufNome'] if pd.notna(row['data.unidadeSubRogada.ufNome']) else row['data.unidadeOrgao.ufNome'],
+            "locality": row['data.unidadeSubRogada.municipioNome'] if pd.notna(row['data.unidadeSubRogada.municipioNome']) else row['data.unidadeOrgao.municipioNome'],
+        },
+        "roles": ["buyer"],
+        "details": {
+            "classification": [
+                {
+                    "scheme": "BRA-PODER",
+                    "id": str(row['data.orgaoSubRogado.poderId']) if pd.notna(row['data.orgaoSubRogado.poderId']) else str(row['data.orgaoEntidade.poderId']),
+                    "description": poder_id[row['data.orgaoSubRogado.poderId']] if pd.notna(row['data.orgaoSubRogado.poderId']) else poder_id[row['data.orgaoEntidade.poderId']],
+                },
+                {
+                    "scheme": "BRA-ESFERA",
+                    "id": str(row['data.orgaoSubRogado.esferaId']) if pd.notna(row['data.orgaoSubRogado.esferaId']) else str(row['data.orgaoEntidade.esferaId']),
+                    "description": esfera_id[row['data.orgaoSubRogado.esferaId']] if pd.notna(row['data.orgaoSubRogado.esferaId']) else esfera_id[row['data.orgaoEntidade.esferaId']],
+                }
+            ]
+        },
+    })
+    
+    # Se o órgão subrogado não existir, significa que o próprio órgão já foi referenciado
+    if pd.notna(row['data.orgaoSubRogado.cnpj']):
+        release['parties'].append({
+            # ORIGINAL BUYER
+            "id": "BR-CNPJ-" + str(row['data.orgaoEntidade.cnpj']),
+            "name": row['data.orgaoEntidade.razaoSocial'],
+            "identifier": {
+                "scheme": "BR-CNPJ",
+                "id": str(row['data.orgaoEntidade.cnpj']),
+                "legalName": row['data.orgaoEntidade.razaoSocial'],
+            },
+            "additionalIdentifiers": [
+                {
+                    "id": str(row['data.unidadeOrgao.codigoUnidade']),
+                    "legalName": row['data.unidadeOrgao.nomeUnidade'],
+                }
+            ],
+            "address": {
+                "region": row['data.unidadeOrgao.ufNome'],
+                "locality": row['data.unidadeOrgao.municipioNome'],
+            },
+            "roles": ["originalBuyer"],
+            "details": {
+                "classification": [
+                    {
+                        "scheme": "BRA-PODER",
+                        "id": str(row['data.orgaoEntidade.poderId']),
+                        "description": poder_id[row['data.orgaoEntidade.poderId']],
+                    },
+                    {
+                        "scheme": "BRA-ESFERA",
+                        "id": str(row['data.orgaoEntidade.esferaId']),
+                        "description": esfera_id[row['data.orgaoEntidade.esferaId']],
+                    }
+                ]
+            },
+        })
+    
+    # Adicionando os suppliers
+    release['parties'] = release['parties'] + [supplier for supplier in suppliers]
+    
+    release['tender'] = {
             "id": str(row['data.processo']),
-            "title": row['data.modalidadeNome'],
+            "title": row['data.tipoInstrumentoConvocatorioNome'] + ' - ' + str(row['data.processo']),
+            "description": str(row['data.objetoCompra']),
+            "procuringEntity": {
+                "name": row['data.orgaoEntidade.razaoSocial'],
+                "id": "BR-CNPJ-" + str(row['data.orgaoEntidade.cnpj']),
+            },
             "value": {
                 "amount": row['data.valorTotalEstimado'],
                 "currency": "BRL"
             },
-            "procurementMethodDetails": 'amparoLegal.nome: ' + row['data.amparoLegal.nome'] + '; srp: ' + str(row['data.srp']),
-            "procurementMethodRationale": 'amparoLegal.descricao: ' + str(row['data.amparoLegal.descricao']) + '; justificativaPresencial: ' + str(row['data.justificativaPresencial']),
+            "procurementMethod": tipo_instrumento_convocatorio[str(row['data.tipoInstrumentoConvocatorioCodigo'])],
+            "procurementMethodDetails": (
+                'tipoInstrumentoConvocatorioCodigo: ' + str(row['data.tipoInstrumentoConvocatorioCodigo'])
+                + '; tipoInstrumentoConvocatorioNome: ' + row['data.tipoInstrumentoConvocatorioNome']
+                + '; modalidadeId: ' + str(row['data.modalidadeId'])
+                + '; modalidadeNome: ' + row['data.modalidadeNome']
+                + '; modoDisputaId: ' + str(row['data.modoDisputaId'])
+                + '; modoDisputaNome: ' + row['data.modoDisputaNome']
+                + '; srp: ' + str(row['data.srp'])
+            ),
+            "procurementMethodRationale": (
+                'amparoLegalCodigo: ' + str(row['data.amparoLegal.codigo'])
+                + '; amparoLegalNome: ' + str(row['data.amparoLegal.nome'])
+                + '; amparoLegalDescricao: ' + str(row['data.amparoLegal.descricao'])
+            ),
+            "mainProcurementCategory": "goods",
+            "submissionMethod": [modalidade_contratacao[str(row['data.modalidadeId'])]],
+            "submissionMethodDetails": str(row['data.modalidadeNome']),
             "tenderPeriod": {
                 "startDate": to_ocds_dt(row['data.dataAberturaProposta']),
-                "endDate": to_ocds_dt(row['data.dataEncerramentoProposta'])
+                "endDate": to_ocds_dt(row['data.dataEncerramentoProposta']),
+                "maxExtentDate": to_ocds_dt(row['data.dataEncerramentoProposta']),
+                "durationInDays": duracao_em_dias(row['data.dataAberturaProposta'], row['data.dataEncerramentoProposta']),
             },
             "items": items,
-            "description": str(row['data.objetoCompra']),
-            "documents": [{
-                "id": "linkSistemaOrigem",
-                "uri": row['data.linkSistemaOrigem'] if pd.notna(row['data.linkSistemaOrigem']) else None,
-            }]
-        },
-        "awards": awards,
-        "date": to_ocds_dt(row['data.dataPublicacaoPncp']),
-        "buyer": {
-            "id": str(row['data.orgaoEntidade.cnpj']),
-            "name": row['data.orgaoEntidade.razaoSocial'],
-            "address": {
-                "region": row['data.unidadeOrgao.ufNome'],
-                "locality": row['data.unidadeOrgao.municipioNome']
-            },
-            "details": {
-                "classification": {
-                    "scheme": "poderId",
-                    "id": str(row['data.orgaoEntidade.poderId']),
-                }
-            }
-        },
-        "parties": [{
-            "contactPoint": {
-                "name": row['data.usuarioNome']
-            },
-            "id": str(row['data.orgaoEntidade.cnpj']),
-            "name": row['data.orgaoEntidade.razaoSocial'],
-            "additionalIdentifiers": [
-                {
-                    "scheme": "unidadeSubRogada",
-                    "id": str(row['data.unidadeSubRogada.codigoUnidade']) if pd.notna(row['data.unidadeSubRogada.codigoUnidade']) else None,
-                    "legalName": row['data.unidadeSubRogada.nomeUnidade'] if pd.notna(row['data.unidadeSubRogada.nomeUnidade']) else None,
-                    "address": {
-                        "region": row['data.unidadeSubRogada.ufSigla'] if pd.notna(row['data.unidadeSubRogada.ufSigla']) else None,
-                        "locality": row['data.unidadeSubRogada.municipioNome'] if pd.notna(row['data.unidadeSubRogada.municipioNome']) else None,
-                    },
-                },
-                {
-                    "scheme": "orgaoSubRogado",
-                    "id": str(row['data.orgaoSubRogado.cnpj']) if pd.notna(row['data.orgaoSubRogado.cnpj']) else None,
-                    "legalName": row['data.orgaoSubRogado.razaoSocial'] if pd.notna(row['data.orgaoSubRogado.razaoSocial']) else None,
-                    "details": {
-                        "classification": {
-                            "scheme": "poderId",
-                            "id": str(row['data.orgaoSubRogado.poderId']) if pd.notna(row['data.orgaoSubRogado.poderId']) else None,
-                        }
-                    },
-                },
-                {
-                    "scheme": "unidadeOrgao",
-                    "id": str(row['data.unidadeOrgao.codigoUnidade']) if pd.notna(row['data.unidadeOrgao.codigoUnidade']) else None,
-                    "legalName": row['data.unidadeOrgao.nomeUnidade'] if pd.notna(row['data.unidadeOrgao.nomeUnidade']) else None,
-                    "address": {
-                        "region": row['data.unidadeOrgao.ufSigla'] if pd.notna(row['data.unidadeOrgao.ufSigla']) else None,
-                        "locality": row['data.unidadeOrgao.municipioNome'] if pd.notna(row['data.unidadeOrgao.municipioNome']) else None,
-                    },
-                },
-            ],
-        }]
+            "lots": lots,
+        }
+    
+    release['awards'] = awards
+    
+    estados = {
+        "Acre": "ac",
+        "Alagoas": "al",
+        "Amapá": "ap",
+        "Amazonas": "am",
+        "Bahia": "ba",
+        "Ceará": "ce",
+        "Distrito Federal": "df",
+        "Espírito Santo": "es",
+        "Goiás": "go",
+        "Maranhão": "ma",
+        "Mato Grosso": "mt",
+        "Mato Grosso do Sul": "ms",
+        "Minas Gerais": "mg",
+        "Pará": "pa",
+        "Paraíba": "pb",
+        "Paraná": "pr",
+        "Pernambuco": "pe",
+        "Piauí": "pi",
+        "Rio de Janeiro": "rj",
+        "Rio Grande do Norte": "rn",
+        "Rio Grande do Sul": "rs",
+        "Rondônia": "ro",
+        "Roraima": "rr",
+        "Santa Catarina": "sc",
+        "São Paulo": "sp",
+        "Sergipe": "se",
+        "Tocantins": "to"
     }
     
+    # Caso a chave não exista, criamos
+    if estados[row['data.unidadeOrgao.ufNome']] not in releases:
+        releases[estados[row['data.unidadeOrgao.ufNome']]] = []
+
+    # Adicionamos a release recém-criada ao seu respectivo estado
+    releases[estados[row['data.unidadeOrgao.ufNome']]].append(release)
+
+# Criamos o JSON e ZIP de cada estado (contendo todas as suas contratações)
+for estado in releases:
     # Montagem do objeto OCDS
     ocds = {
-        "uri": "https://exemplo.com", # link no qual o OCDS poderá ser acessado, alterar após definir a URL correta
+        "uri": "https://exemplo.com",  # link no qual o OCDS poderá ser acessado, alterar após definir a URL correta
         "publishedDate": to_ocds_dt(datetime.now().isoformat()),
-        "publisher":{
+        "publisher": {
             "name": "Medicamentos Transparentes",
             "uri": "https://medicamentos.transparencia.org.br/",
         },
         "version": "1.1",
-        "releases": [
-            release
-        ]
+        "releases": releases[estado]
     }
 
-
     # Exportar para JSON
-    with open(f'output/{ocid}.json', 'w', encoding='utf-8') as f:
+    json_file = f'{estado}-{mes_coleta}-{ano_coleta}.json'
+    with open(f'output/{json_file}', 'w', encoding='utf-8') as f:
         json.dump(ocds, f, ensure_ascii=False, indent=2)
+        
+    # Exportar para Zip
+    with zipfile.ZipFile(f"output/{estado}-{mes_coleta}-{ano_coleta}-json.zip", "w", zipfile.ZIP_DEFLATED) as zipf:
+        zipf.write(f'output/{json_file}', arcname=json_file)
