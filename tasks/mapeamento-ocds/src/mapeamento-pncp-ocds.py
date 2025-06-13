@@ -1,3 +1,9 @@
+"""
+Este script transforma contratações públicas em formato compatível com o padrão OCDS (Open Contracting Data Standard).
+Ele processa dados de contratações, itens e resultados e gera arquivos JSON e ZIP por estado.
+Comentários explicativos estão distribuídos ao longo do código original.
+"""
+
 import json
 from datetime import datetime, timezone
 import pandas as pd
@@ -267,7 +273,7 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
         }
         })
 
-
+    # "traduzindo" os IDs do PNCP
     poder_id = {
     "E": "Executivo",
     "L": "Legislativo",
