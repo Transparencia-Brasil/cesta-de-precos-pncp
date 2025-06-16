@@ -278,7 +278,7 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
     "E": "Executivo",
     "L": "Legislativo",
     "J": "Judiciário",
-    "N": "alguma coisa"
+    "N": "Não se aplica"
     }
 
     esfera_id = {
@@ -286,6 +286,7 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
     "E": "Estadual",
     "M": "Municipal",
     "D": "Distrital",
+    "N": "Não se aplica"
     }
 
     tipo_instrumento_convocatorio = {
