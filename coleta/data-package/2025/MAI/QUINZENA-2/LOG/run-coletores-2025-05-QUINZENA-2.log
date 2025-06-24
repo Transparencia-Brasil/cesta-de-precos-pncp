@@ -1,0 +1,171 @@
+---
+# COLETORES
+---
+
+INÍCIO DA COLETA ÀS '14-Jun-2025 15:19:13'
+
+Diretório: ENTRADA
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/src/ETL
+
+
+Diretório:
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp
+
+PARÂMETROS: 
+ - PRIMEIRO_DIA='2025-05-16' - é a data de início da coleta
+ - ULTIMO_DIA='2025-05-31' - é a data final da coleta
+ - ALIAS_COLETA='2025-05/QUINZENA-2' - é um alias para identificar a coleta e apontar um destino no diretório de /coletas
+
+---
+## CONTRATAÇÃO
+
+Script:
+ - 'src/ETL/coletores/coleta-contratacoes.R'
+
+Diretório de saída:
+ - 'coleta/contratacoes/2025-05/QUINZENA-2'
+
+Screen criada para coletar contratações:
+ - 'coletor-contratacoes-2025-05-16-ate-2025-05-31'
+
+Saída sendo registrada em:
+ - 'coleta/contratacoes/2025-05/QUINZENA-2/run-coletor-contratacoes-2025-05-16-ate-2025-05-31.log'.
+
+Parâmetros do coletor: 
+ - PATH_OUTPUT_DIR="coleta/contratacoes/2025-05/QUINZENA-2"
+ - PRIMEIRO_DIA="2025-05-16"
+ - ULTIMO_DIA="2025-05-31"
+
+Coleta de CONTRATAÇÕES em execução...
+
+There is a screen on:
+	15214.coletor-contratacoes-2025-05-16-ate-2025-05-31	(06/14/25 15:19:13)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+
+Aguardando a screen 'coletor-contratacoes-2025-05-16-ate-2025-05-31' encerrar...
+Screen coletor-contratacoes-2025-05-16-ate-2025-05-31 encerrada
+
+Coleta de CONTRATAÇÕES concluída!
+
+---
+## ITENS
+
+Script:
+ - 'src/ETL/coletores/coleta-itens.R'
+
+Diretório de saída:
+ - 'coleta/itens/2025-05/QUINZENA-2'
+
+Screen criada para coletar itens:
+ - 'coletor-itens-2025-05-16-ate-2025-05-31'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2025-05/QUINZENA-2/run-coletor-itens-2025-05-16-ate-2025-05-31.log'.
+
+Parâmetro do coletor:
+ - CONTRATACOES='coleta/contratacoes/2025-05/QUINZENA-2/dados.csv'
+
+Coleta de ITENS em execução...
+
+There is a screen on:
+	16271.coletor-itens-2025-05-16-ate-2025-05-31	(06/14/25 16:21:55)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+Aguardando a screen 'coletor-itens-2025-05-16-ate-2025-05-31' encerrar...
+Screen coletor-itens-2025-05-16-ate-2025-05-31 encerrada
+
+Coleta de ITENS concluída!
+
+---
+## CLASSIFICADOR - FILTRA MEDICAMENTOS
+
+Script:
+ - 'src/ETL/classificador/filtra-medicamentos.py'
+
+Diretório de saída:
+ - 'coleta/itens/2025-05/QUINZENA-2'
+
+Screen criada para coletar contratações:
+ - 'classificador-2025-05-16-ate-2025-05-31'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2025-05/QUINZENA-2/run-classificador-2025-05-16-ate-2025-05-31.log'.
+
+Parâmetros do classificador:
+ITENS='coleta/itens/2025-05/QUINZENA-2/dados.csv'
+CATALOGO='data/catmat/catmat.csv'
+
+Filtragem e classificação de MEDICAMENTOS em execução...
+
+There is a screen on:
+	31704.classificador-2025-05-16-ate-2025-05-31	(06/15/25 07:13:07)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+
+Aguardando o arquivo 'coleta/itens/2025-05/QUINZENA-2/medicamentos.csv' ser criado...
+
+Arquivo coleta/itens/2025-05/QUINZENA-2/medicamentos.csv criado.
+Classificação e filtragem de MEDICAMENTOS de ITENS concluída!
+
+---
+## RESULTADOS
+
+Script:
+ - 'src/ETL/coletores/coleta-resultados.R'
+
+Diretório de saída:
+ - 'coleta/resultados/2025-05/QUINZENA-2'
+
+Screen criada para coletar resultados:
+ - 'coletor-resultados-2025-05-16-ate-2025-05-31'
+
+Saída sendo registrada em:
+ - 'coleta/resultados/2025-05/QUINZENA-2/run-coletor-resultados-2025-05-16-ate-2025-05-31.log'.
+
+Parâmetro do coletor:
+ - 'coleta/itens/2025-05/QUINZENA-2/medicamentos.csv'
+
+Coleta de RESULTADOS em execução...
+
+There is a screen on:
+	32470.coletor-resultados-2025-05-16-ate-2025-05-31	(06/15/25 09:24:16)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+coletando resultados das contratações de medicamentos
+
+Aguardando a screen 'coletor-resultados-2025-05-16-ate-2025-05-31' encerrar...
+Screen coletor-resultados-2025-05-16-ate-2025-05-31 encerrada
+
+Coleta de RESULTADOS de MEDICAMENTOS concluída!
+
+
+COLETA ENCERRADA ÀS '15-Jun-2025 11:28:29'!
+---
+## PACOTE DE DADOS
+
+Diretório 'coleta/data-package/2025/MAI/QUINZENA-2/DATA' criado.
+Diretório 'coleta/data-package/2025/MAI/QUINZENA-2/LOG' criado.
+
+Arquivos csv copiados para coleta/data-package/2025/MAI/QUINZENA-2/DATA
+
+Estrutura do pacote de dados:
+
+[ 512]  coleta/data-package/2025/MAI/QUINZENA-2
+├── [ 512]  DATA
+│   ├── [ 389]  contratacoes-erros.csv
+│   ├── [ 205]  contratacoes-monitoramento.csv
+│   ├── [106M]  contratacoes.csv
+│   ├── [   0]  itens-erros.csv
+│   ├── [864K]  itens-medicamentos-resultados-erros.csv
+│   ├── [1.1K]  itens-medicamentos-resultados-monitoramento.csv
+│   ├── [2.2M]  itens-medicamentos-resultados.csv
+│   ├── [5.6M]  itens-medicamentos.csv
+│   ├── [7.2K]  itens-monitoramento.csv
+│   └── [146M]  itens.csv
+└── [ 512]  LOG
+    ├── [2.6K]  run-classificador-2025-05-16-ate-2025-05-31.log
+    ├── [ 42K]  run-coletor-contratacoes-2025-05-16-ate-2025-05-31.log
+    ├── [2.1M]  run-coletor-itens-2025-05-16-ate-2025-05-31.log
+    └── [538K]  run-coletor-resultados-2025-05-16-ate-2025-05-31.log
+
+3 directories, 14 files
