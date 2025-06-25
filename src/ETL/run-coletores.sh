@@ -194,3 +194,106 @@ echo -e "\nColeta de RESULTADOS de MEDICAMENTOS concluída!\n"
 
 AGORA=$(date +"%d-%b-%Y %H:%M:%S")
 echo -e "\nCOLETA ENCERRADA ÀS '$AGORA'!"
+
+# EMPACOTADOR ------------------------------------------------------------------
+
+echo -e "---\n## PACOTE DE DADOS\n"
+
+# coleta os resultados e copia para uma estrutura de diretórios mais coerente
+# para exportação no banco de dados:
+
+# Extrair ano, mês e dia do PRIMEIRO_DIA
+ANO_COLETA=${PRIMEIRO_DIA:0:4}
+MES_COLETA=${PRIMEIRO_DIA:5:2}
+DIA_COLETA=${PRIMEIRO_DIA:8:2}
+
+# Determinar qual quinzena
+if [ "$DIA_COLETA" = "01" ]; then
+  QUINZENA="QUINZENA-1"
+else
+  QUINZENA="QUINZENA-2"
+fi
+
+# Converter mês numérico para abreviação
+case $MES_COLETA in
+  "01") MES_COLETA="JAN" ;;
+  "02") MES_COLETA="FEV" ;;
+  "03") MES_COLETA="MAR" ;;
+  "04") MES_COLETA="ABR" ;;
+  "05") MES_COLETA="MAI" ;;
+  "06") MES_COLETA="JUN" ;;
+  "07") MES_COLETA="JUL" ;;
+  "08") MES_COLETA="AGO" ;;
+  "09") MES_COLETA="SET" ;;
+  "10") MES_COLETA="OUT" ;;
+  "11") MES_COLETA="NOV" ;;
+  "12") MES_COLETA="DEZ" ;;
+  *) echo "Mês inválido: $MES_COLETA"; exit 1 ;;
+esac
+
+# Criar diretório para o pacote de dados
+PACOTE_PATH="coleta/data-package/$ANO_COLETA/$MES_COLETA/$QUINZENA"
+
+# Criar subdiretórios DADOS e LOG
+PACOTE_PATH_DADOS="$PACOTE_PATH/DATA"
+PACOTE_PATH_LOG="$PACOTE_PATH/LOG"
+
+if [ ! -d "$PACOTE_PATH_DADOS" ]; then
+  mkdir -p "$PACOTE_PATH_DADOS"
+  echo "Diretório '$PACOTE_PATH_DADOS' criado."
+fi
+
+if [ ! -d "$PACOTE_PATH_LOG" ]; then
+  mkdir -p "$PACOTE_PATH_LOG"
+  echo "Diretório '$PACOTE_PATH_LOG' criado."
+fi
+
+# Copiar arquivos de contratações
+CONTRATACOES_PATH="coleta/contratacoes/${ALIAS_COLETA}"
+ITENS_PATH="coleta/itens/${ALIAS_COLETA}"
+RESULTADOS_PATH="coleta/resultados/${ALIAS_COLETA}"
+
+# Copiar arquivos de contratações
+cp "${CONTRATACOES_PATH}/dados.csv" "${PACOTE_PATH_DADOS}/contratacoes.csv"
+cp "${CONTRATACOES_PATH}/erros.csv" "${PACOTE_PATH_DADOS}/contratacoes-erros.csv"
+cp "${CONTRATACOES_PATH}/monitoramento.csv" "${PACOTE_PATH_DADOS}/contratacoes-monitoramento.csv"
+
+# Copiar arquivos de itens
+cp "${ITENS_PATH}/dados.csv" "${PACOTE_PATH_DADOS}/itens.csv"
+cp "${ITENS_PATH}/erros.csv" "${PACOTE_PATH_DADOS}/itens-erros.csv"
+cp "${ITENS_PATH}/monitoramento.csv" "${PACOTE_PATH_DADOS}/itens-monitoramento.csv"
+cp "${ITENS_PATH}/medicamentos.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos.csv"
+
+# Copiar arquivos de resultados
+cp "${RESULTADOS_PATH}/dados.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos-resultados.csv"
+cp "${RESULTADOS_PATH}/erros.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos-resultados-erros.csv"
+cp "${RESULTADOS_PATH}/monitoramento.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos-resultados-monitoramento.csv"
+
+# Confirmar cópia dos csv's
+echo -e "\nArquivos csv copiados para ${PACOTE_PATH_DADOS}"
+
+# Copiar todos os arquivos de log
+cp "${CONTRATACOES_PATH}"/*.log "${PACOTE_PATH_LOG}/" 2>/dev/null || true
+cp "${ITENS_PATH}"/*.log "${PACOTE_PATH_LOG}/" 2>/dev/null || true
+cp "${RESULTADOS_PATH}"/*.log "${PACOTE_PATH_LOG}/" 2>/dev/null || true
+
+# Exibe a árvore de diretórios do pacote
+echo -e "\nEstrutura do pacote de dados:\n"
+if command -v tree &> /dev/null; then
+    tree -h $PACOTE_PATH
+else
+    echo "Comando 'tree' não encontrado. Instalando..."
+    sudo apt-get update && sudo apt-get install tree -y
+    tree -h $PACOTE_PATH
+fi
+
+# Encontra o arquivo de log mais recente em src/ETL e seus subdiretórios
+LATEST_LOG=$(find src/ETL -type f -name "*.log" -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" ")
+
+if [ -n "$LATEST_LOG" ]; then
+  cp "$LATEST_LOG" "${PACOTE_PATH_LOG}/"
+fi
+
+# Confirmar cópia dos logs
+echo -e "\nArquivos de log copiados para ${PACOTE_PATH_LOG}"
+echo -e "\nFim! =)"
