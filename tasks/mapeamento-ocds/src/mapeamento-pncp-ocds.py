@@ -12,9 +12,6 @@ import zipfile
 import os
 import sys
 
-contratacoes = pd.read_csv('input/contratacoes.csv')
-itens = pd.read_csv('input/itens-medicamentos.csv')
-resultados = pd.read_csv('input/resultados.csv')
 
 # Pega os parâmetros MES e ANO de coleta
 # Essa informação será usada para gerar o nome do arquivo de saída
@@ -29,6 +26,35 @@ if "MES" in os.environ:
 else:
     sys.stderr.write("Invalid arguments, missing parameter: 'MES'.\n")
     os._exit(1)
+
+
+# As coletas foram divididas em dois arquivos CSV, um para cada quinzena
+# Pegamos os dois arquivos e concatenamos em um único DataFrame 
+## Contratações
+contratacoes_q1 = pd.read_csv('tasks/mapeamento-ocds/input/QUINZENA-1/DATA/contratacoes.csv')
+contratacoes_q2 = pd.read_csv('tasks/mapeamento-ocds/input/QUINZENA-2/DATA/contratacoes.csv')
+contratacoes = pd.concat([contratacoes_q1, contratacoes_q2], ignore_index=True)
+### Removendo duplicatas
+contratacoes = contratacoes.drop(columns=['totalRegistros','totalPaginas','numeroPagina','paginasRestantes','empty', 'endpoint'])
+contratacoes = contratacoes.drop_duplicates()
+
+## Itens
+itens_q1 = pd.read_csv('tasks/mapeamento-ocds/input/QUINZENA-1/DATA/itens-medicamentos.csv')
+itens_q2 = pd.read_csv('tasks/mapeamento-ocds/input/QUINZENA-2/DATA/itens-medicamentos.csv')
+itens = pd.concat([itens_q1, itens_q2], ignore_index=True)
+
+## Resultados
+resultados_q1 = pd.read_csv('tasks/mapeamento-ocds/input/QUINZENA-1/DATA/itens-medicamentos-resultados.csv')
+resultados_q2 = pd.read_csv('tasks/mapeamento-ocds/input/QUINZENA-2/DATA/itens-medicamentos-resultados.csv')
+resultados = pd.concat([resultados_q1, resultados_q2], ignore_index=True)
+
+# print(contratacoes_q1.shape)
+# print(contratacoes_q2.shape)
+# print(contratacoes.shape)
+
+# itens = pd.read_csv('input/itens-medicamentos.csv')
+# resultados = pd.read_csv('input/resultados.csv')
+
 
 # Função para converter data para o formato OCDS
 # Formato esperado: 'YYYY-MM-DDTHH:MM:SSZ'
@@ -79,7 +105,7 @@ contratacoes_filtradas = []
 # pd.reset_option('display.max_rows')
 
 # Filtro para realizar testes
-# contratacoes = contratacoes[contratacoes['data.unidadeOrgao.ufNome'].isin(['Santa Catarina'])]
+contratacoes = contratacoes[contratacoes['data.unidadeOrgao.ufNome'].isin(['Santa Catarina'])]
 
 print("FILTRANDO ITENS POR CONTRATAÇÃO...")
 
@@ -148,18 +174,24 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
 
         lots.append({
             "id": 'lot-' + str(item['numeroItem']),
+            **({"statusDetailsId": str(item['situacaoCompraItem'])} if item['situacaoCompraItem'] else {}),
+            **({"statusDetails": item['situacaoCompraItemNome']} if pd.notna(item['situacaoCompraItemNome']) else {}),
+            "value": {
+                "amount": item['valorTotal'],
+                "currency": "BRL",
+            },
             "lotsDetails": {
-                **({"statusDetailsId": str(item['situacaoCompraItem'])} if item['situacaoCompraItem'] else {}),
-                **({"statusDetails": item['situacaoCompraItemNome']} if pd.notna(item['situacaoCompraItemNome']) else {}),
-                **({"confidentialBudget": item['orcamentoSigiloso']} if pd.notna(item['orcamentoSigiloso']) else {}),
+                **({"confidentialBudget": item['orcamentoSigiloso']} if pd.notna(item['orcamentoSigiloso']) and item['orcamentoSigiloso'] != False else {}),
                 **({"asset": item['patrimonio']} if pd.notna(item['patrimonio']) else {}),
                 **({"realEstateRegistrationCode": item['codigoRegistroImobiliario']} if pd.notna(item['codigoRegistroImobiliario']) else {}),
-                **({"standardPreferenceMarginApplicability": item['aplicabilidadeMargemPreferenciaNormal']} if pd.notna(item['aplicabilidadeMargemPreferenciaNormal']) else {}),
+                **({"standardPreferenceMarginApplicability": item['aplicabilidadeMargemPreferenciaNormal']} if pd.notna(item['aplicabilidadeMargemPreferenciaNormal']) and item['aplicabilidadeMargemPreferenciaNormal'] != False else {}),
                 **({"standardPreferenceMarginPercentage": item['percentualMargemPreferenciaNormal']} if pd.notna(item['percentualMargemPreferenciaNormal']) else {}),
-                **({"additionalPreferenceMarginApplicability": item['aplicabilidadeMargemPreferenciaAdicional']} if pd.notna(item['aplicabilidadeMargemPreferenciaAdicional']) else {}),
+                **({"additionalPreferenceMarginApplicability": item['aplicabilidadeMargemPreferenciaAdicional']} if pd.notna(item['aplicabilidadeMargemPreferenciaAdicional']) and item['aplicabilidadeMargemPreferenciaAdicional'] != False else {}),
                 **({"additionalPreferenceMarginPercentage": item['percentualMargemPreferenciaAdicional']} if pd.notna(item['percentualMargemPreferenciaAdicional']) else {}),
-                **({"benefitType": str(int(item['tipoBeneficio']))} if pd.notna(item['tipoBeneficio']) else {}),
-                **({"benefitTypeName": item['tipoBeneficioNome']} if pd.notna(item['tipoBeneficioNome']) else {}),
+                **({
+                    **({"benefitType": str(int(item['tipoBeneficio']))} if pd.notna(item['tipoBeneficio']) else {}),
+                    **({"benefitTypeName": item['tipoBeneficioNome']} if pd.notna(item['tipoBeneficioNome']) else {})
+                } if item['tipoBeneficioNome'] not in ["Sem benefício", "Não se aplica"] else {}),
                 **({"ncmNbsCode": item['ncmNbsCodigo']} if pd.notna(item['ncmNbsCodigo']) else {}),
                 **({"ncmNbsDescription": item['ncmNbsDescricao']} if pd.notna(item['ncmNbsDescricao']) else {}),
                 **({"catalogItemCategoryId": item['categoriaItemCatalogo.id']} if pd.notna(item['categoriaItemCatalogo.id']) else {}),
@@ -169,19 +201,54 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
                 **({"awardCriteria": award_criteria[str(item['criterioJulgamentoId'])]} if pd.notna(award_criteria[str(item['criterioJulgamentoId'])]) else {}),
                 **({"awardCriteriaDetails": item['criterioJulgamentoNome']} if pd.notna(item['criterioJulgamentoNome']) else {}),
             },
-            "value": {
-                "amount": item['valorTotal'],
-                "currency": "BRL",
-            },
         })
         
         if item['tipoBeneficioNome'] not in ["Sem benefício", "Não se aplica"]:
-            lots[-1]["sustainability"] = {
-                    "description":
-                        'tipoBeneficio: ' + str(int(item['tipoBeneficio']))
-                        + '; tipoBeneficioNome: ' + item['tipoBeneficioNome'],
-                    "goal": item['incentivoProdutivoBasico'],
+            if item['tipoBeneficioNome'] == "Participação exclusiva para ME/EPP":
+                lots[-1]["sustainability"] = [{
+                        "goal": "social.smeInclusion",
+                        # "goal": item['incentivoProdutivoBasico'],
+                        "strategies": [
+                            "reservedParticipation"
+                        ]
+                    }
+                ]
+                        
+                lots[-1]["otherRequirements"] = {
+                    "reservedParticipation": [
+                        "sme"
+                    ]
                 }
+            
+            elif item['tipoBeneficioNome'] == "Subcontratação para ME/EPP":
+                lots[-1]["sustainability"] = [{
+                        "goal": "social.smeInclusion",
+                        # "goal": item['incentivoProdutivoBasico'],
+                        "strategies": [
+                            "subcontracting"
+                        ]
+
+                    }
+                ]
+                        
+                lots[-1]["subcontractingTerms"] = {
+                    "description": "Subcontratação para ME/EPP"
+                }
+            
+            elif item['tipoBeneficioNome'] == "Cota reservada para ME/EPP":
+                lots[-1]["sustainability"] = [{
+                        "goal": "social.smeInclusion",
+                        # "goal": item['incentivoProdutivoBasico'],
+                        "strategies": [
+                            "reservedParticipationQuota"
+                        ]
+
+                    }
+                ]
+            
+
+
+
 
     # Resultados relacionados
     res_rel = resultados[resultados['numeroControlePNCPCompra'] == row['data.numeroControlePNCP']]
@@ -224,7 +291,7 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
                 "roles": ["supplier"],
                 "details": {
                     **({"scale": porte_fornecedor[res['porteFornecedorNome']]} if pd.notna(porte_fornecedor[res['porteFornecedorNome']]) else {}),
-                    "classification": [
+                    "classifications": [
                         {
                             "scheme": "BRA-TIPO-PESSOA",
                             "id": str(res['tipoPessoa']),
@@ -238,7 +305,7 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
             })
             
             if pd.notna(res['naturezaJuridicaId']):
-                suppliers[-1]['details']['classification'].append({
+                suppliers[-1]['details']['classifications'].append({
                     "scheme": "BRA-NATUREZA-JURIDICA",
                     "id": str(int(res['naturezaJuridicaId'])),
                     "description": str(res['naturezaJuridicaNome']),
@@ -275,31 +342,31 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
                 "description": str(res['paisOrigemProdutoServico.nome'])}]} if pd.notna(res['paisOrigemProdutoServico.nome']) else {}),
             "relatedLot": 'lot-' + str(res['numeroItem']),
             }],
-            "lots": {
-                **({"id": 'lot-' + str(res['numeroItem'])} if pd.notna(res['numeroItem']) else {}),
-                "lotsDetails": {
-                    **({"preferenceMarginApplication": str(res['aplicacaoMargemPreferencia'])} if pd.notna(res['aplicacaoMargemPreferencia']) else {}),
-                    **({"smallBusinessBenefitApplication": str(res['aplicacaoBeneficioMeEpp'])} if pd.notna(res['aplicacaoBeneficioMeEpp']) else {}),
-                    **({"tiebreakCriterionApplication": str(res['aplicacaoCriterioDesempate'])} if pd.notna(res['aplicacaoCriterioDesempate']) else {}),
-                    **({"updateDate": to_ocds_dt(res['dataAtualizacao'])} if pd.notna(res['dataAtualizacao']) else {}),
-                    **({"inclusionDate": to_ocds_dt(res['dataInclusao'])} if pd.notna(res['dataInclusao']) else {}),
-                    **({"foreignCurrencyQuoteTimezone": str(res['timezoneCotacaoMoedaEstrangeira'])} if pd.notna(res['timezoneCotacaoMoedaEstrangeira']) else {}),
-                    **({"foreignCurrencyId": str(res['moedaEstrangeira.id'])} if pd.notna(res['moedaEstrangeira.id']) else {}),
-                    **({"foreignCurrencySymbol": str(res['moedaEstrangeira.simbolo'])} if pd.notna(res['moedaEstrangeira.simbolo']) else {}),
-                    **({"foreignCurrencyName": str(res['moedaEstrangeira.nome'])} if pd.notna(res['moedaEstrangeira.nome']) else {}),
-                    **({"foreignCurrencyNominalValue": str(res['valorNominalMoedaEstrangeira'])} if pd.notna(res['valorNominalMoedaEstrangeira']) else {}),
-                    **({"foreignCurrencyQuoteDate": to_ocds_dt(res['dataCotacaoMoedaEstrangeira'])} if pd.notna(res['dataCotacaoMoedaEstrangeira']) else {}),
-                    **({"preferenceMarginLegalBasisId": str(res['amparoLegalMargemPreferencia.id'])} if pd.notna(res['amparoLegalMargemPreferencia.id']) else {}),
-                    **({"preferenceMarginLegalBasisName": str(res['amparoLegalMargemPreferencia.nome'])} if pd.notna(res['amparoLegalMargemPreferencia.nome']) else {}),
-                    **({"preferenceMarginLegalBasisDescription": str(res['amparoLegalMargemPreferencia.descricao'])} if pd.notna(res['amparoLegalMargemPreferencia.descricao']) else {}),
-                    **({"preferenceMarginLegalBasisActiveStatus": str(res['amparoLegalMargemPreferencia.statusAtivo'])} if pd.notna(res['amparoLegalMargemPreferencia.statusAtivo']) else {}),
-                    **({"tiebreakCriterionLegalBasisId": str(res['amparoLegalCriterioDesempate.id'])} if pd.notna(res['amparoLegalCriterioDesempate.id']) else {}),
-                    **({"tiebreakCriterionLegalBasisName": str(res['amparoLegalCriterioDesempate.nome'])} if pd.notna(res['amparoLegalCriterioDesempate.nome']) else {}),
-                    **({"tiebreakCriterionLegalBasisDescription": str(res['amparoLegalCriterioDesempate.descricao'])} if pd.notna(res['amparoLegalCriterioDesempate.descricao']) else {}),
-                    **({"tiebreakCriterionLegalBasisActiveStatus": str(res['amparoLegalCriterioDesempate.statusAtivo'])} if pd.notna(res['amparoLegalCriterioDesempate.statusAtivo']) else {}),
-                    **({"cancellationDate": to_ocds_dt(res['dataCancelamento'])} if pd.notna(res['dataCancelamento']) else {}),
-                }
-            }
+            # "lots": {
+            #     **({"id": 'lot-' + str(res['numeroItem'])} if pd.notna(res['numeroItem']) else {}),
+            #     "lotsDetails": {
+            #         **({"preferenceMarginApplication": str(res['aplicacaoMargemPreferencia'])} if pd.notna(res['aplicacaoMargemPreferencia']) else {}),
+            #         **({"smallBusinessBenefitApplication": str(res['aplicacaoBeneficioMeEpp'])} if pd.notna(res['aplicacaoBeneficioMeEpp']) else {}),
+            #         **({"tiebreakCriterionApplication": str(res['aplicacaoCriterioDesempate'])} if pd.notna(res['aplicacaoCriterioDesempate']) else {}),
+            #         **({"updateDate": to_ocds_dt(res['dataAtualizacao'])} if pd.notna(res['dataAtualizacao']) else {}),
+            #         **({"inclusionDate": to_ocds_dt(res['dataInclusao'])} if pd.notna(res['dataInclusao']) else {}),
+            #         **({"foreignCurrencyQuoteTimezone": str(res['timezoneCotacaoMoedaEstrangeira'])} if pd.notna(res['timezoneCotacaoMoedaEstrangeira']) else {}),
+            #         **({"foreignCurrencyId": str(res['moedaEstrangeira.id'])} if pd.notna(res['moedaEstrangeira.id']) else {}),
+            #         **({"foreignCurrencySymbol": str(res['moedaEstrangeira.simbolo'])} if pd.notna(res['moedaEstrangeira.simbolo']) else {}),
+            #         **({"foreignCurrencyName": str(res['moedaEstrangeira.nome'])} if pd.notna(res['moedaEstrangeira.nome']) else {}),
+            #         **({"foreignCurrencyNominalValue": str(res['valorNominalMoedaEstrangeira'])} if pd.notna(res['valorNominalMoedaEstrangeira']) else {}),
+            #         **({"foreignCurrencyQuoteDate": to_ocds_dt(res['dataCotacaoMoedaEstrangeira'])} if pd.notna(res['dataCotacaoMoedaEstrangeira']) else {}),
+            #         **({"preferenceMarginLegalBasisId": str(res['amparoLegalMargemPreferencia.id'])} if pd.notna(res['amparoLegalMargemPreferencia.id']) else {}),
+            #         **({"preferenceMarginLegalBasisName": str(res['amparoLegalMargemPreferencia.nome'])} if pd.notna(res['amparoLegalMargemPreferencia.nome']) else {}),
+            #         **({"preferenceMarginLegalBasisDescription": str(res['amparoLegalMargemPreferencia.descricao'])} if pd.notna(res['amparoLegalMargemPreferencia.descricao']) else {}),
+            #         **({"preferenceMarginLegalBasisActiveStatus": str(res['amparoLegalMargemPreferencia.statusAtivo'])} if pd.notna(res['amparoLegalMargemPreferencia.statusAtivo']) else {}),
+            #         **({"tiebreakCriterionLegalBasisId": str(res['amparoLegalCriterioDesempate.id'])} if pd.notna(res['amparoLegalCriterioDesempate.id']) else {}),
+            #         **({"tiebreakCriterionLegalBasisName": str(res['amparoLegalCriterioDesempate.nome'])} if pd.notna(res['amparoLegalCriterioDesempate.nome']) else {}),
+            #         **({"tiebreakCriterionLegalBasisDescription": str(res['amparoLegalCriterioDesempate.descricao'])} if pd.notna(res['amparoLegalCriterioDesempate.descricao']) else {}),
+            #         **({"tiebreakCriterionLegalBasisActiveStatus": str(res['amparoLegalCriterioDesempate.statusAtivo'])} if pd.notna(res['amparoLegalCriterioDesempate.statusAtivo']) else {}),
+            #         **({"cancellationDate": to_ocds_dt(res['dataCancelamento'])} if pd.notna(res['dataCancelamento']) else {}),
+            #     }
+            # }
         })
         
         idx += 1
@@ -384,7 +451,7 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
         },
         "roles": ["buyer", "procuringEntity"],
         "details": {
-            "classification": [
+            "classifications": [
                 {
                     "scheme": "BRA-ESFERA",
                     "id": str(row['data.orgaoSubRogado.esferaId']) if pd.notna(row['data.orgaoSubRogado.esferaId']) else str(row['data.orgaoEntidade.esferaId']),
@@ -397,7 +464,7 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
     bra_poder_id = str(row['data.orgaoSubRogado.poderId']) if pd.notna(row['data.orgaoSubRogado.poderId']) else str(row['data.orgaoEntidade.poderId'])
     
     if bra_poder_id != "N":
-        release["parties"][0]["details"]["classification"].append({
+        release["parties"][0]["details"]["classifications"].append({
             "scheme": "BRA-PODER",
             "id": str(row['data.orgaoSubRogado.poderId']) if pd.notna(row['data.orgaoSubRogado.poderId']) else str(row['data.orgaoEntidade.poderId']),
             "description": poder_id[row['data.orgaoSubRogado.poderId']] if pd.notna(row['data.orgaoSubRogado.poderId']) else poder_id[row['data.orgaoEntidade.poderId']],
@@ -426,7 +493,7 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
             },
             "roles": ["originalBuyer"],
             "details": {
-                "classification": [
+                "classifications": [
                     {
                         "scheme": "BRA-ESFERA",
                         "id": str(row['data.orgaoEntidade.esferaId']),
@@ -437,7 +504,7 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
         })
         
         if str(row['data.orgaoEntidade.poderId']) != "N":
-            release["parties"][-1]["details"]["classification"].append({
+            release["parties"][-1]["details"]["classifications"].append({
                 "scheme": "BRA-PODER",
                 "id": str(row['data.orgaoEntidade.poderId']),
                 "description": poder_id[row['data.orgaoEntidade.poderId']],
@@ -549,22 +616,25 @@ for estado in releases:
             "version": "1.1",
             "extensions": [
                 "https://raw.githubusercontent.com/open-contracting-extensions/ocds_partyDetails_scale_extension/master/extension.json",
-                "https://raw.githubusercontent.com/open-contracting-extensions/ocds_lots_extension/master/extension.json",
+                "https://raw.githubusercontent.com/open-contracting-extensions/ocds_lots_extension/v1.1.5/extension.json ",
                 "https://raw.githubusercontent.com/open-contracting-extensions/ocds_subcontracting_extension/master/extension.json",
                 "https://raw.githubusercontent.com/open-contracting-extensions/ocds_location_extension/master/extension.json", 
+                "https://raw.githubusercontent.com/open-contracting-extensions/ocds_organizationClassification_extension/master/extension.json",
+                "https://raw.githubusercontent.com/open-contracting-extensions/ocds_sustainability_extension/master/extension.json",
+                "https://gitlab.com/dncp-opendata/ocds_statusdetails_extension/-/raw/master/extension.json",
             ],
             "releases": lote
         }
 
         # Exportar para JSON
         json_file = f'{id}-{lote_num}.json' if total_lotes > 1 else f'{id}.json'
-        with open(f'output/{json_file}', 'w', encoding='utf-8') as f:
+        with open(f'tasks/mapeamento-ocds/output/{json_file}', 'w', encoding='utf-8') as f:
             json.dump(ocds, f, ensure_ascii=False, indent=2)
             
         json_files.append(json_file)
         
     # Exportar para Zip
-    with zipfile.ZipFile(f"output/{id}-json.zip", "w", zipfile.ZIP_DEFLATED) as zipf:
+    with zipfile.ZipFile(f"tasks/mapeamento-ocds/output/{id}-json.zip", "w", zipfile.ZIP_DEFLATED) as zipf:
         for json_file in json_files:
-            json_path = os.path.join("output", json_file)
+            json_path = os.path.join("tasks/mapeamento-ocds/output", json_file)
             zipf.write(json_path, arcname=json_file)
