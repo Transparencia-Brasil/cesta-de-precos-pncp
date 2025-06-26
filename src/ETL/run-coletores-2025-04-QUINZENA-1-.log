@@ -1,0 +1,54 @@
+---
+# COLETORES
+---
+
+INÍCIO DA COLETA ÀS '25-Jun-2025 23:26:44'
+
+Diretório: ENTRADA
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/src/ETL
+
+
+Diretório:
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp
+
+PARÂMETROS: 
+ - PRIMEIRO_DIA='2025-04-01' - é a data de início da coleta
+ - ULTIMO_DIA='2025-04-15' - é a data final da coleta
+ - ALIAS_COLETA='2025-04/QUINZENA-1' - é um alias para identificar a coleta e apontar um destino no diretório de /coletas
+
+---
+## CONTRATAÇÃO
+
+O arquivo 'coleta/contratacoes/2025-04/QUINZENA-1/dados.csv' já existe. Deseja executar o coletor/classificador novamente? (s/n): 
+Resposta: n
+
+Execução do coletor ignorada.
+
+Coleta de CONTRATAÇÕES concluída!
+
+---
+## ITENS
+
+Script:
+ - 'src/ETL/coletores/coleta-itens.R'
+
+Diretório de saída:
+ - 'coleta/itens/2025-04/QUINZENA-1'
+
+Screen criada para coletar itens:
+ - 'coletor-itens-2025-04-01-ate-2025-04-15'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2025-04/QUINZENA-1/run-coletor-itens-2025-04-01-ate-2025-04-15.log'.
+
+Parâmetro do coletor:
+ - CONTRATACOES='coleta/contratacoes/2025-04/QUINZENA-1/dados.csv'
+
+Coleta de ITENS em execução...
+
+There are screens on:
+	6787.coletor-itens-2025-04-01-ate-2025-04-15	(06/25/25 23:26:52)	(Detached)
+	6548.curitiba	(06/25/25 23:21:51)	(Detached)
+2 Sockets in /run/screen/S-rdurl0.
+
+Aguardando a screen 'coletor-itens-2025-04-01-ate-2025-04-15' encerrar...

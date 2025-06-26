@@ -1,0 +1,76 @@
+---
+# COLETORES
+---
+
+INÍCIO DA COLETA ÀS '25-Jun-2025 22:08:45'
+
+Diretório: ENTRADA
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/src/ETL
+
+
+Diretório:
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp
+
+PARÂMETROS: 
+ - PRIMEIRO_DIA='2025-04-01' - é a data de início da coleta
+ - ULTIMO_DIA='2025-04-15' - é a data final da coleta
+ - ALIAS_COLETA='2025-04/QUINZENA-1' - é um alias para identificar a coleta e apontar um destino no diretório de /coletas
+
+---
+## CONTRATAÇÃO
+
+Script:
+ - 'src/ETL/coletores/coleta-contratacoes.R'
+
+Diretório de saída:
+ - 'coleta/contratacoes/2025-04/QUINZENA-1'
+
+Screen criada para coletar contratações:
+ - 'coletor-contratacoes-2025-04-01-ate-2025-04-15'
+
+Saída sendo registrada em:
+ - 'coleta/contratacoes/2025-04/QUINZENA-1/run-coletor-contratacoes-2025-04-01-ate-2025-04-15.log'.
+
+Parâmetros do coletor: 
+ - PATH_OUTPUT_DIR="coleta/contratacoes/2025-04/QUINZENA-1"
+ - PRIMEIRO_DIA="2025-04-01"
+ - ULTIMO_DIA="2025-04-15"
+
+Coleta de CONTRATAÇÕES em execução...
+
+There are screens on:
+	5089.coletor-contratacoes-2025-04-01-ate-2025-04-15	(06/25/25 22:08:45)	(Detached)
+	4804.curitiba	(06/25/25 21:56:12)	(Detached)
+2 Sockets in /run/screen/S-rdurl0.
+
+
+Aguardando a screen 'coletor-contratacoes-2025-04-01-ate-2025-04-15' encerrar...
+Screen coletor-contratacoes-2025-04-01-ate-2025-04-15 encerrada
+
+Coleta de CONTRATAÇÕES concluída!
+
+---
+## ITENS
+
+Script:
+ - 'src/ETL/coletores/coleta-itens.R'
+
+Diretório de saída:
+ - 'coleta/itens/2025-04/QUINZENA-1'
+
+Screen criada para coletar itens:
+ - 'coletor-itens-2025-04-01-ate-2025-04-15'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2025-04/QUINZENA-1/run-coletor-itens-2025-04-01-ate-2025-04-15.log'.
+
+Parâmetro do coletor:
+ - CONTRATACOES='coleta/contratacoes/2025-04/QUINZENA-1/dados.csv'
+
+Coleta de ITENS em execução...
+
+There is a screen on:
+	5952.coletor-itens-2025-04-01-ate-2025-04-15	(06/25/25 22:59:17)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+Aguardando a screen 'coletor-itens-2025-04-01-ate-2025-04-15' encerrar...
