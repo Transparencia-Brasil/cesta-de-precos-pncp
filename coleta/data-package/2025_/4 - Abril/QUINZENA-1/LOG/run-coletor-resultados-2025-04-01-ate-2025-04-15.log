@@ -1,0 +1,251 @@
+Mensagen de aviso:
+pacote 'httr2' foi compilado no R versão 4.4.3 
+Rows: 705 Columns: 53
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (13): endpoint, descricao, materialOuServico, materialOuServicoNome, un...
+dbl  (13): numeroItem, valorUnitarioEstimado, valorTotal, quantidade, itemCa...
+lgl  (25): orcamentoSigiloso, incentivoProdutivoBasico, temResultado, aplica...
+dttm  (2): dataInclusao, dataAtualizacao
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Endpoint 1 coletado Endpoint 2 coletado Endpoint 3 coletado Endpoint 4 coletado Endpoint 5 coletado [1] "Can't retrieve empty body."
+Endpoint 6 coletado [1] "Can't retrieve empty body."
+Endpoint 7 coletado Endpoint 8 coletado Endpoint 9 coletado [1] "Can't retrieve empty body."
+Endpoint 10 coletado [1] "Can't retrieve empty body."
+Endpoint 11 coletado [1] "Can't retrieve empty body."
+Endpoint 12 coletado [1] "Can't retrieve empty body."
+Endpoint 13 coletado Endpoint 14 coletado [1] "Can't retrieve empty body."
+Endpoint 15 coletado Endpoint 16 coletado [1] "Can't retrieve empty body."
+Endpoint 17 coletado [1] "Can't retrieve empty body."
+Endpoint 18 coletado [1] "Can't retrieve empty body."
+Endpoint 19 coletado Endpoint 20 coletado Endpoint 21 coletado Endpoint 22 coletado Endpoint 23 coletado [1] "Can't retrieve empty body."
+Endpoint 24 coletado [1] "Can't retrieve empty body."
+Endpoint 25 coletado [1] "Can't retrieve empty body."
+Endpoint 26 coletado [1] "Can't retrieve empty body."
+Endpoint 27 coletado [1] "Can't retrieve empty body."
+Endpoint 28 coletado [1] "Can't retrieve empty body."
+Endpoint 29 coletado Endpoint 30 coletado Endpoint 31 coletado Endpoint 32 coletado Endpoint 33 coletado Endpoint 34 coletado Endpoint 35 coletado Endpoint 36 coletado Endpoint 37 coletado [1] "Can't retrieve empty body."
+Endpoint 38 coletado [1] "Can't retrieve empty body."
+Endpoint 39 coletado Endpoint 40 coletado Endpoint 41 coletado Endpoint 42 coletado Endpoint 43 coletado Endpoint 44 coletado Endpoint 45 coletado Endpoint 46 coletado [1] "Can't retrieve empty body."
+Endpoint 47 coletado [1] "Can't retrieve empty body."
+Endpoint 48 coletado [1] "Can't retrieve empty body."
+Endpoint 49 coletado [1] "Can't retrieve empty body."
+Endpoint 50 coletado [1] "Can't retrieve empty body."
+Endpoint 51 coletado [1] "Can't retrieve empty body."
+Endpoint 52 coletado Endpoint 53 coletado Endpoint 54 coletado Endpoint 55 coletado Endpoint 56 coletado [1] "Can't retrieve empty body."
+Endpoint 57 coletado [1] "Can't retrieve empty body."
+Endpoint 58 coletado [1] "Can't retrieve empty body."
+Endpoint 59 coletado Endpoint 60 coletado Endpoint 61 coletado Endpoint 62 coletado Endpoint 63 coletado Endpoint 64 coletado Endpoint 65 coletado Endpoint 66 coletado Endpoint 67 coletado Endpoint 68 coletado Endpoint 69 coletado Endpoint 70 coletado Endpoint 71 coletado Endpoint 72 coletado Endpoint 73 coletado [1] "Can't retrieve empty body."
+Endpoint 74 coletado [1] "Can't retrieve empty body."
+Endpoint 75 coletado [1] "Can't retrieve empty body."
+Endpoint 76 coletado [1] "Can't retrieve empty body."
+Endpoint 77 coletado [1] "Can't retrieve empty body."
+Endpoint 78 coletado [1] "Can't retrieve empty body."
+Endpoint 79 coletado [1] "Can't retrieve empty body."
+Endpoint 80 coletado Endpoint 81 coletado [1] "Can't retrieve empty body."
+Endpoint 82 coletado [1] "Can't retrieve empty body."
+Endpoint 83 coletado [1] "Can't retrieve empty body."
+Endpoint 84 coletado [1] "Can't retrieve empty body."
+Endpoint 85 coletado Endpoint 86 coletado [1] "Can't retrieve empty body."
+Endpoint 87 coletado Endpoint 88 coletado Endpoint 89 coletado Endpoint 90 coletado Endpoint 91 coletado Endpoint 92 coletado Endpoint 93 coletado [1] "Can't retrieve empty body."
+Endpoint 94 coletado Endpoint 95 coletado [1] "Can't retrieve empty body."
+Endpoint 96 coletado Endpoint 97 coletado Endpoint 98 coletado [1] "Can't retrieve empty body."
+Endpoint 99 coletado Endpoint 100 coletado Endpoint 101 coletado Endpoint 102 coletado [1] "Can't retrieve empty body."
+Endpoint 103 coletado [1] "Can't retrieve empty body."
+Endpoint 104 coletado [1] "Can't retrieve empty body."
+Endpoint 105 coletado [1] "Can't retrieve empty body."
+Endpoint 106 coletado [1] "Can't retrieve empty body."
+Endpoint 107 coletado [1] "Can't retrieve empty body."
+Endpoint 108 coletado [1] "Can't retrieve empty body."
+Endpoint 109 coletado [1] "Can't retrieve empty body."
+Endpoint 110 coletado [1] "Can't retrieve empty body."
+Endpoint 111 coletado Endpoint 112 coletado Endpoint 113 coletado Endpoint 114 coletado Endpoint 115 coletado Endpoint 116 coletado [1] "Can't retrieve empty body."
+Endpoint 117 coletado [1] "Can't retrieve empty body."
+Endpoint 118 coletado [1] "Can't retrieve empty body."
+Endpoint 119 coletado [1] "Can't retrieve empty body."
+Endpoint 120 coletado [1] "Can't retrieve empty body."
+Endpoint 121 coletado [1] "Can't retrieve empty body."
+Endpoint 122 coletado Endpoint 123 coletado Endpoint 124 coletado Endpoint 125 coletado [1] "Can't retrieve empty body."
+Endpoint 126 coletado [1] "Can't retrieve empty body."
+Endpoint 127 coletado [1] "Can't retrieve empty body."
+Endpoint 128 coletado [1] "Can't retrieve empty body."
+Endpoint 129 coletado Endpoint 130 coletado Endpoint 131 coletado Endpoint 132 coletado [1] "Can't retrieve empty body."
+Endpoint 133 coletado [1] "Can't retrieve empty body."
+Endpoint 134 coletado Endpoint 135 coletado [1] "Can't retrieve empty body."
+Endpoint 136 coletado Endpoint 137 coletado Endpoint 138 coletado Endpoint 139 coletado Endpoint 140 coletado Endpoint 141 coletado Endpoint 142 coletado Endpoint 143 coletado Endpoint 144 coletado Endpoint 145 coletado [1] "Can't retrieve empty body."
+Endpoint 146 coletado [1] "Can't retrieve empty body."
+Endpoint 147 coletado Endpoint 148 coletado Endpoint 149 coletado Endpoint 150 coletado [1] "Can't retrieve empty body."
+Endpoint 151 coletado Endpoint 152 coletado Endpoint 153 coletado Endpoint 154 coletado Endpoint 155 coletado [1] "Can't retrieve empty body."
+Endpoint 156 coletado [1] "Can't retrieve empty body."
+Endpoint 157 coletado [1] "Can't retrieve empty body."
+Endpoint 158 coletado Endpoint 159 coletado Endpoint 160 coletado Endpoint 161 coletado Endpoint 162 coletado Endpoint 163 coletado Endpoint 164 coletado [1] "Can't retrieve empty body."
+Endpoint 165 coletado Endpoint 166 coletado Endpoint 167 coletado Endpoint 168 coletado Endpoint 169 coletado [1] "Can't retrieve empty body."
+Endpoint 170 coletado [1] "Can't retrieve empty body."
+Endpoint 171 coletado Endpoint 172 coletado Endpoint 173 coletado Endpoint 174 coletado Endpoint 175 coletado Endpoint 176 coletado Endpoint 177 coletado Endpoint 178 coletado Endpoint 179 coletado Endpoint 180 coletado Endpoint 181 coletado Endpoint 182 coletado Endpoint 183 coletado Endpoint 184 coletado [1] "Can't retrieve empty body."
+Endpoint 185 coletado Endpoint 186 coletado Endpoint 187 coletado Endpoint 188 coletado [1] "Can't retrieve empty body."
+Endpoint 189 coletado Endpoint 190 coletado Endpoint 191 coletado Endpoint 192 coletado Endpoint 193 coletado [1] "Can't retrieve empty body."
+Endpoint 194 coletado Endpoint 195 coletado Endpoint 196 coletado [1] "Can't retrieve empty body."
+Endpoint 197 coletado Endpoint 198 coletado [1] "Can't retrieve empty body."
+Endpoint 199 coletado Endpoint 200 coletado Endpoint 201 coletado [1] "Can't retrieve empty body."
+Endpoint 202 coletado [1] "Can't retrieve empty body."
+Endpoint 203 coletado [1] "Can't retrieve empty body."
+Endpoint 204 coletado Endpoint 205 coletado Endpoint 206 coletado Endpoint 207 coletado Endpoint 208 coletado [1] "Can't retrieve empty body."
+Endpoint 209 coletado [1] "Can't retrieve empty body."
+Endpoint 210 coletado Endpoint 211 coletado [1] "Can't retrieve empty body."
+Endpoint 212 coletado Endpoint 213 coletado [1] "Can't retrieve empty body."
+Endpoint 214 coletado [1] "Can't retrieve empty body."
+Endpoint 215 coletado Endpoint 216 coletado Endpoint 217 coletado Endpoint 218 coletado Endpoint 219 coletado [1] "Can't retrieve empty body."
+Endpoint 220 coletado Endpoint 221 coletado [1] "Can't retrieve empty body."
+Endpoint 222 coletado Endpoint 223 coletado Endpoint 224 coletado Endpoint 225 coletado [1] "Can't retrieve empty body."
+Endpoint 226 coletado Endpoint 227 coletado Endpoint 228 coletado Endpoint 229 coletado Endpoint 230 coletado Endpoint 231 coletado Endpoint 232 coletado Endpoint 233 coletado Endpoint 234 coletado Endpoint 235 coletado [1] "Can't retrieve empty body."
+Endpoint 236 coletado [1] "Can't retrieve empty body."
+Endpoint 237 coletado Endpoint 238 coletado Endpoint 239 coletado [1] "Can't retrieve empty body."
+Endpoint 240 coletado [1] "Can't retrieve empty body."
+Endpoint 241 coletado [1] "Can't retrieve empty body."
+Endpoint 242 coletado Endpoint 243 coletado Endpoint 244 coletado [1] "Can't retrieve empty body."
+Endpoint 245 coletado Endpoint 246 coletado [1] "Can't retrieve empty body."
+Endpoint 247 coletado [1] "Can't retrieve empty body."
+Endpoint 248 coletado Endpoint 249 coletado [1] "Can't retrieve empty body."
+Endpoint 250 coletado Endpoint 251 coletado Endpoint 252 coletado Endpoint 253 coletado [1] "Can't retrieve empty body."
+Endpoint 254 coletado [1] "Can't retrieve empty body."
+Endpoint 255 coletado [1] "Can't retrieve empty body."
+Endpoint 256 coletado Endpoint 257 coletado Endpoint 258 coletado Endpoint 259 coletado [1] "Can't retrieve empty body."
+Endpoint 260 coletado Endpoint 261 coletado Endpoint 262 coletado Endpoint 263 coletado Endpoint 264 coletado Endpoint 265 coletado Endpoint 266 coletado Endpoint 267 coletado Endpoint 268 coletado Endpoint 269 coletado Endpoint 270 coletado [1] "Can't retrieve empty body."
+Endpoint 271 coletado [1] "Can't retrieve empty body."
+Endpoint 272 coletado Endpoint 273 coletado Endpoint 274 coletado Endpoint 275 coletado Endpoint 276 coletado [1] "Can't retrieve empty body."
+Endpoint 277 coletado Endpoint 278 coletado Endpoint 279 coletado [1] "Can't retrieve empty body."
+Endpoint 280 coletado Endpoint 281 coletado [1] "Can't retrieve empty body."
+Endpoint 282 coletado Endpoint 283 coletado [1] "Can't retrieve empty body."
+Endpoint 284 coletado [1] "Can't retrieve empty body."
+Endpoint 285 coletado [1] "Can't retrieve empty body."
+Endpoint 286 coletado [1] "Can't retrieve empty body."
+Endpoint 287 coletado [1] "Can't retrieve empty body."
+Endpoint 288 coletado [1] "Can't retrieve empty body."
+Endpoint 289 coletado Endpoint 290 coletado [1] "Can't retrieve empty body."
+Endpoint 291 coletado [1] "Can't retrieve empty body."
+Endpoint 292 coletado [1] "Can't retrieve empty body."
+Endpoint 293 coletado [1] "Can't retrieve empty body."
+Endpoint 294 coletado [1] "Can't retrieve empty body."
+Endpoint 295 coletado [1] "Can't retrieve empty body."
+Endpoint 296 coletado Endpoint 297 coletado Endpoint 298 coletado Endpoint 299 coletado Endpoint 300 coletado Endpoint 301 coletado Endpoint 302 coletado Endpoint 303 coletado Endpoint 304 coletado Endpoint 305 coletado Endpoint 306 coletado Endpoint 307 coletado [1] "Can't retrieve empty body."
+Endpoint 308 coletado Endpoint 309 coletado Endpoint 310 coletado Endpoint 311 coletado Endpoint 312 coletado Endpoint 313 coletado Endpoint 314 coletado Endpoint 315 coletado Endpoint 316 coletado Endpoint 317 coletado Endpoint 318 coletado Endpoint 319 coletado Endpoint 320 coletado Endpoint 321 coletado Endpoint 322 coletado Endpoint 323 coletado Endpoint 324 coletado Endpoint 325 coletado Endpoint 326 coletado Endpoint 327 coletado Endpoint 328 coletado Endpoint 329 coletado Endpoint 330 coletado Endpoint 331 coletado Endpoint 332 coletado Endpoint 333 coletado Endpoint 334 coletado Endpoint 335 coletado Endpoint 336 coletado Endpoint 337 coletado Endpoint 338 coletado Endpoint 339 coletado Endpoint 340 coletado Endpoint 341 coletado Endpoint 342 coletado Endpoint 343 coletado Endpoint 344 coletado Endpoint 345 coletado Endpoint 346 coletado Endpoint 347 coletado Endpoint 348 coletado Endpoint 349 coletado Endpoint 350 coletado Endpoint 351 coletado [1] "Can't retrieve empty body."
+Endpoint 352 coletado [1] "Can't retrieve empty body."
+Endpoint 353 coletado [1] "Can't retrieve empty body."
+Endpoint 354 coletado [1] "Can't retrieve empty body."
+Endpoint 355 coletado [1] "Can't retrieve empty body."
+Endpoint 356 coletado [1] "Can't retrieve empty body."
+Endpoint 357 coletado Endpoint 358 coletado Endpoint 359 coletado [1] "Can't retrieve empty body."
+Endpoint 360 coletado [1] "Can't retrieve empty body."
+Endpoint 361 coletado Endpoint 362 coletado [1] "Can't retrieve empty body."
+Endpoint 363 coletado Endpoint 364 coletado Endpoint 365 coletado Endpoint 366 coletado Endpoint 367 coletado Endpoint 368 coletado Endpoint 369 coletado Endpoint 370 coletado [1] "Can't retrieve empty body."
+Endpoint 371 coletado [1] "Can't retrieve empty body."
+Endpoint 372 coletado [1] "Can't retrieve empty body."
+Endpoint 373 coletado Endpoint 374 coletado Endpoint 375 coletado Endpoint 376 coletado Endpoint 377 coletado Endpoint 378 coletado Endpoint 379 coletado Endpoint 380 coletado Endpoint 381 coletado Endpoint 382 coletado Endpoint 383 coletado Endpoint 384 coletado Endpoint 385 coletado Endpoint 386 coletado Endpoint 387 coletado Endpoint 388 coletado Endpoint 389 coletado Endpoint 390 coletado Endpoint 391 coletado Endpoint 392 coletado Endpoint 393 coletado [1] "Can't retrieve empty body."
+Endpoint 394 coletado [1] "Can't retrieve empty body."
+Endpoint 395 coletado [1] "Can't retrieve empty body."
+Endpoint 396 coletado Endpoint 397 coletado Endpoint 398 coletado Endpoint 399 coletado Endpoint 400 coletado Endpoint 401 coletado Endpoint 402 coletado Endpoint 403 coletado Endpoint 404 coletado Endpoint 405 coletado Endpoint 406 coletado Endpoint 407 coletado [1] "Can't retrieve empty body."
+Endpoint 408 coletado [1] "Can't retrieve empty body."
+Endpoint 409 coletado Endpoint 410 coletado Endpoint 411 coletado [1] "Can't retrieve empty body."
+Endpoint 412 coletado [1] "Can't retrieve empty body."
+Endpoint 413 coletado [1] "Can't retrieve empty body."
+Endpoint 414 coletado [1] "Can't retrieve empty body."
+Endpoint 415 coletado [1] "Can't retrieve empty body."
+Endpoint 416 coletado Endpoint 417 coletado Endpoint 418 coletado Endpoint 419 coletado Endpoint 420 coletado Endpoint 421 coletado Endpoint 422 coletado Endpoint 423 coletado Endpoint 424 coletado Endpoint 425 coletado Endpoint 426 coletado Endpoint 427 coletado Endpoint 428 coletado Endpoint 429 coletado Endpoint 430 coletado Endpoint 431 coletado Endpoint 432 coletado Endpoint 433 coletado Endpoint 434 coletado Endpoint 435 coletado Endpoint 436 coletado Endpoint 437 coletado Endpoint 438 coletado Endpoint 439 coletado Endpoint 440 coletado Endpoint 441 coletado Endpoint 442 coletado Endpoint 443 coletado Endpoint 444 coletado Endpoint 445 coletado Endpoint 446 coletado Endpoint 447 coletado Endpoint 448 coletado Endpoint 449 coletado Endpoint 450 coletado Endpoint 451 coletado Endpoint 452 coletado [1] "Can't retrieve empty body."
+Endpoint 453 coletado Endpoint 454 coletado [1] "Can't retrieve empty body."
+Endpoint 455 coletado Endpoint 456 coletado Endpoint 457 coletado Endpoint 458 coletado Endpoint 459 coletado Endpoint 460 coletado [1] "Can't retrieve empty body."
+Endpoint 461 coletado [1] "Can't retrieve empty body."
+Endpoint 462 coletado [1] "Can't retrieve empty body."
+Endpoint 463 coletado [1] "Can't retrieve empty body."
+Endpoint 464 coletado Endpoint 465 coletado Endpoint 466 coletado Endpoint 467 coletado Endpoint 468 coletado Endpoint 469 coletado Endpoint 470 coletado [1] "Can't retrieve empty body."
+Endpoint 471 coletado [1] "Can't retrieve empty body."
+Endpoint 472 coletado Endpoint 473 coletado Endpoint 474 coletado Endpoint 475 coletado [1] "Can't retrieve empty body."
+Endpoint 476 coletado Endpoint 477 coletado [1] "Can't retrieve empty body."
+Endpoint 478 coletado Endpoint 479 coletado Endpoint 480 coletado Endpoint 481 coletado Endpoint 482 coletado Endpoint 483 coletado Endpoint 484 coletado Endpoint 485 coletado Endpoint 486 coletado Endpoint 487 coletado Endpoint 488 coletado Endpoint 489 coletado Endpoint 490 coletado [1] "Can't retrieve empty body."
+Endpoint 491 coletado [1] "Can't retrieve empty body."
+Endpoint 492 coletado Endpoint 493 coletado Endpoint 494 coletado Endpoint 495 coletado Endpoint 496 coletado Endpoint 497 coletado Endpoint 498 coletado Endpoint 499 coletado [1] "Can't retrieve empty body."
+Endpoint 500 coletado Endpoint 501 coletado [1] "Can't retrieve empty body."
+Endpoint 502 coletado Endpoint 503 coletado Endpoint 504 coletado Endpoint 505 coletado Endpoint 506 coletado Endpoint 507 coletado Endpoint 508 coletado [1] "Can't retrieve empty body."
+Endpoint 509 coletado [1] "Can't retrieve empty body."
+Endpoint 510 coletado [1] "Can't retrieve empty body."
+Endpoint 511 coletado [1] "Can't retrieve empty body."
+Endpoint 512 coletado [1] "Can't retrieve empty body."
+Endpoint 513 coletado [1] "Can't retrieve empty body."
+Endpoint 514 coletado [1] "Can't retrieve empty body."
+Endpoint 515 coletado [1] "Can't retrieve empty body."
+Endpoint 516 coletado [1] "Can't retrieve empty body."
+Endpoint 517 coletado [1] "Can't retrieve empty body."
+Endpoint 518 coletado [1] "Can't retrieve empty body."
+Endpoint 519 coletado [1] "Can't retrieve empty body."
+Endpoint 520 coletado [1] "Can't retrieve empty body."
+Endpoint 521 coletado [1] "Can't retrieve empty body."
+Endpoint 522 coletado [1] "Can't retrieve empty body."
+Endpoint 523 coletado [1] "Can't retrieve empty body."
+Endpoint 524 coletado [1] "Can't retrieve empty body."
+Endpoint 525 coletado [1] "Can't retrieve empty body."
+Endpoint 526 coletado [1] "Can't retrieve empty body."
+Endpoint 527 coletado [1] "Can't retrieve empty body."
+Endpoint 528 coletado [1] "Can't retrieve empty body."
+Endpoint 529 coletado [1] "Can't retrieve empty body."
+Endpoint 530 coletado Endpoint 531 coletado [1] "Can't retrieve empty body."
+Endpoint 532 coletado [1] "Can't retrieve empty body."
+Endpoint 533 coletado Endpoint 534 coletado Endpoint 535 coletado [1] "Can't retrieve empty body."
+Endpoint 536 coletado [1] "Can't retrieve empty body."
+Endpoint 537 coletado Endpoint 538 coletado Endpoint 539 coletado Endpoint 540 coletado Endpoint 541 coletado Endpoint 542 coletado Endpoint 543 coletado Endpoint 544 coletado Endpoint 545 coletado Endpoint 546 coletado Endpoint 547 coletado Endpoint 548 coletado [1] "Can't retrieve empty body."
+Endpoint 549 coletado Endpoint 550 coletado Endpoint 551 coletado Endpoint 552 coletado Endpoint 553 coletado Endpoint 554 coletado Endpoint 555 coletado Endpoint 556 coletado Endpoint 557 coletado Endpoint 558 coletado Endpoint 559 coletado Endpoint 560 coletado [1] "Can't retrieve empty body."
+Endpoint 561 coletado [1] "Can't retrieve empty body."
+Endpoint 562 coletado [1] "Can't retrieve empty body."
+Endpoint 563 coletado [1] "Can't retrieve empty body."
+Endpoint 564 coletado [1] "Can't retrieve empty body."
+Endpoint 565 coletado Endpoint 566 coletado Endpoint 567 coletado Endpoint 568 coletado Endpoint 569 coletado Endpoint 570 coletado Endpoint 571 coletado Endpoint 572 coletado Endpoint 573 coletado Endpoint 574 coletado Endpoint 575 coletado [1] "Can't retrieve empty body."
+Endpoint 576 coletado [1] "Can't retrieve empty body."
+Endpoint 577 coletado [1] "Can't retrieve empty body."
+Endpoint 578 coletado Endpoint 579 coletado Endpoint 580 coletado Endpoint 581 coletado Endpoint 582 coletado [1] "Can't retrieve empty body."
+Endpoint 583 coletado [1] "Can't retrieve empty body."
+Endpoint 584 coletado [1] "Can't retrieve empty body."
+Endpoint 585 coletado Endpoint 586 coletado [1] "Can't retrieve empty body."
+Endpoint 587 coletado Endpoint 588 coletado [1] "Can't retrieve empty body."
+Endpoint 589 coletado [1] "Can't retrieve empty body."
+Endpoint 590 coletado [1] "Can't retrieve empty body."
+Endpoint 591 coletado [1] "Can't retrieve empty body."
+Endpoint 592 coletado [1] "Can't retrieve empty body."
+Endpoint 593 coletado [1] "Can't retrieve empty body."
+Endpoint 594 coletado [1] "Can't retrieve empty body."
+Endpoint 595 coletado [1] "Can't retrieve empty body."
+Endpoint 596 coletado [1] "Can't retrieve empty body."
+Endpoint 597 coletado [1] "Can't retrieve empty body."
+Endpoint 598 coletado Endpoint 599 coletado Endpoint 600 coletado Endpoint 601 coletado Endpoint 602 coletado Endpoint 603 coletado Endpoint 604 coletado Endpoint 605 coletado Endpoint 606 coletado [1] "Can't retrieve empty body."
+Endpoint 607 coletado Endpoint 608 coletado Endpoint 609 coletado [1] "Can't retrieve empty body."
+Endpoint 610 coletado [1] "Can't retrieve empty body."
+Endpoint 611 coletado [1] "Can't retrieve empty body."
+Endpoint 612 coletado [1] "Can't retrieve empty body."
+Endpoint 613 coletado [1] "Can't retrieve empty body."
+Endpoint 614 coletado Endpoint 615 coletado [1] "Can't retrieve empty body."
+Endpoint 616 coletado Endpoint 617 coletado [1] "Can't retrieve empty body."
+Endpoint 618 coletado Endpoint 619 coletado Endpoint 620 coletado Endpoint 621 coletado Endpoint 622 coletado Endpoint 623 coletado Endpoint 624 coletado Endpoint 625 coletado Endpoint 626 coletado Endpoint 627 coletado Endpoint 628 coletado [1] "Can't retrieve empty body."
+Endpoint 629 coletado Endpoint 630 coletado Endpoint 631 coletado Endpoint 632 coletado Endpoint 633 coletado Endpoint 634 coletado Endpoint 635 coletado Endpoint 636 coletado Endpoint 637 coletado Endpoint 638 coletado Endpoint 639 coletado Endpoint 640 coletado Endpoint 641 coletado Endpoint 642 coletado Endpoint 643 coletado Endpoint 644 coletado Endpoint 645 coletado Endpoint 646 coletado Endpoint 647 coletado Endpoint 648 coletado Endpoint 649 coletado Endpoint 650 coletado Endpoint 651 coletado Endpoint 652 coletado Endpoint 653 coletado Endpoint 654 coletado Endpoint 655 coletado Endpoint 656 coletado Endpoint 657 coletado Endpoint 658 coletado Endpoint 659 coletado Endpoint 660 coletado [1] "Can't retrieve empty body."
+Endpoint 661 coletado [1] "Can't retrieve empty body."
+Endpoint 662 coletado Endpoint 663 coletado Endpoint 664 coletado Endpoint 665 coletado Endpoint 666 coletado Endpoint 667 coletado Endpoint 668 coletado Endpoint 669 coletado Endpoint 670 coletado Endpoint 671 coletado Endpoint 672 coletado Endpoint 673 coletado Endpoint 674 coletado Endpoint 675 coletado Endpoint 676 coletado [1] "Can't retrieve empty body."
+Endpoint 677 coletado [1] "Can't retrieve empty body."
+Endpoint 678 coletado Endpoint 679 coletado Endpoint 680 coletado Endpoint 681 coletado Endpoint 682 coletado Endpoint 683 coletado Endpoint 684 coletado Endpoint 685 coletado Endpoint 686 coletado [1] "Can't retrieve empty body."
+Endpoint 687 coletado [1] "Can't retrieve empty body."
+Endpoint 688 coletado [1] "Can't retrieve empty body."
+Endpoint 689 coletado Endpoint 690 coletado [1] "Can't retrieve empty body."
+Endpoint 691 coletado [1] "Can't retrieve empty body."
+Endpoint 692 coletado [1] "Can't retrieve empty body."
+Endpoint 693 coletado [1] "Can't retrieve empty body."
+Endpoint 694 coletado [1] "Can't retrieve empty body."
+Endpoint 695 coletado [1] "Can't retrieve empty body."
+Endpoint 696 coletado [1] "Can't retrieve empty body."
+Endpoint 697 coletado [1] "Can't retrieve empty body."
+Endpoint 698 coletado [1] "Can't retrieve empty body."
+Endpoint 699 coletado [1] "Can't retrieve empty body."
+Endpoint 700 coletado [1] "Can't retrieve empty body."
+Endpoint 701 coletado [1] "Can't retrieve empty body."
+Endpoint 702 coletado [1] "Can't retrieve empty body."
+Endpoint 703 coletado [1] "Can't retrieve empty body."
+Endpoint 704 coletado [1] "Can't retrieve empty body."
+Salvo o lote até o endpoint número: 705 
+Lotes restantes: 0 
+Endpoint 705 coletado 

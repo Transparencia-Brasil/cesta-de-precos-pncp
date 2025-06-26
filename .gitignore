@@ -73,3 +73,5 @@ src/ETL/run-coletores.old.sh
 .env
 tasks/verifica-campos-com-catalogo-e-ncm/input/itens-filtrados.rds
 tasks/verifica-campos-com-catalogo-e-ncm/input/usuarios.rds
+# remover depois
+coleta/itens/2025-04/QUINZENA-1/run-coletor-itens-2025-04-01-ate-2025-04-15.log
