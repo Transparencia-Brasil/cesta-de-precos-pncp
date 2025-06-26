@@ -42,33 +42,11 @@ cd src/ETL
 
 * PARÂMETROS:
   * `2025-01-Q1`: *Alias* para o subdiretório onde os dados e o arquivo de log serão salvos.
-  * `2025-01-01`: Data de início da coleta.
-  * `2025-01-15`: Data de fim da coleta.
+  * `2025-01-01`: Data de início da coleta (padrão AAAA-MM-DD).
+  * `2025-01-15`: Data de fim da coleta (padrão AAAA-MM-DD).
   * `run-coletores-2025-01-Q1.log`: Arquivo de log que armazenará todas as mensagens de saída e erros gerados durante a execução do script.
 
 ***
-
-### TASKS (`/tasks`)
-
-#### dados-de-teste
-
-* Gere amostras aleatórias de medicamentos para rotulagem manual utilizando o script `seleciona-dados-para-rotulacao-manual.R`.
-
-#### experimento-LLM
-
-* Realize análises de similaridade e embeddings utilizando os notebooks disponíveis na pasta `src`. O notebook `analise-de-similaridade-com-embeddings.ipynb` é um exemplo de como utilizar o modelo LLM para gerar embeddings e calcular similaridade entre os itens.
-
-#### filtros-dinamicos
-
-* Execute a análise de quantidade de filtros com o arquivo `analise-da-quantidade-de-filtros.qmd`. Os filtros são utilizados no front end do painel de cestas de preços.
-
-#### preprocessamento
-
-* Utilize os scripts disponíveis na pasta `src` para realizar o pré-processamento dos dados.
-
-#### unifica-dados
-
-* Unifique e trate os dados de contratações utilizando os scripts disponíveis na pasta `src`. Dadso unificados são salvos na pasta `data` e foram utilizados para a primeira ingestão dos dados no banco de dados Postgres.
 
 ## Responsáveis
 
