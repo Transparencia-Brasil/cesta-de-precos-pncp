@@ -166,6 +166,9 @@ tabela_de_transporte <- inner_join(to, from) %>%
     to = sprintf("%s/%s", here(dest_dir), files_to)
   )
 
+TABELA_DE_TRANSPORTE_PATH <- here("tasks/migra-dados-para-data-package/inputs/tabela-de-arquivos-coletados.rds")
+
+saveRDS(tabela_de_transporte, TABELA_DE_TRANSPORTE_PATH)
 
 # CRIA DIRETÒRIOS DESTINO ------------------------------------------------------
 
@@ -175,115 +178,3 @@ walk(unique(dirname(tabela_de_transporte$to)), dir.create, recursive = TRUE)
 # COPIA ARQUIVOS PARA PACOTE ---------------------------------------------------
 
 map2(tabela_de_transporte$from, tabela_de_transporte$to, file.copy, recursive = TRUE)
-
-
-# SUBSET - CURITIBA ------------------------------------------------------------
-
-cwb <- tabela_de_transporte %>%
-  transmute(file_path = to, file = basename(to)) %>%
-  filter(file %in% c("contratacoes.csv", "itens.csv", "itens-medicamentos.csv"))
-
-
-# CONTRATACOES -----------------------------------------------------------------
-
-# seleciona arquivo de contratações
-cwb_contratacoes <- cwb %>%
-  filter(file == "contratacoes.csv") %>%
-  mutate(
-    data = map(file_path, read_csv, col_types = cols(.default = col_character()))
-  )
-
-# filtra Curitiba
-cwb_contratacoes <- cwb_contratacoes %>%
-  select(data) %>%
-  unnest(data) %>%
-  filter(data.unidadeOrgao.municipioNome == "Curitiba")
-
-# Filtra esfera municipal
-cwb_contratacoes <- cwb_contratacoes %>%
-  filter(data.orgaoEntidade.esferaId == "M")
-
-# salva
-write_excel_csv2(cwb_contratacoes, "contratacoes-curitiba.csv")
-
-
-# MEDICAMENTOS -----------------------------------------------------------------
-
-# Cria chave de cruzamento
-make_id <- \(endpoint) {
-  cnpj <- endpoint %>%
-    str_remove("^.+orgaos\\/") %>%
-    str_remove("\\/compras.+")
-
-  ano <- endpoint %>%
-    str_remove("^.+compras\\/") %>%
-    str_extract("^\\d+")
-
-  sequencial <- endpoint %>%
-    str_remove(str_glue("^.+compras\\/{ano}\\/")) %>%
-    str_remove(str_glue("\\/itens")) %>%
-    str_pad(width = 6, pad = "0")
-
-  numeroControlePNCP <- str_glue("{cnpj}-1-{sequencial}/{ano}")
-
-  return(numeroControlePNCP)
-}
-
-
-# seleciona arquivo de medicamentos
-cwb_medicamentos <- cwb %>%
-  filter(file == "itens-medicamentos.csv") %>%
-  mutate(
-    data = map(file_path, read_csv, col_types = cols(.default = col_character()))
-  )
-
-cwb_medicamentos <- cwb_medicamentos %>%
-  select(data) %>%
-  unnest(data)
-
-# Cria ID e faz o semi-join com as contratações de curitiba
-cwb_medicamentos <- cwb_medicamentos %>%
-  mutate(data.numeroControlePNCP = make_id(endpoint)) %>%
-  semi_join(select(cwb_contratacoes, data.numeroControlePNCP))
-
-write_excel_csv2(cwb_medicamentos, "itens-das-contratacoes-somente-medicamentos-curitiba.csv")
-
-# ITENS ------------------------------------------------------------------------
-
-# seleciona arquivo de itens
-cwb_itens <- cwb %>%
-  filter(file == "itens.csv") %>%
-  mutate(
-    data = map(file_path, read_csv, col_types = cols(.default = col_character()))
-  )
-
-# desaninha
-cwb_itens <- cwb_itens %>%
-  select(data) %>%
-  unnest(data)
-
-# Cria ID e faz o semi-join com as contratações de curitiba
-cwb_itens <- cwb_itens %>%
-  mutate(data.numeroControlePNCP = make_id(endpoint)) %>%
-  semi_join(select(cwb_contratacoes, data.numeroControlePNCP))
-
-cwb_itens <- cwb_itens %>%
-  anti_join(select(cwb_medicamentos, data.numeroControlePNCP, numeroItem))
-
-
-# salva
-write_excel_csv2(cwb_itens, "itens-das-contratacoes-curitiba-demais-itens.csv")
-
-cwb_itens %>%
-  count(materialOuServicoNome)
-
-cwb_contratacoes %>%
-  count(data.modalidadeNome, sort = TRUE)
-
-cwb_contratacoes %>%
-  count(data.amparoLegal.descricao, sort = TRUE) %>%
-  View()
-
-cwb_contratacoes %>%
-  filter(data.amparoLegal.descricao == "282") %>%
-  View()
