@@ -5,16 +5,21 @@ Comentários explicativos estão distribuídos ao longo do código original.
 """
 
 import json
-from datetime import datetime, timezone
-import pandas as pd
-from tqdm import tqdm
-import zipfile
+import locale
 import os
 import sys
+import zipfile
+from datetime import datetime, timezone
 
+import pandas as pd
+from tqdm import tqdm
+
+# : PARÂMETROS -----------------------------------------------------------------
 
 # Pega os parâmetros MES e ANO de coleta
-# Essa informação será usada para gerar o nome do arquivo de saída
+# Essa informação será usada para:
+# - gerar o nome do arquivo de entrada
+# - gerar o nome do arquivo de saída
 if "ANO" in os.environ:
     ano_coleta = int(os.environ["ANO"])
 else:
@@ -28,33 +33,90 @@ else:
     os._exit(1)
 
 
-# As coletas foram divididas em dois arquivos CSV, um para cada quinzena
-# Pegamos os dois arquivos e concatenamos em um único DataFrame 
-## Contratações
-contratacoes_q1 = pd.read_csv('tasks/mapeamento-ocds/input/QUINZENA-1/DATA/contratacoes.csv')
-contratacoes_q2 = pd.read_csv('tasks/mapeamento-ocds/input/QUINZENA-2/DATA/contratacoes.csv')
-contratacoes = pd.concat([contratacoes_q1, contratacoes_q2], ignore_index=True)
-### Removendo duplicatas
-contratacoes = contratacoes.drop(columns=['totalRegistros','totalPaginas','numeroPagina','paginasRestantes','empty', 'endpoint'])
-contratacoes = contratacoes.drop_duplicates()
+# FILEPATHS --------------------------------------------------------------------
 
-## Itens
-itens_q1 = pd.read_csv('tasks/mapeamento-ocds/input/QUINZENA-1/DATA/itens-medicamentos.csv')
-itens_q2 = pd.read_csv('tasks/mapeamento-ocds/input/QUINZENA-2/DATA/itens-medicamentos.csv')
+# Aqui o usuário deverá setar para seu próprio diretório
+base_dir = "C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp"
+
+def get_filepaths(base_dir, ano_coleta, mes_coleta):
+    """
+    Retorna os diretórios e caminhos dos arquivos de coleta, quinzena 1 e 2, e os caminhos dos arquivos CSV.
+    """
+
+    # precisamos do nome do mês em pt-br
+    # Dicionário de meses em pt-br
+    MESES_PTBR = {
+        1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril",
+        5: "Maio", 6: "Junho", 7: "Julho", 8: "Agosto",
+        9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro"
+    }
+
+    # gera mÊs e ano dinamicamente, conforme parâmetros recebidos
+    ano_dir = f"{str(ano_coleta)}_"
+    mes_dir = f"{mes_coleta} - {MESES_PTBR[mes_coleta]}"
+    coleta_dir = os.path.join(base_dir, "coleta", "data-package", ano_dir, mes_dir)
+
+    # As coletas foram divididas em dois arquivos CSV, um para cada quinzena
+    # subdiretórios conforme a quinzena de coleta
+    quinzena1_dir = os.path.join(coleta_dir, "QUINZENA-1", "DATA")
+    quinzena2_dir = os.path.join(coleta_dir, "QUINZENA-2", "DATA")
+
+    # contratações paths
+    contratacoes_q1_path = os.path.join(quinzena1_dir, "contratacoes.csv")
+    contratacoes_q2_path = os.path.join(quinzena2_dir, "contratacoes.csv")
+
+    # caminhos path
+    itens_q1_path = os.path.join(quinzena1_dir, "itens-medicamentos.csv")
+    itens_q2_path = os.path.join(quinzena2_dir, "itens-medicamentos.csv")
+
+    # resultados path
+    resultados_q1_path = os.path.join(quinzena1_dir, "itens-medicamentos-resultados.csv")
+    resultados_q2_path = os.path.join(quinzena2_dir, "itens-medicamentos-resultados.csv")
+
+    return (
+        contratacoes_q1_path, contratacoes_q2_path,
+        itens_q1_path, itens_q2_path,
+        resultados_q1_path, resultados_q2_path
+    )
+
+# As coletas foram divididas em dois arquivos CSV, um para cada quinzena
+# Pegamos os dois arquivos e concatenamos em um único DataFrame
+contratacoes_q1_path, contratacoes_q2_path, itens_q1_path, itens_q2_path, resultados_q1_path, resultados_q2_path = get_filepaths(base_dir, ano_coleta, mes_coleta)
+
+
+# : CARREGA DADOS --------------------------------------------------------------
+
+# Contratações
+contratacoes_q1 = pd.read_csv(contratacoes_q1_path, low_memory=False)
+contratacoes_q2 = pd.read_csv(contratacoes_q2_path, low_memory=False)
+contratacoes = pd.concat([contratacoes_q1, contratacoes_q2], ignore_index=True)
+
+# Itens
+itens_q1 = pd.read_csv(itens_q1_path, low_memory=False)
+itens_q2 = pd.read_csv(itens_q2_path, low_memory=False)
 itens = pd.concat([itens_q1, itens_q2], ignore_index=True)
 
-## Resultados
-resultados_q1 = pd.read_csv('tasks/mapeamento-ocds/input/QUINZENA-1/DATA/itens-medicamentos-resultados.csv')
-resultados_q2 = pd.read_csv('tasks/mapeamento-ocds/input/QUINZENA-2/DATA/itens-medicamentos-resultados.csv')
+# Resultados
+resultados_q1 = pd.read_csv(resultados_q1_path, low_memory=False)
+resultados_q2 = pd.read_csv(resultados_q2_path, low_memory=False)
 resultados = pd.concat([resultados_q1, resultados_q2], ignore_index=True)
 
-# print(contratacoes_q1.shape)
-# print(contratacoes_q2.shape)
-# print(contratacoes.shape)
 
-# itens = pd.read_csv('input/itens-medicamentos.csv')
-# resultados = pd.read_csv('input/resultados.csv')
+# : REMOVE DUPLICATAS ----------------------------------------------------------
 
+# contratações
+contratacoes = contratacoes.drop(columns=['totalRegistros','totalPaginas','numeroPagina','paginasRestantes','empty', 'endpoint'], errors='ignore')
+contratacoes = contratacoes.drop_duplicates()
+
+# itens
+itens = itens.drop_duplicates()
+
+# resultados
+resultados = resultados.drop_duplicates()
+
+
+
+# : FUNÇÕES AUXILIARES ---------------------------------------------------------
 
 # Função para converter data para o formato OCDS
 # Formato esperado: 'YYYY-MM-DDTHH:MM:SSZ'
@@ -67,15 +129,16 @@ def to_ocds_dt(data):
         print(f"Erro ao converter data: {e} ->> {data}: {type(data)}")
         return None
 
+# Função para calcular a duração em dias entre duas datas no formato ISO
 def duracao_em_dias(data_inicio, data_fim):
-    try:
-        inicio = datetime.fromisoformat(data_inicio)
-        fim = datetime.fromisoformat(data_fim)
-        duracao = (fim - inicio).days
-        return duracao
-    except Exception as e:
-        print(f"Erro ao calcular duração: {e} ->> {data_inicio}: {type(data_inicio)} || ->> {data_fim}: {type(data_fim)}")
-        return None
+  try:
+    inicio = datetime.fromisoformat(data_inicio)
+    fim = datetime.fromisoformat(data_fim)
+    duracao = (fim - inicio).days
+    return duracao
+  except Exception as e:
+    print(f"Erro ao calcular duração: {e} ->> {data_inicio}: {type(data_inicio)} || ->> {data_fim}: {type(data_fim)}")
+    return None
 
 # Extrai cnpj, ano e sequencial da coluna numeroControlePNCP
 def extrair_parametros(numero_controle):
@@ -84,8 +147,6 @@ def extrair_parametros(numero_controle):
     sequencial = str(int(sequencial))  # remove zeros à esquerda
     return pd.Series([cnpj, ano, sequencial])
 
-# Aplica extração
-contratacoes[['cnpj', 'ano', 'sequencial']] = contratacoes['data.numeroControlePNCP'].apply(extrair_parametros)
 
 # Função para verificar se o endpoint do item bate com os campos da contratação
 def match_endpoint(endpoint, cnpj, ano, sequencial):
@@ -95,17 +156,26 @@ def match_endpoint(endpoint, cnpj, ano, sequencial):
         f'/{int(sequencial)}/' in str(endpoint)  # evita colisões tipo 81, 181, etc.
     )
 
+
+# : CRIA COLUNAS CNPJ, ANO, SEQUENCIAL -----------------------------------------
+
+# Aplica extração
+contratacoes[['cnpj', 'ano', 'sequencial']] = contratacoes['data.numeroControlePNCP'].apply(extrair_parametros)
+
+# Exibe todas as linhas -> Quantidade de contratações por UF
+pd.set_option('display.max_rows', None)
+print(contratacoes.groupby('data.unidadeOrgao.ufNome').size())
+pd.reset_option('display.max_rows')
+
+
+# : FILTRO DE ITENS POR CONTRATAÇÃO --------------------------------------------
+
 # Para cada linha de contratacoes, filtra os itens correspondentes
 itens_filtrados_por_contratacao = []
 contratacoes_filtradas = []
 
-# Exibe todas as linhas -> Quantidade de contratações por UF
-# pd.set_option('display.max_rows', None)
-# print(contratacoes.groupby('data.unidadeOrgao.ufNome').size())
-# pd.reset_option('display.max_rows')
-
 # Filtro para realizar testes
-contratacoes = contratacoes[contratacoes['data.unidadeOrgao.ufNome'].isin(['Santa Catarina'])]
+# contratacoes = contratacoes[contratacoes['data.unidadeOrgao.ufNome'].isin(['Santa Catarina'])]
 
 print("FILTRANDO ITENS POR CONTRATAÇÃO...")
 
@@ -119,9 +189,9 @@ for idx, row in tqdm(contratacoes.iterrows(), total=len(contratacoes)):
     if not itens_match.empty:
         # Adiciona número de controle (pode ajudar na rastreabilidade depois)
         itens_match['numeroControlePNCP'] = row['data.numeroControlePNCP']
-        
+
         itens_filtrados_por_contratacao.append(itens_match)
-        
+
         # Filtra a lista de contratações para manter apenas as que têm itens correspondentes
         # Assim, criamos o json apenas para as contratações que relativas aos itens filtrados (medicamentos)
         contratacoes_filtradas.append(row)
@@ -131,13 +201,17 @@ contratacoes_filtradas_df = pd.DataFrame(contratacoes_filtradas)
 # Junta todos os itens encontrados
 itens_filtrados = pd.concat(itens_filtrados_por_contratacao, ignore_index=True)
 
+
+# : CRIANDO ESTRUTURA OCDS -----------------------------------------------------
+
 # Vamos organizar as releases como dicionário cujo o Estado será a chave
 releases = {}
 
 print("PROCESSANDO CONTRATAÇÕES...")
 for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_filtradas_df)):
+    # Cria ocid concatenando campos
     ocid = str(row['data.orgaoEntidade.cnpj']) + '_' + str(row['data.anoCompra']) + '_' + str(row['data.sequencialCompra'])
-    
+
     # Itens relacionados - filtramos pelo número de controle do PNCP
     itens_rel = itens_filtrados[itens_filtrados['numeroControlePNCP'] == row['data.numeroControlePNCP']]
     items = []
@@ -153,7 +227,7 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
         "7": None,  # Não se aplica
         "8": "qualityOnly"  # Melhor técnica
     }
-    
+
     for _, item in itens_rel.iterrows():
         i = {
             "id": str(item['numeroItem']),
@@ -202,7 +276,7 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
                 **({"awardCriteriaDetails": item['criterioJulgamentoNome']} if pd.notna(item['criterioJulgamentoNome']) else {}),
             },
         })
-        
+
         if item['tipoBeneficioNome'] not in ["Sem benefício", "Não se aplica"]:
             if item['tipoBeneficioNome'] == "Participação exclusiva para ME/EPP":
                 lots[-1]["sustainability"] = [{
@@ -213,13 +287,13 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
                         ]
                     }
                 ]
-                        
+
                 lots[-1]["otherRequirements"] = {
                     "reservedParticipation": [
                         "sme"
                     ]
                 }
-            
+
             elif item['tipoBeneficioNome'] == "Subcontratação para ME/EPP":
                 lots[-1]["sustainability"] = [{
                         "goal": "social.smeInclusion",
@@ -230,11 +304,11 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
 
                     }
                 ]
-                        
+
                 lots[-1]["subcontractingTerms"] = {
                     "description": "Subcontratação para ME/EPP"
                 }
-            
+
             elif item['tipoBeneficioNome'] == "Cota reservada para ME/EPP":
                 lots[-1]["sustainability"] = [{
                         "goal": "social.smeInclusion",
@@ -245,7 +319,7 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
 
                     }
                 ]
-            
+
 
 
 
@@ -255,7 +329,7 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
     awards = []
     lista_niFornecedor = []
     suppliers = []
-    
+
     tipoPessoa = {
         "PF": "Pessoa Física",
         "PJ": "Pessoa Jurídica",
@@ -303,7 +377,7 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
                         }]
                 }
             })
-            
+
             if pd.notna(res['naturezaJuridicaId']):
                 suppliers[-1]['details']['classifications'].append({
                     "scheme": "BRA-NATUREZA-JURIDICA",
@@ -368,7 +442,7 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
             #     }
             # }
         })
-        
+
         idx += 1
 
     # "traduzindo" os IDs do PNCP
@@ -406,9 +480,9 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
     "9": None,  # Inexigibilidade
     "10": None,  # Manifestação de Interesse
     "11": None,  # Pré-qualificação
-    "12": None,  # Credenciamento 
-    "13": "written",  # Leilão - Presencial  
-    "14": None,  # Inaplicabilidade da Licitação      
+    "12": None,  # Credenciamento
+    "13": "written",  # Leilão - Presencial
+    "14": None,  # Inaplicabilidade da Licitação
     }
 
     # Montagem do release
@@ -424,7 +498,7 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
         },
         "language": "pt",
     }
-    
+
     release['parties'] = []
 
     # O órgão subrogado, quando existente, ocupa a função de buyer
@@ -454,22 +528,22 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
             "classifications": [
                 {
                     "scheme": "BRA-ESFERA",
-                    "id": str(row['data.orgaoSubRogado.esferaId']) if pd.notna(row['data.orgaoSubRogado.esferaId']) else str(row['data.orgaoEntidade.esferaId']),
+                    "id": "BRA-ESFERA-" + str(row['data.orgaoSubRogado.esferaId']) if pd.notna(row['data.orgaoSubRogado.esferaId']) else "BRA-ESFERA-" + str(row['data.orgaoEntidade.esferaId']),
                     "description": esfera_id[row['data.orgaoSubRogado.esferaId']] if pd.notna(row['data.orgaoSubRogado.esferaId']) else esfera_id[row['data.orgaoEntidade.esferaId']],
                 }
             ]
         },
     })
-    
-    bra_poder_id = str(row['data.orgaoSubRogado.poderId']) if pd.notna(row['data.orgaoSubRogado.poderId']) else str(row['data.orgaoEntidade.poderId'])
-    
+
+    bra_poder_id = "BRA-PODER-" + str(row['data.orgaoSubRogado.poderId']) if pd.notna(row['data.orgaoSubRogado.poderId']) else "BRA-PODER-" + str(row['data.orgaoEntidade.poderId'])
+
     if bra_poder_id != "N":
         release["parties"][0]["details"]["classifications"].append({
             "scheme": "BRA-PODER",
-            "id": str(row['data.orgaoSubRogado.poderId']) if pd.notna(row['data.orgaoSubRogado.poderId']) else str(row['data.orgaoEntidade.poderId']),
+            "id": "BRA-PODER-" + str(row['data.orgaoSubRogado.poderId']) if pd.notna(row['data.orgaoSubRogado.poderId']) else "BRA-PODER-" + str(row['data.orgaoEntidade.poderId']),
             "description": poder_id[row['data.orgaoSubRogado.poderId']] if pd.notna(row['data.orgaoSubRogado.poderId']) else poder_id[row['data.orgaoEntidade.poderId']],
         })
-    
+
     # Se o órgão subrogado não existir, significa que o próprio órgão já foi referenciado
     if pd.notna(row['data.orgaoSubRogado.cnpj']):
         release['parties'].append({
@@ -496,23 +570,23 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
                 "classifications": [
                     {
                         "scheme": "BRA-ESFERA",
-                        "id": str(row['data.orgaoEntidade.esferaId']),
+                        "id": "BRA-ESFERA-" + str(row['data.orgaoEntidade.esferaId']),
                         "description": esfera_id[row['data.orgaoEntidade.esferaId']],
                     }
                 ]
             },
         })
-        
+
         if str(row['data.orgaoEntidade.poderId']) != "N":
             release["parties"][-1]["details"]["classifications"].append({
                 "scheme": "BRA-PODER",
-                "id": str(row['data.orgaoEntidade.poderId']),
+                "id": "BRA-PODER-" + str(row['data.orgaoEntidade.poderId']),
                 "description": poder_id[row['data.orgaoEntidade.poderId']],
             })
-    
+
     # Adicionando os suppliers
     release['parties'] = release['parties'] + [supplier for supplier in suppliers]
-    
+
     release['tender'] = {
             "id": str(row['data.processo']),
             "title": row['data.tipoInstrumentoConvocatorioNome'] + ' - ' + str(row['data.processo']),
@@ -552,10 +626,10 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
             "items": items,
             "lots": lots,
         }
-    
+
     if awards != []:
         release['awards'] = awards
-    
+
     estados = {
         "Acre": "ac",
         "Alagoas": "al",
@@ -585,13 +659,16 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
         "Sergipe": "se",
         "Tocantins": "to"
     }
-    
+
     # Caso a chave não exista, criamos
     if estados[row['data.unidadeOrgao.ufNome']] not in releases:
         releases[estados[row['data.unidadeOrgao.ufNome']]] = []
 
     # Adicionamos a release recém-criada ao seu respectivo estado
     releases[estados[row['data.unidadeOrgao.ufNome']]].append(release)
+
+
+# : CRIA JSON E ZIP ------------------------------------------------------------
 
 # Criamos o JSON e ZIP de cada estado (contendo todas as suas contratações)
 for estado in releases:
@@ -602,7 +679,7 @@ for estado in releases:
 
     for i in range(0, len(lista), lote_tamanho):
         lote = lista[i:i+lote_tamanho]
-        
+
         id = f'{estado}-{mes_coleta}-{ano_coleta}'
 
         # Montagem do objeto OCDS
@@ -616,9 +693,9 @@ for estado in releases:
             "version": "1.1",
             "extensions": [
                 "https://raw.githubusercontent.com/open-contracting-extensions/ocds_partyDetails_scale_extension/master/extension.json",
-                "https://raw.githubusercontent.com/open-contracting-extensions/ocds_lots_extension/v1.1.5/extension.json ",
+                "https://raw.githubusercontent.com/open-contracting-extensions/ocds_lots_extension/v1.1.5/extension.json",
                 "https://raw.githubusercontent.com/open-contracting-extensions/ocds_subcontracting_extension/master/extension.json",
-                "https://raw.githubusercontent.com/open-contracting-extensions/ocds_location_extension/master/extension.json", 
+                "https://raw.githubusercontent.com/open-contracting-extensions/ocds_location_extension/master/extension.json",
                 "https://raw.githubusercontent.com/open-contracting-extensions/ocds_organizationClassification_extension/master/extension.json",
                 "https://raw.githubusercontent.com/open-contracting-extensions/ocds_sustainability_extension/master/extension.json",
                 "https://gitlab.com/dncp-opendata/ocds_statusdetails_extension/-/raw/master/extension.json",
@@ -627,14 +704,16 @@ for estado in releases:
         }
 
         # Exportar para JSON
-        json_file = f'{id}-{lote_num}.json' if total_lotes > 1 else f'{id}.json'
-        with open(f'tasks/mapeamento-ocds/output/{json_file}', 'w', encoding='utf-8') as f:
+        json_file = f'{id}-{i // lote_tamanho + 1}.json' if total_lotes > 1 else f'{id}.json'
+        with open(os.path.join(base_dir, 'tasks', 'mapeamento-ocds', 'output', json_file), 'w', encoding='utf-8') as f:
             json.dump(ocds, f, ensure_ascii=False, indent=2)
-            
+
         json_files.append(json_file)
-        
+
     # Exportar para Zip
-    with zipfile.ZipFile(f"tasks/mapeamento-ocds/output/{id}-json.zip", "w", zipfile.ZIP_DEFLATED) as zipf:
+    zip_file = f"{id}-json.zip"
+    zip_file = os.path.join(base_dir, 'tasks', 'mapeamento-ocds', 'output', zip_file)
+    with zipfile.ZipFile(zip_file, "w", zipfile.ZIP_DEFLATED) as zipf:
         for json_file in json_files:
-            json_path = os.path.join("tasks/mapeamento-ocds/output", json_file)
+            json_path = os.path.join(base_dir, 'tasks', 'mapeamento-ocds', 'output', json_file)
             zipf.write(json_path, arcname=json_file)
