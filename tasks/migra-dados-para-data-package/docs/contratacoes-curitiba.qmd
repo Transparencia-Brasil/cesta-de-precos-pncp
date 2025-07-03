@@ -56,6 +56,7 @@ execute:
 
 
 ```{r}
+#| label: carrega-dados
 library(tidyverse)
 library(here)
 library(gt)
@@ -64,7 +65,7 @@ PATH_RSETUP <- here("setup/rsetup.R")
 PATH_CWB_DATA <- here("tasks/migra-dados-para-data-package/inputs/cwb.rds")
 
 source(PATH_RSETUP, encoding = "utf-8")
-cwb <- readRDS(PATH_CWB_DATA)
+cwb_full <- readRDS(PATH_CWB_DATA)
 ```
 
 ```{r}
@@ -161,69 +162,133 @@ saveRDS(cwb, PATH_CWB_DATA)
 ## Contratações públicas no município de Curitiba-PR
 
 ```{r}
+#| label: funcao-processa-dados
+
+
 municipio <- unique(cwb$contratacoes$data.unidadeOrgao.municipioNome)
 uf <- unique(cwb$contratacoes$data.unidadeOrgao.ufSigla)
 
-filtra_resultados_srp <- function(cwb) {
-  contratacoes_srp <- cwb$contratacoes %>%
-    filter(as.logical(data.srp)) %>%
-    distinct(data.numeroControlePNCP)
+#' Processa dados de contratações do município de Curitiba
+#'
+#' Esta função filtra e organiza os dados de contratações públicas do município de Curitiba,
+#' considerando apenas aquelas com situação "Divulgada no PNCP". Ela seleciona as contratações,
+#' separa os itens comuns e itens de medicamentos, marca os itens de medicamentos, e reúne todos
+#' os itens em um único data frame. Além disso, filtra os resultados das contratações, removendo
+#' itens cancelados e mantendo apenas a primeira classificação de SRP, quando aplicável.
+#'
+#' @param cwb Uma lista contendo os data frames: \code{contratacoes}, \code{itens},
+#' \code{itens_medicamentos} e \code{itens_resultados}, referentes aos dados das contratações.
+#'
+#' @return Uma lista com três elementos:
+#' \describe{
+#'   \item{contratacoes}{Data frame com as contratações filtradas e distintas.}
+#'   \item{itens}{Data frame com todos os itens das contratações, incluindo medicamentos, com indicação.}
+#'   \item{itens_resultados}{Data frame com os resultados das contratações, filtrando itens cancelados e SRP.}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' resultado <- processa_contratacoes(cwb)
+#' }
+#'
+#' @export
 
-  itens_srp <- cwb$itens %>%
-    semi_join(contratacoes_srp) %>%
-    distinct(data.numeroControlePNCP, numeroItem)
+processa_contratacoes <- function(cwb) {
+  # somente contratações com SRP
+  contratacoes <- cwb$contratacoes %>%
+    filter(data.situacaoCompraNome == "Divulgada no PNCP") %>%
+    distinct(
+      data.numeroControlePNCP,
+      data.srp = as.logical(data.srp),
+      data.modalidadeNome,
+      data.modoDisputaNome,
+      data.tipoInstrumentoConvocatorioNome,
+      data.objetoCompra,
+      data.situacaoCompraNome,
+      data.amparoLegal.nome,
+      data.amparoLegal.descricao
+    )
 
-  itens_medicamentos_srp <- cwb$itens_medicamentos %>%
-    semi_join(contratacoes_srp) %>%
-    distinct(data.numeroControlePNCP, numeroItem)
+  # itens das contratações sem SRP
+  itens <- cwb$itens %>%
+    semi_join(contratacoes) %>%
+    distinct(
+      data.numeroControlePNCP,
+      numeroItem,
+      materialOuServicoNome,
+      descricao,
+      unidadeMedida,
+      valorUnitarioEstimado,
+      quantidadeEstimada = quantidade,
+      orcamentoSigiloso,
+      criterioJulgamentoNome
+    ) %>%
+    mutate(
+      valorUnitarioEstimado = as.numeric(valorUnitarioEstimado),
+      quantidadeEstimada = as.numeric(quantidadeEstimada),
+      valorTotalEstimado = quantidadeEstimada * valorUnitarioEstimado
+    ) %>%
+    mutate(medicamento = FALSE)
 
-  itens_resultados_srp <- cwb$itens_resultados %>%
-    semi_join(bind_rows(itens_srp, itens_medicamentos_srp)) %>%
+  # medicamentos sem SRP
+  itens_medicamentos <- cwb$itens_medicamentos %>%
+    semi_join(contratacoes) %>%
+    distinct(
+      data.numeroControlePNCP,
+      numeroItem,
+      materialOuServicoNome,
+      descricao,
+      unidadeMedida,
+      valorUnitarioEstimado,
+      quantidadeEstimada = quantidade,
+      orcamentoSigiloso,
+      criterioJulgamentoNome
+    ) %>%
+    mutate(
+      valorUnitarioEstimado = as.numeric(valorUnitarioEstimado),
+      quantidadeEstimada = as.numeric(quantidadeEstimada),
+      valorTotalEstimado = quantidadeEstimada * valorUnitarioEstimado
+    ) %>%
+    mutate(medicamento = TRUE)
+
+  # reúne os itens
+  itens <- bind_rows(itens, itens_medicamentos)
+
+  # resultados das contratações sem SRP
+  itens_resultados <- cwb$itens_resultados %>%
+    semi_join(itens) %>%
     filter(situacaoCompraItemResultadoNome != "Cancelado") %>%
-    distinct(data.numeroControlePNCP, numeroItem, sequencialResultado)
+    filter(is.na(ordemClassificacaoSrp) | ordemClassificacaoSrp == "1") %>%
+    distinct(
+      data.numeroControlePNCP,
+      numeroItem,
+      sequencialResultado,
+      niFornecedor,
+      nomeRazaoSocialFornecedor,
+      tipoPessoa,
+      quantidadeHomologada,
+      valorUnitarioHomologado
+    ) %>%
+    mutate(
+      valorUnitarioHomologado = as.numeric(valorUnitarioHomologado),
+      quantidadeHomologada = as.numeric(quantidadeHomologada),
+      valorTotalHomologado = quantidadeHomologada * valorUnitarioHomologado
+    )
 
   return(list(
-    contratacoes = contratacoes_srp,
-    itens = itens_srp,
-    itens_medicamentos = itens_medicamentos_srp,
-    itens_resultados_srp = itens_resultados_srp
+    contratacoes = contratacoes,
+    itens = itens,
+    # itens_medicamentos = itens_medicamentos,
+    itens_resultados = itens_resultados
   ))
 }
 
-filtra_resultados_srp(cwb)$itens_resultados_srp
-
-
-
-cwb$itens_resultados <- cwb$itens_resultados %>%
-  transmute(
-    data.numeroControlePNCP = numeroControlePNCPCompra,
-    numeroItem, endpoint,
-    dataInclusao, niFornecedor,
-    quantidadeHomologada = as.numeric(quantidadeHomologada),
-    vaorUnitarioHomologado = as.numeric(valorUnitarioHomologado)
-  )
-
-cwb$itens_resultados %>%
-  filter(numeroControlePNCPCompra == "76417005000186-1-000048/2024", numeroItem == 1) %>%
-  View()
-
-cwb$itens_resultados %>%
-  filter(numeroControlePNCPCompra == "14814139000183-1-000031/2025", numeroItem == 1) %>%
-  View()
-
-cwb$itens_resultados %>%
-  filter(numeroControlePNCPCompra == "14814139000183-1-000001/2024", numeroItem == 1) %>%
-  View()
-
-
-cwb$itens_resultados %>%
-  filter(numeroControlePNCPCompra %in% contr$data.numeroControlePNCP) %>%
-  filter(situacaoCompraItemResultadoNome != "Cancelado") %>%
-  distinct(numeroItem, numeroControlePNCPCompra, sequencialResultado) %>%
-  count(numeroItem, numeroControlePNCPCompra, sort = TRUE)
+cwb <- processa_contratacoes(cwb_full)
 ```
 
-Este relatório faz um levantamento dos dados de contratações e itens das contratações para o município de `r municipio`-`r uf`. Os dados foram extraídos do PNCP e abrangem todas as contratações publicadas no PNCP entre 01/01/2025 até 31/05/2025.
+Este relatório apresenta um panorama das contratações públicas realizadas pelo município de `r municipio`-`r uf`, com dados extraídos do PNCP referentes ao período de 01/01/2025 a 31/05/2025.
+
+Foram consideradas apenas contratações com situação "Divulgada no PNCP". O processamento dos dados envolveu a seleção das contratações, a marcação dos itens de medicamentos e a consolidação de todos os itens em um único conjunto de dados. Além disso, os resultados das contratações foram filtrados para remover itens cancelados e manter apenas a primeira classificação de SRP, quando aplicável.
 
 - Bases de dados:
   - `contratacoes` contendo dados de `r nrow(cwb$contratacoes)` editais, avisos e atos de contratações diretas realizados por órgãos e entidades da esfera municipal localizados no município.
@@ -233,86 +298,78 @@ Este relatório faz um levantamento dos dados de contratações e itens das cont
 ### Itens contratados
 
 ```{r}
+#| label: tbl-itens-contratados
+#| tbl-cap: "Resumo dos itens contratados por tipo e homologação"
 
-conta_material_servico <- cwb$itens %>%
-  mutate(valorUnitarioEstimado = as.numeric(valorUnitarioEstimado)) %>%
-  left_join(cwb$itens_resultados) %>%
-  glimpse()
-summarise(
-  .by = materialOuServicoNome,
-  total_estimado = sum(valorUnitarioEstimado),
-  total_homologado = sum(valorUnitarioEstimado),
-  qtd_contratacoes = n()
+
+googlesheets4::write_sheet(
+  cwb$itens,
+  "https://docs.google.com/spreadsheets/d/1ndRb6gB3yqP1FpPKmQgffrq56Md7M0AfOpV-oTQ3kLM/edit?gid=148460776#gid=148460776",
+  sheet = "itens"
 )
 
-conta_medicamentos <- cwb$itens_medicamentos %>% glimpse()
-mutate(
-  valorUnitarioEstimado = as.numeric(valorUnitarioEstimado),
-  materialOuServicoNome = "Medicamentos"
-) %>%
-  summarise(
-    .by = materialOuServicoNome,
-    total_estimado = sum(valorUnitarioEstimado),
-    qtd_contratacoes = n()
-  )
+googlesheets4::write_sheet(
+  cwb$itens_resultados,
+  "https://docs.google.com/spreadsheets/d/1ndRb6gB3yqP1FpPKmQgffrq56Md7M0AfOpV-oTQ3kLM/edit?gid=148460776#gid=148460776",
+  sheet = "itens-resultados"
+)
 
-bind_rows(conta_material_servico, conta_medicamentos) %>%
-  gt() %>%
-  fmt_currency_brl(total_estimado) %>%
+googlesheets4::write_sheet(
+  cwb$contratacoes,
+  "https://docs.google.com/spreadsheets/d/1ndRb6gB3yqP1FpPKmQgffrq56Md7M0AfOpV-oTQ3kLM/edit?gid=148460776#gid=148460776",
+  sheet = "contratações"
+)
+
+cwb_counts <- cwb$itens %>%
+  select(
+    data.numeroControlePNCP,
+    numeroItem,
+    medicamento,
+    materialOuServicoNome
+  ) %>%
+  left_join(cwb$itens_resultados) %>%
+  mutate(
+    homologado = !is.na(valorUnitarioHomologado)
+  ) %>%
+  summarise(
+    .by = c(medicamento, materialOuServicoNome, homologado),
+    qtd_fornecedores = n_distinct(niFornecedor, na.rm = TRUE),
+    qtd_contratacoes = n(),
+    valor_total_homologado = sum(valorTotalHomologado, na.rm = TRUE)
+  ) %>%
+  arrange(homologado, desc(valor_total_homologado)) %>%
+  mutate(
+    medicamento = if_else(medicamento, "Medicamentos", materialOuServicoNome),
+    homologado = if_else(homologado, "Sim", "Não")
+  ) %>%
+  select(-materialOuServicoNome) %>%
+  mutate(across(where(is.numeric), \(x) if_else(x == 0, NA_real_, x)))
+
+cwb_counts %>%
+  gt(groupname_col = "medicamento") %>%
+  gt(groupname_col = "medicamento") %>%
+  fmt_currency_brl(valor_total_homologado) %>%
+  fmt_integer_ptbr(qtd_fornecedores) %>%
   fmt_integer_ptbr(qtd_contratacoes) %>%
   cols_label(
     .fn = md,
-    materialOuServicoNome = "**Tipo**",
-    total_estimado = "**Valor estimado**",
-    qtd_contratacoes = "**Quantidade de contratações**"
-  )
-```
-
-```{r}
-de_para <- cwb$contratacoes %>%
-  distinct(data.amparoLegal.codigo, data.amparoLegal.nome, data.amparoLegal.descricao) %>%
-  mutate(data.amparoLegal.descricao = str_replace(data.amparoLegal.descricao, "^[0-9]+$", NA_character_)) %>%
-  group_by(data.amparoLegal.codigo, data.amparoLegal.nome) %>%
-  fill(data.amparoLegal.descricao, .direction = "downup") %>%
-  ungroup() %>%
-  arrange(data.amparoLegal.descricao) %>%
-  distinct(data.amparoLegal.codigo, data.amparoLegal.nome, data.amparoLegal.descricao)
-
-cwb$contratacoes %>%
-  select(-data.amparoLegal.descricao) %>%
-  left_join(de_para) %>%
-  summarise(
-    .by = c(data.amparoLegal.nome, data.amparoLegal.descricao),
-    valorTotalEstimado = sum(as.numeric(data.valorTotalEstimado)),
-    valorTotalHomologado = sum(as.numeric(data.valorTotalHomologado)),
-    qtdContratacoes = n()
+    medicamento = " ",
+    # materialOuServicoNome = "**Tipo de item/serviço**",
+    homologado = "**Homologado?**",
+    qtd_fornecedores = "**Qtd. fornecedores**",
+    qtd_contratacoes = "**Qtd. contratações**",
+    valor_total_homologado = "**Valor total<br>homologado**"
   ) %>%
-  arrange(desc(valorTotalEstimado), desc(valorTotalHomologado)) %>%
-  mutate(
-    data.amparoLegal.descricao = gsub("^(.+\\:)(.+)$", "***\\1**\\2*", data.amparoLegal.descricao)
+  tab_style(
+    style = cell_fill(color = "#d4edda"),
+    locations = cells_body(
+      rows = homologado == "Sim"
+    )
   ) %>%
-  gt(groupname_col = "data.amparoLegal.nome") %>%
-  fmt_currency_brl(contains("valor")) %>%
-  fmt_integer_ptbr(qtdContratacoes) %>%
-  fmt_markdown(columns = data.amparoLegal.descricao) %>%
   sub_missing() %>%
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_row_groups()
-  ) %>%
-  tab_style(
-    style = cell_text(size = px(12)), # Reduz o tamanho da fonte
-    locations = cells_body(columns = data.amparoLegal.descricao)
-  ) %>%
-  cols_label(
-    .fn = md,
-    data.amparoLegal.descricao = "**Descrição do amparo legal**",
-    valorTotalEstimado = "**Valor total estimado**",
-    valorTotalHomologado = "**Valor total homologado**",
-    qtdContratacoes = "**Quantidade de contratações**"
-  ) %>%
   tab_options(
     table.font.size = px(15),
+    table.width = px(900), # <-- aumenta a largura da tabela
     heading.background.color = "#f8f9fa",
     row_group.background.color = "#e9ecef",
     column_labels.background.color = "#dee2e6",
@@ -321,8 +378,48 @@ cwb$contratacoes %>%
     data_row.padding = px(6)
   ) %>%
   tab_header(
-    title = md("**Contratações por Amparo Legal**"),
-    subtitle = md("Valores estimados e homologados agrupados por tipo de amparo legal")
+    title = md("**Resumo dos Itens Contratados**"),
+    subtitle = md("Distribuição por tipo, valor homologado e fornecedores")
   ) %>%
   opt_row_striping()
+
+```
+
+```{r}
+#| label: ul-label
+
+amparo_legal <- cwb$contratacoes %>%
+  distinct(data.numeroControlePNCP, data.amparoLegal.nome, data.amparoLegal.descricao)
+
+cwb$itens %>%
+  select(
+    data.numeroControlePNCP,
+    numeroItem,
+    medicamento,
+    materialOuServicoNome,
+    valorTotalEstimado
+  ) %>%
+  left_join(cwb$itens_resultados) %>%
+  mutate(
+    homologado = if_else(!is.na(valorUnitarioHomologado), "Homologado", "Não homologado"),
+  ) %>%
+  left_join(amparo_legal) %>%
+  mutate(
+    amparo_legal = sprintf("%s-%s", data.amparoLegal.nome, data.amparoLegal.descricao)
+  ) %>%
+  summarise(
+    .by = c(amparo_legal, homologado),
+    qtd_fornecedores = n_distinct(niFornecedor, na.rm = TRUE),
+    qtd_contratacoes = n(),
+    valor_total_homologado = sum(valorTotalHomologado, na.rm = TRUE),
+    valor_total_estimado = sum(valorTotalEstimado, na.rm = TRUE)
+  ) %>%
+  pivot_wider(
+    names_from = homologado,
+    values_from = c(qtd_fornecedores, qtd_contratacoes, valor_total_homologado, valor_total_estimado)
+  ) # %>%
+# googlesheets4::write_sheet(
+#   "https://docs.google.com/spreadsheets/d/1ndRb6gB3yqP1FpPKmQgffrq56Md7M0AfOpV-oTQ3kLM",
+#   sheet = "Amparo Legal"
+# )
 ```
