@@ -216,18 +216,18 @@ fi
 
 # Converter mês numérico para abreviação
 case $MES_COLETA in
-  "01") MES_COLETA="JAN" ;;
-  "02") MES_COLETA="FEV" ;;
-  "03") MES_COLETA="MAR" ;;
-  "04") MES_COLETA="ABR" ;;
-  "05") MES_COLETA="MAI" ;;
-  "06") MES_COLETA="JUN" ;;
-  "07") MES_COLETA="JUL" ;;
-  "08") MES_COLETA="AGO" ;;
-  "09") MES_COLETA="SET" ;;
-  "10") MES_COLETA="OUT" ;;
-  "11") MES_COLETA="NOV" ;;
-  "12") MES_COLETA="DEZ" ;;
+  "01") MES_COLETA="1 - Janeiro" ;;
+  "02") MES_COLETA="2 - Fevereiro" ;;
+  "03") MES_COLETA="3 - Março" ;;
+  "04") MES_COLETA="4 - Abril" ;;
+  "05") MES_COLETA="5 - Maio" ;;
+  "06") MES_COLETA="6 - Junho" ;;
+  "07") MES_COLETA="7 - Julho" ;;
+  "08") MES_COLETA="8 - Agosto" ;;
+  "09") MES_COLETA="9 - Setembro" ;;
+  "10") MES_COLETA="10 - Outubro" ;;
+  "11") MES_COLETA="11 - Novembro" ;;
+  "12") MES_COLETA="12 - Dezembro" ;;
   *) echo "Mês inválido: $MES_COLETA"; exit 1 ;;
 esac
 
