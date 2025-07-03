@@ -2,7 +2,7 @@
 # COLETORES
 ---
 
-INÍCIO DA COLETA ÀS '14-Jun-2025 00:13:42'
+INÍCIO DA COLETA ÀS '29-Jun-2025 12:37:03'
 
 Diretório: ENTRADA
 /mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/src/ETL
@@ -39,7 +39,7 @@ Parâmetros do coletor:
 Coleta de CONTRATAÇÕES em execução...
 
 There is a screen on:
-	790.coletor-contratacoes-2025-05-01-ate-2025-05-15	(06/14/25 00:13:42)	(Detached)
+	3985.coletor-contratacoes-2025-05-01-ate-2025-05-15	(06/29/25 12:37:03)	(Detached)
 1 Socket in /run/screen/S-rdurl0.
 
 
@@ -69,7 +69,7 @@ Parâmetro do coletor:
 Coleta de ITENS em execução...
 
 There is a screen on:
-	2115.coletor-itens-2025-05-01-ate-2025-05-15	(06/14/25 01:02:04)	(Detached)
+	4833.coletor-itens-2025-05-01-ate-2025-05-15	(06/29/25 13:24:06)	(Detached)
 1 Socket in /run/screen/S-rdurl0.
 
 Aguardando a screen 'coletor-itens-2025-05-01-ate-2025-05-15' encerrar...
@@ -99,7 +99,7 @@ CATALOGO='data/catmat/catmat.csv'
 Filtragem e classificação de MEDICAMENTOS em execução...
 
 There is a screen on:
-	13134.classificador-2025-05-01-ate-2025-05-15	(06/14/25 11:54:22)	(Detached)
+	15608.classificador-2025-05-01-ate-2025-05-15	(06/29/25 23:43:04)	(Detached)
 1 Socket in /run/screen/S-rdurl0.
 
 
@@ -128,9 +128,10 @@ Parâmetro do coletor:
 
 Coleta de RESULTADOS em execução...
 
-There is a screen on:
-	13711.coletor-resultados-2025-05-01-ate-2025-05-15	(06/14/25 13:26:58)	(Detached)
-1 Socket in /run/screen/S-rdurl0.
+There are screens on:
+	16912.coletor-resultados-2025-05-01-ate-2025-05-15	(06/30/25 02:32:35)	(Detached)
+	15608.classificador-2025-05-01-ate-2025-05-15	(06/29/25 23:57:59)	(Detached)
+2 Sockets in /run/screen/S-rdurl0.
 coletando resultados das contratações de medicamentos
 
 Aguardando a screen 'coletor-resultados-2025-05-01-ate-2025-05-15' encerrar...
@@ -139,12 +140,10 @@ Screen coletor-resultados-2025-05-01-ate-2025-05-15 encerrada
 Coleta de RESULTADOS de MEDICAMENTOS concluída!
 
 
-COLETA ENCERRADA ÀS '14-Jun-2025 14:53:55'!
+COLETA ENCERRADA ÀS '30-Jun-2025 03:51:56'!
 ---
 ## PACOTE DE DADOS
 
-Diretório 'coleta/data-package/2025/MAI/QUINZENA-1/DATA' criado.
-Diretório 'coleta/data-package/2025/MAI/QUINZENA-1/LOG' criado.
 
 Arquivos csv copiados para coleta/data-package/2025/MAI/QUINZENA-1/DATA
 
@@ -152,23 +151,24 @@ Estrutura do pacote de dados:
 
 [ 512]  coleta/data-package/2025/MAI/QUINZENA-1
 ├── [ 512]  DATA
-│   ├── [ 218]  contratacoes-erros.csv
+│   ├── [ 808]  contratacoes-erros.csv
 │   ├── [ 205]  contratacoes-monitoramento.csv
-│   ├── [ 78M]  contratacoes.csv
+│   ├── [ 75M]  contratacoes.csv
 │   ├── [   0]  itens-erros.csv
-│   ├── [571K]  itens-medicamentos-resultados-erros.csv
+│   ├── [492K]  itens-medicamentos-resultados-erros.csv
 │   ├── [ 772]  itens-medicamentos-resultados-monitoramento.csv
 │   ├── [1.6M]  itens-medicamentos-resultados.csv
-│   ├── [3.9M]  itens-medicamentos.csv
-│   ├── [5.3K]  itens-monitoramento.csv
-│   └── [105M]  itens.csv
+│   ├── [3.6M]  itens-medicamentos.csv
+│   ├── [5.2K]  itens-monitoramento.csv
+│   └── [100M]  itens.csv
 └── [ 512]  LOG
     ├── [2.6K]  run-classificador-2025-05-01-ate-2025-05-15.log
-    ├── [ 31K]  run-coletor-contratacoes-2025-05-01-ate-2025-05-15.log
-    ├── [1.6M]  run-coletor-itens-2025-05-01-ate-2025-05-15.log
-    └── [367K]  run-coletor-resultados-2025-05-01-ate-2025-05-15.log
+    ├── [ 30K]  run-coletor-contratacoes-2025-05-01-ate-2025-05-15.log
+    ├── [1.5M]  run-coletor-itens-2025-05-01-ate-2025-05-15.log
+    ├── [327K]  run-coletor-resultados-2025-05-01-ate-2025-05-15.log
+    └── [5.1K]  run-coletores-2025-05-QUINZENA-1.log
 
-3 directories, 14 files
+3 directories, 15 files
 
 Arquivos de log copiados para coleta/data-package/2025/MAI/QUINZENA-1/LOG
 
