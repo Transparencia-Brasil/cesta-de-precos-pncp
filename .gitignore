@@ -67,9 +67,8 @@ coleta/resultados/monitoramento.csv
 tasks/unifica-dados/output/itens-resultados-medicamentos.csv
 tasks/unifica-dados/output/itens-resultados.csv.old
 
-coleta/**/*.csv
-src/ETL/run-coletores.old.sh
 **/_recoletas
+coleta/**/*.csv
 .env
 tasks/verifica-campos-com-catalogo-e-ncm/input/itens-filtrados.rds
 tasks/verifica-campos-com-catalogo-e-ncm/input/usuarios.rds
