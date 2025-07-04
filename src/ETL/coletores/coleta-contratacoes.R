@@ -168,58 +168,91 @@ endpoints <- paginas_por_modalidade %>% pull(endpoint)
 # TEMPLATE ----------------------------------------------------------------
 # Mapear todas as colunas que serão coletadas e garantir balanceamento do dataset
 
-# referência: https://pncp.gov.br/api/consulta/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/consultarContratacaoPorDataDePublicacao
+# referência: https://pncp.gov.br/api/consulta/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/consultarContratacaoPorDataUltimaAtualizacao
 template_contratacoes <- tibble(
-  # ids
-  data.numeroControlePNCP = character(),
-  data.anoCompra = character(),
-  data.sequencialCompra = character(),
-  # modalidade
-  data.modalidadeId = character(),
-  data.modalidadeNome = character(),
-  # modoDisputa
-  data.modoDisputaId = character(),
-  data.modoDisputaNome = character(),
-  # instrumentoConvocatorio
-  data.tipoInstrumentoConvocatorioCodigo = character(),
-  data.tipoInstrumentoConvocatorioNome = character(),
-  # dataAbertura e dataEncerramento
-  data.dataAberturaProposta = character(),
-  data.dataEncerramentoProposta = character(),
-  # valorEstimado e valorHomologado
-  data.valorTotalEstimado = character(),
-  data.valorTotalHomologado = character(),
-  # objetoCompra
-  data.objetoCompra = character(),
   # srp
   data.srp = character(),
-  # ampareLegal
-  data.amparoLegal.codigo = character(),
-  data.amparoLegal.nome = character(),
   # orgaoEntidade
   data.orgaoEntidade.cnpj = character(),
   data.orgaoEntidade.razaoSocial = character(),
-  data.orgaoEntidade.esferaId = character(),
   data.orgaoEntidade.poderId = character(),
+  data.orgaoEntidade.esferaId = character(),
+  # ids
+  data.anoCompra = character(),
+  data.sequencialCompra = character(),
+  # datas
+  data.dataInclusao = character(), #
+  data.dataPublicacaoPncp = character(), #
+  data.dataAtualizacao = character(), #
+  # ids
+  data.numeroCompra = character(), #
   # unidadeOrgao
+  data.unidadeOrgao.ufNome = character(),
+  data.unidadeOrgao.codigoIbge = character(),
   data.unidadeOrgao.codigoUnidade = character(),
   data.unidadeOrgao.nomeUnidade = character(),
-  data.unidadeOrgao.codigoIbge = character(),
-  data.unidadeOrgao.municipioNome = character(),
   data.unidadeOrgao.ufSigla = character(),
-  data.unidadeOrgao.ufNome = character(),
+  data.unidadeOrgao.municipioNome = character(),
+  # ampareLegal
+  data.amparoLegal.descricao = character(),
+  data.amparoLegal.nome = character(),
+  data.amparoLegal.codigo = character(),
+  # dataAbertura e dataEncerramento
+  data.dataAberturaProposta = character(),
+  data.dataEncerramentoProposta = character(),
+  # informação complementar
+  data.informacaoComplementar = character(),
+  # processo
+  data.processo = character(),
+  # objetoCompra
+  data.objetoCompra = character(),
+  # link contratacao no sistema original
+  data.linkSistemaOrigem = character(),
+  # jsutificativa presencial
+  data.justificativaPresencial = character(),
   # unidadeSubRogada
+  data.unidadeSubRogada.ufNome = character(),
+  data.unidadeSubRogada.codigoIbge = character(),
   data.unidadeSubRogada.codigoUnidade = character(),
   data.unidadeSubRogada.nomeUnidade = character(),
-  data.unidadeSubRogada.codigoIbge = character(),
-  data.unidadeSubRogada.municipioNome = character(),
   data.unidadeSubRogada.ufSigla = character(),
-  data.unidadeSubRogada.ufNome = character(),
+  data.unidadeSubRogada.municipioNome = character(),
   # orgaoSubRogado
   data.orgaoSubRogado.cnpj = character(),
   data.orgaoSubRogado.razaoSocial = character(),
-  data.orgaoSubRogado.esferaId = character(),
   data.orgaoSubRogado.poderId = character(),
+  data.orgaoSubRogado.esferaId = character(),
+  # valorEstimado e valorHomologado
+  data.valorTotalHomologado = character(),
+  # id PNCP
+  data.numeroControlePNCP = character(),
+  # modoDisputa
+  data.modoDisputaId = character(),
+  # data atualização global
+  data.dataAtualizacaoGlobal = character(),
+  data.linkProcessoEletronico = character(),
+  # modalidade
+  data.modalidadeId = character(),
+  # valorEstimado e valorHomologado
+  data.valorTotalEstimado = character(),
+  # modalidade
+  data.modalidadeNome = character(),
+  # modoDisputa
+  data.modoDisputaNome = character(),
+
+  # instrumentoConvocatorio
+  data.tipoInstrumentoConvocatorioCodigo = character(),
+  data.tipoInstrumentoConvocatorioNome = character(),
+  # fontes orçamentárias
+  data.fontesOrcamentarias.codigo = character(),
+  data.fontesOrcamentarias.nome = character(),
+  data.fontesOrcamentarias.descricao = character(),
+  data.fontesOrcamentarias.dataInclusao = character(),
+  # situação da compra
+  data.situacaoCompraId = character(),
+  data.situacaoCompraNome = character(),
+  # nome do sistema usuário
+  data.usuarioNome = character()
 )
 
 

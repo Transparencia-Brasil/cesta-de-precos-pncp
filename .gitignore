@@ -71,3 +71,10 @@ coleta/**/*.csv
 src/ETL/run-coletores.old.sh
 **/_recoletas
 .env
+tasks/verifica-campos-com-catalogo-e-ncm/input/itens-filtrados.rds
+tasks/verifica-campos-com-catalogo-e-ncm/input/usuarios.rds
+
+tasks/mapeamento-ocds/output/**/json/*
+tasks/mapeamento-ocds/output/**/zip/*
+tasks/mapeamento-ocds-/output/**/json/*
+tasks/mapeamento-ocds-/output/**/zip/*
