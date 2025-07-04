@@ -1,0 +1,16 @@
+
+PATH_OUTPUT_DIR: C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/coleta/contratacoes/TESTE
+
+PRIMEIRO_DIA: 2025-01-01
+
+ULTIMO_DIA: 2025-01-02
+
+Modalidade 1 coletada [1] "Can't retrieve empty body."
+Modalidade 2 coletada [1] "Can't retrieve empty body."
+Modalidade 3 coletada Modalidade 4 coletada Modalidade 5 coletada Modalidade 6 coletada Modalidade 7 coletada Modalidade 8 coletada Modalidade 9 coletada [1] "Can't retrieve empty body."
+Modalidade 10 coletada Modalidade 11 coletada Modalidade 12 coletada Modalidade 13 coletada [1] "Can't retrieve empty body."
+Modalidade 14 coletada Endpoint 1 coletado Endpoint 2 coletado Endpoint 3 coletado Endpoint 4 coletado Endpoint 5 coletado Endpoint 6 coletado Endpoint 7 coletado Endpoint 8 coletado Endpoint 9 coletado Endpoint 10 coletado Endpoint 11 coletado Endpoint 12 coletado Endpoint 13 coletado Endpoint 14 coletado Endpoint 15 coletado Endpoint 16 coletado Endpoint 17 coletado Endpoint 18 coletado Endpoint 19 coletado Endpoint 20 coletado Endpoint 21 coletado Endpoint 22 coletado Endpoint 23 coletado Endpoint 24 coletado Endpoint 25 coletado Endpoint 26 coletado Endpoint 27 coletado Endpoint 28 coletado Endpoint 29 coletado Endpoint 30 coletado Endpoint 31 coletado Endpoint 32 coletado Endpoint 33 coletado Endpoint 34 coletado Endpoint 35 coletado Endpoint 36 coletado Endpoint 37 coletado Endpoint 38 coletado Endpoint 39 coletado Endpoint 40 coletado Endpoint 41 coletado Endpoint 42 coletado Endpoint 43 coletado Endpoint 44 coletado Endpoint 45 coletado Endpoint 46 coletado Endpoint 47 coletado Endpoint 48 coletado Endpoint 49 coletado Endpoint 50 coletado Salvo o lote até o endpoint número: 51 
+Lotes restantes: 0 
+Endpoint 51 coletado Mensagen de aviso:
+In fwrite(df_erros, PATH_ERROS, sep = ",", row.names = FALSE, col.names = !file.exists(PATH_ERROS),  :
+  Entrada não tem colunas; criando um arquivo vazio em 'C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/coleta/contratacoes/TESTE/temp/erros.csv' e saindo.

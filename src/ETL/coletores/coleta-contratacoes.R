@@ -25,16 +25,30 @@ source(here("src/ETL/coletores/utils.R"))
 
 # PARAMETROS --------------------------------------------------------------
 
+# captura os arqgumentos
 args <- commandArgs(trailingOnly = TRUE)
 
-# Verifica se o diretório de saída foi passado como argumento, caso contrário, define um padrão
-PATH_OUTPUT_DIR <- ifelse(length(args) >= 1, args[1], here("coleta", "contratacoes"))
+# Processa os argumentos
+for (arg in args) {
+  if (grepl("^PATH_OUTPUT_DIR=", arg)) {
+    PATH_OUTPUT_DIR <- here(sub("^PATH_OUTPUT_DIR=", "", arg))
+  } else if (grepl("^PRIMEIRO_DIA=", arg)) {
+    PRIMEIRO_DIA <- as_date(sub("^PRIMEIRO_DIA=", "", arg))
+  } else if (grepl("^ULTIMO_DIA=", arg)) {
+    ULTIMO_DIA <- as_date(sub("^ULTIMO_DIA=", "", arg))
+  }
+}
 
-# Obtém o primeiro dia do mês anterior
-PRIMEIRO_DIA <- floor_date(today() - months(1), "month")
+# Exemplo de mensagem para verificar os valores
+message("\nPATH_OUTPUT_DIR: ", PATH_OUTPUT_DIR)
+message("\nPRIMEIRO_DIA: ", PRIMEIRO_DIA)
+message("\nULTIMO_DIA: ", ULTIMO_DIA, "\n")
 
-# Obtém o último dia do mês anterior
-ULTIMO_DIA <- ceiling_date(PRIMEIRO_DIA, "month") - days(1)
+stopifnot({
+  dir.exists(PATH_OUTPUT_DIR)
+  is.Date(PRIMEIRO_DIA)
+  is.Date(ULTIMO_DIA)
+})
 
 # Os códigos das modalidades de contratações no PNCP vão de 1 a 14
 # Ref: https://pncp.gov.br/app/entidades-dominio
@@ -154,58 +168,91 @@ endpoints <- paginas_por_modalidade %>% pull(endpoint)
 # TEMPLATE ----------------------------------------------------------------
 # Mapear todas as colunas que serão coletadas e garantir balanceamento do dataset
 
-# referência: https://pncp.gov.br/api/consulta/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/consultarContratacaoPorDataDePublicacao
+# referência: https://pncp.gov.br/api/consulta/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/consultarContratacaoPorDataUltimaAtualizacao
 template_contratacoes <- tibble(
-  # ids
-  data.numeroControlePNCP = character(),
-  data.anoCompra = character(),
-  data.sequencialCompra = character(),
-  # modalidade
-  data.modalidadeId = character(),
-  data.modalidadeNome = character(),
-  # modoDisputa
-  data.modoDisputaId = character(),
-  data.modoDisputaNome = character(),
-  # instrumentoConvocatorio
-  data.tipoInstrumentoConvocatorioCodigo = character(),
-  data.tipoInstrumentoConvocatorioNome = character(),
-  # dataAbertura e dataEncerramento
-  data.dataAberturaProposta = character(),
-  data.dataEncerramentoProposta = character(),
-  # valorEstimado e valorHomologado
-  data.valorTotalEstimado = character(),
-  data.valorTotalHomologado = character(),
-  # objetoCompra
-  data.objetoCompra = character(),
   # srp
   data.srp = character(),
-  # ampareLegal
-  data.amparoLegal.codigo = character(),
-  data.amparoLegal.nome = character(),
   # orgaoEntidade
   data.orgaoEntidade.cnpj = character(),
   data.orgaoEntidade.razaoSocial = character(),
-  data.orgaoEntidade.esferaId = character(),
   data.orgaoEntidade.poderId = character(),
+  data.orgaoEntidade.esferaId = character(),
+  # ids
+  data.anoCompra = character(),
+  data.sequencialCompra = character(),
+  # datas
+  data.dataInclusao = character(), #
+  data.dataPublicacaoPncp = character(), #
+  data.dataAtualizacao = character(), #
+  # ids
+  data.numeroCompra = character(), #
   # unidadeOrgao
+  data.unidadeOrgao.ufNome = character(),
+  data.unidadeOrgao.codigoIbge = character(),
   data.unidadeOrgao.codigoUnidade = character(),
   data.unidadeOrgao.nomeUnidade = character(),
-  data.unidadeOrgao.codigoIbge = character(),
-  data.unidadeOrgao.municipioNome = character(),
   data.unidadeOrgao.ufSigla = character(),
-  data.unidadeOrgao.ufNome = character(),
+  data.unidadeOrgao.municipioNome = character(),
+  # ampareLegal
+  data.amparoLegal.descricao = character(),
+  data.amparoLegal.nome = character(),
+  data.amparoLegal.codigo = character(),
+  # dataAbertura e dataEncerramento
+  data.dataAberturaProposta = character(),
+  data.dataEncerramentoProposta = character(),
+  # informação complementar
+  data.informacaoComplementar = character(),
+  # processo
+  data.processo = character(),
+  # objetoCompra
+  data.objetoCompra = character(),
+  # link contratacao no sistema original
+  data.linkSistemaOrigem = character(),
+  # jsutificativa presencial
+  data.justificativaPresencial = character(),
   # unidadeSubRogada
+  data.unidadeSubRogada.ufNome = character(),
+  data.unidadeSubRogada.codigoIbge = character(),
   data.unidadeSubRogada.codigoUnidade = character(),
   data.unidadeSubRogada.nomeUnidade = character(),
-  data.unidadeSubRogada.codigoIbge = character(),
-  data.unidadeSubRogada.municipioNome = character(),
   data.unidadeSubRogada.ufSigla = character(),
-  data.unidadeSubRogada.ufNome = character(),
+  data.unidadeSubRogada.municipioNome = character(),
   # orgaoSubRogado
   data.orgaoSubRogado.cnpj = character(),
   data.orgaoSubRogado.razaoSocial = character(),
-  data.orgaoSubRogado.esferaId = character(),
   data.orgaoSubRogado.poderId = character(),
+  data.orgaoSubRogado.esferaId = character(),
+  # valorEstimado e valorHomologado
+  data.valorTotalHomologado = character(),
+  # id PNCP
+  data.numeroControlePNCP = character(),
+  # modoDisputa
+  data.modoDisputaId = character(),
+  # data atualização global
+  data.dataAtualizacaoGlobal = character(),
+  data.linkProcessoEletronico = character(),
+  # modalidade
+  data.modalidadeId = character(),
+  # valorEstimado e valorHomologado
+  data.valorTotalEstimado = character(),
+  # modalidade
+  data.modalidadeNome = character(),
+  # modoDisputa
+  data.modoDisputaNome = character(),
+
+  # instrumentoConvocatorio
+  data.tipoInstrumentoConvocatorioCodigo = character(),
+  data.tipoInstrumentoConvocatorioNome = character(),
+  # fontes orçamentárias
+  data.fontesOrcamentarias.codigo = character(),
+  data.fontesOrcamentarias.nome = character(),
+  data.fontesOrcamentarias.descricao = character(),
+  data.fontesOrcamentarias.dataInclusao = character(),
+  # situação da compra
+  data.situacaoCompraId = character(),
+  data.situacaoCompraNome = character(),
+  # nome do sistema usuário
+  data.usuarioNome = character()
 )
 
 
