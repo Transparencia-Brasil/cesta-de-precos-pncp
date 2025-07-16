@@ -52,7 +52,7 @@ def get_filepaths(base_dir, ano_coleta, mes_coleta):
     }
 
     # gera mÊs e ano dinamicamente, conforme parâmetros recebidos
-    ano_dir = f"{str(ano_coleta)}_"
+    ano_dir = f"{str(ano_coleta)}"
     mes_dir = f"{mes_coleta} - {MESES_PTBR[mes_coleta]}"
     coleta_dir = os.path.join(base_dir, "coleta", "data-package", ano_dir, mes_dir)
 

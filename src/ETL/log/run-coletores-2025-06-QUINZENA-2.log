@@ -1,0 +1,107 @@
+---
+# COLETORES
+---
+
+INÍCIO DA COLETA ÀS '05-Jul-2025 10:38:04'
+
+Diretório: ENTRADA
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/src/ETL
+
+
+Diretório:
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp
+
+PARÂMETROS: 
+ - PRIMEIRO_DIA='2025-06-16' - é a data de início da coleta
+ - ULTIMO_DIA='2025-06-30' - é a data final da coleta
+ - ALIAS_COLETA='2025-06/QUINZENA-2' - é um alias para identificar a coleta e apontar um destino no diretório de /coletas
+
+---
+## CONTRATAÇÃO
+
+Script:
+ - 'src/ETL/coletores/coleta-contratacoes.R'
+
+Diretório de saída:
+ - 'coleta/contratacoes/2025-06/QUINZENA-2'
+
+Screen criada para coletar contratações:
+ - 'coletor-contratacoes-2025-06-16-ate-2025-06-30'
+
+Saída sendo registrada em:
+ - 'coleta/contratacoes/2025-06/QUINZENA-2/run-coletor-contratacoes-2025-06-16-ate-2025-06-30.log'.
+
+Parâmetros do coletor: 
+ - PATH_OUTPUT_DIR="coleta/contratacoes/2025-06/QUINZENA-2"
+ - PRIMEIRO_DIA="2025-06-16"
+ - ULTIMO_DIA="2025-06-30"
+
+Coleta de CONTRATAÇÕES em execução...
+
+There is a screen on:
+	20074.coletor-contratacoes-2025-06-16-ate-2025-06-30	(07/05/25 10:38:04)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+
+Aguardando a screen 'coletor-contratacoes-2025-06-16-ate-2025-06-30' encerrar...
+Screen coletor-contratacoes-2025-06-16-ate-2025-06-30 encerrada
+
+Coleta de CONTRATAÇÕES concluída!
+
+---
+## ITENS
+
+Script:
+ - 'src/ETL/coletores/coleta-itens.R'
+
+Diretório de saída:
+ - 'coleta/itens/2025-06/QUINZENA-2'
+
+Screen criada para coletar itens:
+ - 'coletor-itens-2025-06-16-ate-2025-06-30'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2025-06/QUINZENA-2/run-coletor-itens-2025-06-16-ate-2025-06-30.log'.
+
+Parâmetro do coletor:
+ - CONTRATACOES='coleta/contratacoes/2025-06/QUINZENA-2/dados.csv'
+
+Coleta de ITENS em execução...
+
+There is a screen on:
+	21100.coletor-itens-2025-06-16-ate-2025-06-30	(07/05/25 11:36:42)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+Aguardando a screen 'coletor-itens-2025-06-16-ate-2025-06-30' encerrar...
+Screen coletor-itens-2025-06-16-ate-2025-06-30 encerrada
+
+Coleta de ITENS concluída!
+
+---
+## CLASSIFICADOR - FILTRA MEDICAMENTOS
+
+Script:
+ - 'src/ETL/classificador/filtra-medicamentos.py'
+
+Diretório de saída:
+ - 'coleta/itens/2025-06/QUINZENA-2'
+
+Screen criada para coletar contratações:
+ - 'classificador-2025-06-16-ate-2025-06-30'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2025-06/QUINZENA-2/run-classificador-2025-06-16-ate-2025-06-30.log'.
+
+Parâmetros do classificador:
+ITENS='coleta/itens/2025-06/QUINZENA-2/dados.csv'
+CATALOGO='data/catmat/catmat.csv'
+
+Filtragem e classificação de MEDICAMENTOS em execução...
+
+There is a screen on:
+	34635.classificador-2025-06-16-ate-2025-06-30	(07/06/25 01:04:27)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+
+Aguardando o arquivo 'coleta/itens/2025-06/QUINZENA-2/medicamentos.csv' ser criado...
+
