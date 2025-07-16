@@ -1,15 +1,15 @@
 #' Este script carrega os dados coletados do PNCP no banco do Medicamentos Transparentes.
-#' 
+#'
 #' Há 3 parâmetros obrigatórios:
 #' 1 - caminho para um arquivo .csv contendo contratações obtidas da API de consulta
 #' 2 - caminho para um arquivo .csv contendo itens obtidos da API de integração
 #' 3 - caminho para um arquivo .csv contendo resultados de itens obtidos da API de integração
-#' 
+#'
 #' O script processa os arquivos e os insere nas tabelas do banco.
-#' 
+#'
 #' API de consulta: https://pncp.gov.br/api/consulta/swagger-ui/index.html#/
 #' API de integração: https://pncp.gov.br/api/pncp/swagger-ui/index.html#/
-#' 
+#'
 
 suppressPackageStartupMessages(library(readr))
 suppressPackageStartupMessages(library(dplyr))
@@ -37,9 +37,15 @@ for (arg in args) {
 }
 
 # Lê os argumentos
-CAMINHO_CONTRATACOES <- args[1] 
-CAMINHO_MEDICAMENTOS <- args[2] 
+CAMINHO_CONTRATACOES <- args[1]
+CAMINHO_MEDICAMENTOS <- args[2]
 CAMINHO_RESULTADOS <- args[3]
+
+# path_base <- here("coleta/data-package/2025/6 - Junho/QUINZENA-2/DATA")
+
+# CAMINHO_CONTRATACOES <- here(path_base, "contratacoes.csv")
+# CAMINHO_MEDICAMENTOS <- here(path_base, "itens-medicamentos.csv")
+# CAMINHO_RESULTADOS <- here(path_base, "itens-medicamentos-resultados.csv")
 
 # Lê os arquivos de dados
 contratacoes <- read_csv(CAMINHO_CONTRATACOES, show_col_types = FALSE)
@@ -96,19 +102,19 @@ contratacoes <- contratacoes %>%
 {
   # Todos os contratantes coletados
   tb_contratante <- contratacoes %>% select(all_of(COLUNAS_CONTRATANTE))
-  
+
   # Todos os contratantes subrogados coletados
   tb_contratante_subrogado <- contratacoes %>%
     select(all_of(COLUNAS_CONTRATANTE_SUBROGADO)) %>%
     filter(!is.na(data.orgaoSubRogado.cnpj) &
              !is.na(data.unidadeSubRogada.codigoUnidade))
-  
+
   # Deixa os dataframes com os mesmos nomes de colunas (para uní-los)
   names(tb_contratante_subrogado) <- names(tb_contratante)
-  
+
   # Certifica-se que os dataframes possuem colunas de mesmo tipo (para uní-los)
   tb_contratante_subrogado <- map2_dfr(tb_contratante_subrogado, tb_contratante, ~ as(.x, class(.y)))
-  
+
   # Une os dataframes em uma única tabela de contratantes
   tb_contratante <- bind_rows(tb_contratante, tb_contratante_subrogado) %>%
     distinct(data.orgaoEntidade.cnpj,
@@ -145,16 +151,16 @@ contratacoes <- contratacoes %>%
       by = join_by(endpointContratacao == endpoint),
       suffix = c("", "Contratacao")
     )
-  
+
   # Seleciona apenas as colunas que serão inseridas no banco de dados
   tb_item_homologado <- tb_item_homologado %>% select(any_of(COLUNAS_ITEM_HOMOLOGADO))
-  
+
   # Se houver colunas faltantes, elas são preenchidas como NA
   colunas_faltantes <- setdiff(COLUNAS_ITEM_HOMOLOGADO, names(tb_item_homologado))
   for (col in colunas_faltantes) {
     tb_item_homologado[col] <- NA
   }
-  
+
   # Organiza as colunas na ordem correta de inserção
   tb_item_homologado <- tb_item_homologado[COLUNAS_ITEM_HOMOLOGADO]
 }
@@ -169,16 +175,16 @@ contratacoes <- contratacoes %>%
       by = join_by(endpointContratacao == endpoint),
       suffix = c("", "Contratacao")
     )
-  
+
   # Seleciona apenas as colunas que serão inseridas no banco de dados
   tb_item_licitado <- tb_item_licitado %>% select(any_of(COLUNAS_ITEM_LICITADO))
-  
+
   # Se houver colunas faltantes, elas são preenchidas como NA
   colunas_faltantes <- setdiff(COLUNAS_ITEM_LICITADO, names(tb_item_licitado))
   for (col in colunas_faltantes) {
     tb_item_licitado[col] <- NA
   }
-  
+
   # Organiza as colunas na ordem correta de inserção
   tb_item_licitado <- tb_item_licitado[COLUNAS_ITEM_LICITADO]
 }
