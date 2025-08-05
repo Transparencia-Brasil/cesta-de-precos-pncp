@@ -229,19 +229,25 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
     }
 
     for _, item in itens_rel.iterrows():
+        unit = {
+            "value": {
+                "amount": item['valorUnitarioEstimado'],
+                "currency": "BRL"
+            }
+        }
+
+        # Só adiciona "name" se unidadeMedida não for nula
+        if pd.notna(item['unidadeMedida']):
+            unit["name"] = item['unidadeMedida']
+
         i = {
             "id": str(item['numeroItem']),
             "description": item['descricao'],
             "quantity": int(item['quantidade']),
-            "unit": {
-                "name": item['unidadeMedida'],
-                "value": {
-                    "amount": item['valorUnitarioEstimado'],
-                    "currency": "BRL"
-                }
-            },
+            "unit": unit,
             "relatedLot": 'lot-' + str(item['numeroItem'])
         }
+
 
         items.append(i)
         items_by_id[str(item['numeroItem'])] = i  # A fim de facilitar a rastreabilidade em awards
