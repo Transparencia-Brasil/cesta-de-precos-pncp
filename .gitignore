@@ -77,3 +77,5 @@ tasks/mapeamento-ocds/output/**/json/*
 tasks/mapeamento-ocds/output/**/zip/*
 tasks/mapeamento-ocds-/output/**/json/*
 tasks/mapeamento-ocds-/output/**/zip/*
+tasks/experimento-LLM/inputs/demais-items.csv
+tasks/experimento-LLM/inputs/medicamentos-baixa-similaridade.csv
