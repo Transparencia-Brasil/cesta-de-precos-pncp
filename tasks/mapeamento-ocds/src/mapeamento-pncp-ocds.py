@@ -9,6 +9,7 @@ import locale
 import os
 import sys
 import zipfile
+from collections import namedtuple
 from datetime import datetime, timezone
 
 import pandas as pd
@@ -198,38 +199,73 @@ def remove_e_separa_contratacoes_por_data_publicacao(df):
 contratacoes = remove_e_separa_contratacoes_por_data_publicacao(contratacoes)
 
 
-# : FILTRO DE ITENS POR CONTRATAÇÃO --------------------------------------------
+# : CRIA COLUNA NÚMERO CONTROLE PNCP -------------------------------------------
 
-# Para cada linha de contratacoes, filtra os itens correspondentes
-itens_filtrados_por_contratacao = []
-contratacoes_filtradas = []
+def endpoint_para_numero_controle(endpoint):
+    """
+    Converte um endpoint da API PNCP em um número de controle PNCP.
 
-# Filtro para realizar testes
-# contratacoes = contratacoes[contratacoes['data.unidadeOrgao.ufNome'].isin(['Santa Catarina'])]
+    O número de controle da contratação (id contratação PNCP) segue a máscara:
+    99999999999999-1-999999/9999
 
-print("FILTRANDO ITENS POR CONTRATAÇÃO...")
+    Cada contratação receberá um número de controle composto por:
+    • CNPJ do Órgão/Entidade da contratação (14 dígitos)
+    • Dígito "1" - marcador que indica tratar-se de uma contratação
+    • Número sequencial da contratação no PNCP *
+    • Ano da contratação (4 dígitos)
 
-# A lista de itens não possui o campo 'numeroControlePNCP', então precisamos filtrar os itens
-# com base nos campos cnpj, ano e sequencial da contratação, presente no endpoint do item.
-for idx, row in tqdm(contratacoes.iterrows(), total=len(contratacoes)):
-    itens_match = itens[
-        itens['endpoint'].apply(lambda ep: match_endpoint(ep, row['cnpj'], row['ano'], row['sequencial']))
-    ].copy()
+    * O número PNCP será gerado sequencialmente com 6 dígitos e reiniciado a cada mudança de ano.
 
-    if not itens_match.empty:
-        # Adiciona número de controle (pode ajudar na rastreabilidade depois)
-        itens_match['numeroControlePNCP'] = row['data.numeroControlePNCP']
+    Fonte: Página 30 do Manual de Integração do PNCP
+    Link: https://www.gov.br/pncp/pt-br/central-de-conteudo/manuais/manual-de-integracao-pncp
+    """
+    try:
+        partes = endpoint.strip("/").split("/")
+        cnpj = partes[-5]
+        ano = partes[-3]
+        sequencial = partes[-2]
 
-        itens_filtrados_por_contratacao.append(itens_match)
+        sequencial_formatado = f"{int(sequencial):06d}"  # zero à esquerda
+        numero_controle = f"{cnpj}-1-{sequencial_formatado}/{ano}"
+        return numero_controle
 
-        # Filtra a lista de contratações para manter apenas as que têm itens correspondentes
-        # Assim, criamos o json apenas para as contratações que relativas aos itens filtrados (medicamentos)
-        contratacoes_filtradas.append(row)
+    except Exception as e:
+        print(f"Erro ao converter endpoint: {e} ->> {endpoint}")
+        return None
 
-contratacoes_filtradas_df = pd.DataFrame(contratacoes_filtradas)
+itens['data.numeroControlePNCP'] = itens['endpoint'].apply(endpoint_para_numero_controle)
 
-# Junta todos os itens encontrados
-itens_filtrados = pd.concat(itens_filtrados_por_contratacao, ignore_index=True)
+
+# : FILTRA ITENS ---------------------------------------------------------------
+
+def filtrar_itens_e_contratacoes_validas(itens, contratacoes):
+    """
+    Filtra DataFrames mantendo apenas registros com numeroControlePNCP em comum.
+
+    Parâmetros:
+       itens (DataFrame): DataFrame com dados de itens
+       contratacoes (DataFrame): DataFrame com dados de contratações
+
+    Retorna:
+        tuple: (itens_validos, contratacoes_validas)
+            - itens_validos (pd.DataFrame): Itens cujo 'data.numeroControlePNCP' existe em contratações.
+            - contratacoes_validas (pd.DataFrame): Contratações cujo 'data.numeroControlePNCP' existe em itens.
+    """
+
+    if 'data.numeroControlePNCP' not in itens.columns or 'data.numeroControlePNCP' not in contratacoes.columns:
+        raise ValueError("Ambos os DataFrames devem conter a coluna 'data.numeroControlePNCP'")
+
+    # Números de controle presentes em ambos os DataFrames
+    numeros_controle_comuns = set(itens['data.numeroControlePNCP'].dropna()) & set(contratacoes['data.numeroControlePNCP'].dropna())
+
+    # Filtra os itens e contratações para manter apenas os registros com correspondência
+    itens_validos = itens[itens['data.numeroControlePNCP'].isin(numeros_controle_comuns)].copy()
+    contratacoes_validas = contratacoes[contratacoes['data.numeroControlePNCP'].isin(numeros_controle_comuns)].copy()
+
+    return itens_validos, contratacoes_validas
+
+# Chama a função e filtra itens e contratações:
+itens_filtrados, contratacoes_filtradas = filtrar_itens_e_contratacoes_validas(itens, contratacoes)
 
 
 # : CRIANDO ESTRUTURA OCDS -----------------------------------------------------
@@ -238,12 +274,12 @@ itens_filtrados = pd.concat(itens_filtrados_por_contratacao, ignore_index=True)
 releases = {}
 
 print("PROCESSANDO CONTRATAÇÕES...")
-for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_filtradas_df)):
+for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_filtradas)):
     # Cria ocid concatenando campos
     ocid = str(row['data.orgaoEntidade.cnpj']) + '_' + str(row['data.anoCompra']) + '_' + str(row['data.sequencialCompra'])
 
     # Itens relacionados - filtramos pelo número de controle do PNCP
-    itens_rel = itens_filtrados[itens_filtrados['numeroControlePNCP'] == row['data.numeroControlePNCP']]
+    itens_rel = itens_filtrados[itens_filtrados['data.numeroControlePNCP'] == row['data.numeroControlePNCP']]
     items = []
     items_by_id = {}
     lots = []
@@ -442,7 +478,8 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
             **({"statusDetails": res['motivoCancelamento']} if pd.notna(res['motivoCancelamento']) else {}),
             "quantity": int(res['quantidadeHomologada']),
             "unit": {
-                "name": items_by_id[str(res['numeroItem'])]['unit']['name'],
+                **({"name": items_by_id[str(res['numeroItem'])]['unit']['name']} if "name" in items_by_id[str(res['numeroItem'])]['unit'] else {}),
+
                 "value": {
                 "amount": res['valorUnitarioHomologado'],
                 "currency": "BRL"
@@ -483,42 +520,42 @@ for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_
 
     # "traduzindo" os IDs do PNCP
     poder_id = {
-    "E": "Executivo",
-    "L": "Legislativo",
-    "J": "Judiciário",
-    "N": "Não se aplica"
+        "E": "Executivo",
+        "L": "Legislativo",
+        "J": "Judiciário",
+        "N": "Não se aplica"
     }
 
     esfera_id = {
-    "F": "Federal",
-    "E": "Estadual",
-    "M": "Municipal",
-    "D": "Distrital",
-    "N": "Não se aplica"
+        "F": "Federal",
+        "E": "Estadual",
+        "M": "Municipal",
+        "D": "Distrital",
+        "N": "Não se aplica"
     }
 
     tipo_instrumento_convocatorio = {
-    "1": "open",  # Edital
-    "2": "limited",  # Aviso de Contratação Direta
-    "3": "direct",  # Ato que autoriza a contratação direta
-    "4": "selective", # Edital de Chamamento Público
+        "1": "open",  # Edital
+        "2": "limited",  # Aviso de Contratação Direta
+        "3": "direct",  # Ato que autoriza a contratação direta
+        "4": "selective", # Edital de Chamamento Público
     }
 
     modalidade_contratacao = {
-    "1": "electronicAuction",  # Leilão - Eletrônico
-    "2": None,  # Diálogo Competitivo
-    "3": None,  # Concurso
-    "4": "electronicSubmission",  # Concorrência - Eletrônica
-    "5": "written",  # Concorrência - Presencial
-    "6": "electronicSubmission",  # Pregão - Eletrônico
-    "7": "written",  # Pregão - Presencial
-    "8": None,  # Dispensa
-    "9": None,  # Inexigibilidade
-    "10": None,  # Manifestação de Interesse
-    "11": None,  # Pré-qualificação
-    "12": None,  # Credenciamento
-    "13": "written",  # Leilão - Presencial
-    "14": None,  # Inaplicabilidade da Licitação
+        "1": "electronicAuction",  # Leilão - Eletrônico
+        "2": None,  # Diálogo Competitivo
+        "3": None,  # Concurso
+        "4": "electronicSubmission",  # Concorrência - Eletrônica
+        "5": "written",  # Concorrência - Presencial
+        "6": "electronicSubmission",  # Pregão - Eletrônico
+        "7": "written",  # Pregão - Presencial
+        "8": None,  # Dispensa
+        "9": None,  # Inexigibilidade
+        "10": None,  # Manifestação de Interesse
+        "11": None,  # Pré-qualificação
+        "12": None,  # Credenciamento
+        "13": "written",  # Leilão - Presencial
+        "14": None,  # Inaplicabilidade da Licitação
     }
 
     # Montagem do release
