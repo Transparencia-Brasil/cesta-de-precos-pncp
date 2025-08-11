@@ -92,34 +92,38 @@ paths = get_filepaths(base_dir, ano_coleta, mes_coleta)
 
 # : CARREGA DADOS --------------------------------------------------------------
 
-# Contratações
-contratacoes_q1 = pd.read_csv(contratacoes_q1_path, low_memory=False)
-contratacoes_q2 = pd.read_csv(contratacoes_q2_path, low_memory=False)
-contratacoes = pd.concat([contratacoes_q1, contratacoes_q2], ignore_index=True)
+def carregar_e_concatenar(path1, path2):
+    return pd.concat([
+        pd.read_csv(path1, low_memory=False),
+        pd.read_csv(path2, low_memory=False)
+    ], ignore_index=True)
 
-# Itens
-itens_q1 = pd.read_csv(itens_q1_path, low_memory=False)
-itens_q2 = pd.read_csv(itens_q2_path, low_memory=False)
-itens = pd.concat([itens_q1, itens_q2], ignore_index=True)
+contratacoes = carregar_e_concatenar(paths.contratacoes_q1, paths.contratacoes_q2)
+itens = carregar_e_concatenar(paths.itens_q1, paths.itens_q2)
+resultados = carregar_e_concatenar(paths.resultados_q1, paths.resultados_q2)
 
-# Resultados
-resultados_q1 = pd.read_csv(resultados_q1_path, low_memory=False)
-resultados_q2 = pd.read_csv(resultados_q2_path, low_memory=False)
-resultados = pd.concat([resultados_q1, resultados_q2], ignore_index=True)
+
+# : REMOVE COLUNAS DESNECESSÁRIAS ----------------------------------------------
+
+# colunas de metadados da API
+colunas_desnecessaria = [
+    'totalRegistros',
+    'totalPaginas',
+    'numeroPagina',
+    'paginasRestantes',
+    'empty',
+    'endpoint'
+]
+
+# drop colunas de metadados da API
+contratacoes = contratacoes.drop(columns= colunas_desnecessaria, errors='ignore')
 
 
 # : REMOVE DUPLICATAS ----------------------------------------------------------
 
-# contratações
-contratacoes = contratacoes.drop(columns=['totalRegistros','totalPaginas','numeroPagina','paginasRestantes','empty', 'endpoint'], errors='ignore')
 contratacoes = contratacoes.drop_duplicates()
-
-# itens
 itens = itens.drop_duplicates()
-
-# resultados
 resultados = resultados.drop_duplicates()
-
 
 
 # : FUNÇÕES AUXILIARES ---------------------------------------------------------
