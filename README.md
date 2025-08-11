@@ -51,3 +51,7 @@ cd src/ETL
 * [Luiz Fonseca](https://github.com/fonluiz)
 * [Raul Durlo](https://github.com/rdurl0)
 * [Talita Lôbo](https://github.com/talitalobo)
+
+[![Transparência Brasil](https://www.transparencia.org.br/img/logos/logo-tb.svg)](https://www.transparencia.org.br/)
+
+[![Creative Commons BY 4.0](https://licensebuttons.net/l/by/4.0/88x31.png)](https://creativecommons.org/licenses/by/4.0/)
