@@ -231,6 +231,22 @@ def separar_contratacoes_por_data_publicacao(df):
 # Exemplo de uso:
 contratacoes_filtradas_df = separar_contratacoes_por_data_publicacao(contratacoes_filtradas_df)
 
+
+# # : CRIA COLUNAS CNPJ, ANO, SEQUENCIAL -----------------------------------------
+
+# # Aplica extração
+# contratacoes[['cnpj', 'ano', 'sequencial']] = contratacoes['data.numeroControlePNCP'].apply(extrair_parametros)
+
+# # Exibe todas as linhas -> Quantidade de contratações por UF
+# pd.set_option('display.max_rows', None)
+# print(contratacoes.groupby('data.unidadeOrgao.ufNome').size())
+# pd.reset_option('display.max_rows')
+
+ex = contratacoes[contratacoes['data.numeroControlePNCP'] == "46374500000194-1-002024/2024"]
+
+contratacoes_filtradas.iloc[1879]
+itens_filtrados[itens_filtrados['data.numeroControlePNCP'] == "03130778000103-1-000025/2024"]
+
 # : TESTE ----------------------- TESTE FIM ####################################
 
 
