@@ -157,7 +157,6 @@ def extrair_parametros(numero_controle):
     sequencial = str(int(sequencial))  # remove zeros à esquerda
     return pd.Series([cnpj, ano, sequencial])
 
-
 # Função para verificar se o endpoint do item bate com os campos da contratação
 def match_endpoint(endpoint, cnpj, ano, sequencial):
     return (
@@ -167,15 +166,36 @@ def match_endpoint(endpoint, cnpj, ano, sequencial):
     )
 
 
-# : CRIA COLUNAS CNPJ, ANO, SEQUENCIAL -----------------------------------------
+# : REMOVE DATAS DE PUBLICAÇÃO INVÁLIDA ----------------------------------------
 
-# Aplica extração
-contratacoes[['cnpj', 'ano', 'sequencial']] = contratacoes['data.numeroControlePNCP'].apply(extrair_parametros)
+def remove_e_separa_contratacoes_por_data_publicacao(df):
+    """
+    Aplica a função to_ocds_dt() no campo dataPublicacaoPncp e separa o DataFrame em dois:
+    - contratacoes_sem_data: linhas onde a data convertida é NA
+    - contratacoes_com_data: linhas onde a data convertida não é NA
+    Retorna (contratacoes_sem_data, contratacoes_com_data)
+    """
+    df = df.copy()
+    df['data.dataPublicacaoPncp_ocds'] = df['data.dataPublicacaoPncp'].apply(to_ocds_dt)
+    contratacoes_sem_data = df[df['data.dataPublicacaoPncp_ocds'].isna()].copy()
+    contratacoes_com_data = df[df['data.dataPublicacaoPncp_ocds'].notna()].copy()
 
-# Exibe todas as linhas -> Quantidade de contratações por UF
-pd.set_option('display.max_rows', None)
-print(contratacoes.groupby('data.unidadeOrgao.ufNome').size())
-pd.reset_option('display.max_rows')
+    # quantos erros tiveram?
+    total_erros = len(contratacoes_sem_data)
+
+    # total_erros > 0? Salva as contratações sem data em um arquivo CSV para análise posterior
+    if total_erros > 0:
+        errors_dir = os.path.join(base_dir, "tasks", "mapeamento-ocds", "output", "errors")
+        os.makedirs(errors_dir, exist_ok=True)
+        error_file = os.path.join(errors_dir, f"errors-{mes_coleta}-{ano_coleta}.csv")
+        contratacoes_sem_data.to_csv(error_file, index=False, encoding="utf-8")
+        print(f"{total_erros} foram encontrados e salvos em {error_file}")
+    else:
+        print("Nenhuma contratação sem data encontrada.")
+
+    return contratacoes_com_data
+
+contratacoes = remove_e_separa_contratacoes_por_data_publicacao(contratacoes)
 
 
 # : FILTRO DE ITENS POR CONTRATAÇÃO --------------------------------------------
