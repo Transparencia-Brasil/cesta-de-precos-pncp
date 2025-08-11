@@ -40,48 +40,54 @@ base_dir = "C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp"
 
 def get_filepaths(base_dir, ano_coleta, mes_coleta):
     """
-    Retorna os diretórios e caminhos dos arquivos de coleta, quinzena 1 e 2, e os caminhos dos arquivos CSV.
-    """
+    Retorna os caminhos dos arquivos CSV de contratações, itens e resultados
+    para as duas quinzenas do mês especificado.
 
-    # precisamos do nome do mês em pt-br
-    # Dicionário de meses em pt-br
+    Parâmetros:
+        base_dir (str): Diretório base dos dados.
+        ano_coleta (int): Ano da coleta.
+        mes_coleta (int): Mês da coleta (1 a 12).
+
+    Retorna:
+        FilePaths: namedtuple com os caminhos dos arquivos.
+    """
+    # arquivos da quinzena 1 (q1) e 2 (q2)
+    FilePaths = namedtuple('FilePaths', [
+        'contratacoes_q1',
+        'contratacoes_q2',
+        'itens_q1',
+        'itens_q2',
+        'resultados_q1',
+        'resultados_q2'
+    ])
+
+    # Transforma meses em pt-br
     MESES_PTBR = {
         1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril",
         5: "Maio", 6: "Junho", 7: "Julho", 8: "Agosto",
         9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro"
     }
 
-    # gera mÊs e ano dinamicamente, conforme parâmetros recebidos
-    ano_dir = f"{str(ano_coleta)}"
+    # define diretório de coleta/data-package
+    ano_dir = str(ano_coleta)
     mes_dir = f"{mes_coleta} - {MESES_PTBR[mes_coleta]}"
     coleta_dir = os.path.join(base_dir, "coleta", "data-package", ano_dir, mes_dir)
 
-    # As coletas foram divididas em dois arquivos CSV, um para cada quinzena
-    # subdiretórios conforme a quinzena de coleta
-    quinzena1_dir = os.path.join(coleta_dir, "QUINZENA-1", "DATA")
-    quinzena2_dir = os.path.join(coleta_dir, "QUINZENA-2", "DATA")
+    # define path dos arquivos
+    def path(quinzena, filename):
+        return os.path.join(coleta_dir, f"QUINZENA-{quinzena}", "DATA", filename)
 
-    # contratações paths
-    contratacoes_q1_path = os.path.join(quinzena1_dir, "contratacoes.csv")
-    contratacoes_q2_path = os.path.join(quinzena2_dir, "contratacoes.csv")
-
-    # caminhos path
-    itens_q1_path = os.path.join(quinzena1_dir, "itens-medicamentos.csv")
-    itens_q2_path = os.path.join(quinzena2_dir, "itens-medicamentos.csv")
-
-    # resultados path
-    resultados_q1_path = os.path.join(quinzena1_dir, "itens-medicamentos-resultados.csv")
-    resultados_q2_path = os.path.join(quinzena2_dir, "itens-medicamentos-resultados.csv")
-
-    return (
-        contratacoes_q1_path, contratacoes_q2_path,
-        itens_q1_path, itens_q2_path,
-        resultados_q1_path, resultados_q2_path
+    return FilePaths(
+        contratacoes_q1=path(1, "contratacoes.csv"),
+        contratacoes_q2=path(2, "contratacoes.csv"),
+        itens_q1=path(1, "itens-medicamentos.csv"),
+        itens_q2=path(2, "itens-medicamentos.csv"),
+        resultados_q1=path(1, "itens-medicamentos-resultados.csv"),
+        resultados_q2=path(2, "itens-medicamentos-resultados.csv")
     )
 
-# As coletas foram divididas em dois arquivos CSV, um para cada quinzena
-# Pegamos os dois arquivos e concatenamos em um único DataFrame
-contratacoes_q1_path, contratacoes_q2_path, itens_q1_path, itens_q2_path, resultados_q1_path, resultados_q2_path = get_filepaths(base_dir, ano_coleta, mes_coleta)
+# chamando a função
+paths = get_filepaths(base_dir, ano_coleta, mes_coleta)
 
 
 # : CARREGA DADOS --------------------------------------------------------------
