@@ -31,27 +31,6 @@ medicamentos <- map_df(
   read_csv,
   col_types = cols(.default = col_character())
 )
-    for _, item in itens_rel.iterrows():
-
-        unit = {
-            "value": {
-            "amount": item['valorUnitarioEstimado'],
-            "currency": "BRL"
-            }
-        }
-
-        # Só adiciona "name" se unidadeMedida não for nula
-        if pd.notna(item['unidadeMedida']):
-            unit["name"] = item['unidadeMedida']
-
-        i = {
-            "id": str(item['numeroItem']),
-            "description": item['descricao'],
-            "quantity": int(item['quantidade']),
-            "unit": unit,
-            "relatedLot": 'lot-' + str(item['numeroItem'])
-        }
-
 
 contratacoes <- map_df(
   PATH_CONTRATACOES,
