@@ -1,9 +1,8 @@
+# Cesta de preços - coletores
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/release/python-380/)
 [![R](https://img.shields.io/badge/R-4.0%2B-blue.svg)](https://cran.r-project.org/bin/windows/base/old/4.0.0/)
-
-## Objetivo
 
 Este repositório comporta processamento dos dados de contratações do PNCP para uso em uma aplicação de cesta de preços.
 
