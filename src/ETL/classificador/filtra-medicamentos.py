@@ -180,7 +180,7 @@ def detecta_pdm(descricao):
 itens_df['codigo_pdm'] = itens_df['descricao_limpa'].apply(detecta_pdm)
 
 # Filtra só os itens detectados como medicamentos
-medicamentos_df = itens_df[itens_df['codigo_pdm'].notna()]
+medicamentos_df = itens_df[itens_df['codigo_pdm'].notna()].copy()
 
 
 ### MODELO (TRANSFORMER) #################################################################
