@@ -141,3 +141,9 @@ template_itens <- tibble::tibble(
 
 # Executa a coleta
 coleta(endpoints = endpoints_itens, output_dir = PATH_OUTPUT_DIR, template = template_itens)
+
+message("convertendo arquivo")
+PATH_RESULT <- here(PATH_OUTPUT_DIR, "dados.csv")
+result <- read_csv(PATH_RESULT, col_types = cols(.default = col_character()))
+write_csv(result, PATH_RESULT)
+message("FIM!")
