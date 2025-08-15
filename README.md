@@ -14,16 +14,6 @@ Este repositório comporta processamento dos dados de contratações do PNCP par
 
 * O script `run-coletores.sh` gerencia a execução dos scripts de coleta e classificação de dados das APIs do PNCP, localizados em `src/ETL/coletores` e `src/ETL/classificador`. Recebe como parâmetros a data de início, fim e um *alias* para o subdiretório de saída. As etapas são:
 
-  1. **Coleta de contratações**: Realizada pelo script `src/ETL/coletores/coleta-contratacoes.R`, gerenciado por `coletor-contratacoes.sh`, que recebe como parâmetros a data de início, fim e um *alias* para o subdiretório de saída.
-
-  2. **Coleta de itens contratados**: Realizada pelo script `src/ETL/coletores/coleta-itens-contratacoes.R`, gerenciado por `coletor-itens-contratacoes.sh`, com os mesmos parâmetros de data e *alias*.
-
-  3. **Filtragem e classificação de medicamentos**: Realizada pelo script `src/ETL/classificador/classifica-medicamentos.R`, gerenciado por `classificador.sh`, também utilizando os parâmetros de data e *alias*. Os resultados das filtragens de medicamentos são salvos junto com seus embeddings no mesmo diretório de itens em um arquivo CSV chamado `medicamentos.csv`.
-
-  4. **Resultado das contratações de medicamentos**: Realizada pelo script `src/ETL/coletores/coleta-resultados.R`, gerenciado por `rsc/ETL/coletor-resultados.sh`, com os mesmos parâmetros de data e *alias*.
-
-##### Fluxograma do pipeline de coleta
-
 ```mermaid
 graph LR
 A[Coleta Contratações] --> B[Coleta Itens]
@@ -31,11 +21,27 @@ B --> C[Filtra/Classifica Medicamentos]
 C --> D[Coleta Resultados]
 ```
 
+***
+<br>
+
+| Descrição | Script | Gerenciador | Parâmetros |
+|-----------|--------|-------------|------------|
+| 1. Coleta de contratações — coleta dados de contratações no PNCP | `coleta-contratacoes.R` | `coletor-contratacoes.sh` | Data início, Data fim, *alias* |
+| 2. Coleta de itens contratados — coleta itens das contratações | `coleta-itens-contratacoes.R` | `coletor-itens-contratacoes.sh` | Data início, Data fim, *alias* |
+| 3. Filtragem e classificação de medicamentos — filtra e classifica medicamentos, gerando embeddings | `classifica-medicamentos.R` | `classificador.sh` | Data início, Data fim, *alias* |
+| 4. Resultado das contratações de medicamentos — coleta resultados das contratações de medicamentos | `coleta-resultados.R` | `coletor-resultados.sh` | Data início, Data fim, *alias* |
+
+***
+
+* *Alias* é um subdiretório onde os dados e o arquivo de log serão salvos.
+* Data de início da coleta (padrão AAAA-MM-DD).
+* Data de fim da coleta (padrão AAAA-MM-DD).
+
 ##### Exemplo de execução
 
 ```bash
 cd src/ETL
-./run-coletores.sh "2025-01-Q1" "2025-01-01" "2025-01-15" | tee run-coletores-2025-01-Q1.log
+./run-coletores.sh "2025-01/QUINZENA-1" "2025-01-01" "2025-01-15" | tee run-coletores-2025-01-Q1.log
 ```
 
 * PARÂMETROS:
