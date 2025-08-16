@@ -1,0 +1,10 @@
+[nltk_data] Downloading package stopwords to
+[nltk_data]     C:\Users\rdurl\AppData\Roaming\nltk_data...
+
+Validando os argumentos.[nltk_data]   Package stopwords is already up-to-date!
+
+Detectando nomes PDM nos itens.
+Carregando o modelo.
+Calculando os vetores das descrições dos itens do PNCP.
+Identificando os medicamentos
+Fim da execução. Medicamentos salvos em coleta/itens/2025-07/QUINZENA-1/medicamentos.csv
