@@ -16,8 +16,9 @@ com as descrições dos medicamentos no catálogo.
 3 - Os embeddings dos itens candidatos são comparados com os embeddings dos medicamentos do catálogo que possuem o mesmo PDM.
 A similaridade do coseno é a métrica de comparação e então o medicamento do catálogo com maior similaridade é escolhido como
 párea do item candidato.
-4 - Os itens cujos páreas possuírem similaridade igual ou superior a 0.5 serão classificados como medicamento.
-O valor 0.5 foi definido experimentalmente como sendo o limite que rende os melhores resultados de acurácia.
+4 - Os itens cujos páreas possuírem similaridade igual ou superior a 0.3 serão classificados como medicamento.
+O valor 0.3 foi definido experimentalmente como sendo o limite que rende os melhores resultados de acurácia.
+O LIMITE DE 0.3 FOI FEITO PARA TESTES E WORKSHOP
 
 Por fim, os medicamentos idntificados são salvos em um arquivo chamado 'medicamentos.csv', junto com o código BR do item
 mais similar do catálogo. Os embeddings do catálogo são salvos em um arquivo (catalogo-vetorizado.csv) para evitar calculá-los a
@@ -247,7 +248,7 @@ print('\rIdentificando os medicamentos', end="", flush=True)
 THRESHOLD = 0.3
 
 # Caminho do arquivo de saída ondes serão salvos os medicamentos
-NOME_ARQUIVO_MEDICAMENTOS = dir_itens + "/medicamentos-baixa-similaridad.csv"
+NOME_ARQUIVO_MEDICAMENTOS = dir_itens + "/medicamentos-baixa-similaridade.csv"
 
 def mais_similar(medicamento):
     """
