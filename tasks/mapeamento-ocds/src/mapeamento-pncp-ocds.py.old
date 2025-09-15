@@ -9,13 +9,15 @@ import locale
 import os
 import sys
 import zipfile
-from collections import namedtuple
 from datetime import datetime, timezone
 
 import pandas as pd
 from tqdm import tqdm
 
 # : PARÂMETROS -----------------------------------------------------------------
+
+os.environ["ANO"] = "2025"
+os.environ["MES"] = "3"
 
 # Pega os parâmetros MES e ANO de coleta
 # Essa informação será usada para:
@@ -41,91 +43,79 @@ base_dir = "C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp"
 
 def get_filepaths(base_dir, ano_coleta, mes_coleta):
     """
-    Retorna os caminhos dos arquivos CSV de contratações, itens e resultados
-    para as duas quinzenas do mês especificado.
-
-    Parâmetros:
-        base_dir (str): Diretório base dos dados.
-        ano_coleta (int): Ano da coleta.
-        mes_coleta (int): Mês da coleta (1 a 12).
-
-    Retorna:
-        FilePaths: namedtuple com os caminhos dos arquivos.
+    Retorna os diretórios e caminhos dos arquivos de coleta, quinzena 1 e 2, e os caminhos dos arquivos CSV.
     """
-    # arquivos da quinzena 1 (q1) e 2 (q2)
-    FilePaths = namedtuple('FilePaths', [
-        'contratacoes_q1',
-        'contratacoes_q2',
-        'itens_q1',
-        'itens_q2',
-        'resultados_q1',
-        'resultados_q2'
-    ])
 
-    # Transforma meses em pt-br
+    # precisamos do nome do mês em pt-br
+    # Dicionário de meses em pt-br
     MESES_PTBR = {
         1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril",
         5: "Maio", 6: "Junho", 7: "Julho", 8: "Agosto",
         9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro"
     }
 
-    # define diretório de coleta/data-package
-    ano_dir = str(ano_coleta)
+    # gera mÊs e ano dinamicamente, conforme parâmetros recebidos
+    ano_dir = f"{str(ano_coleta)}"
     mes_dir = f"{mes_coleta} - {MESES_PTBR[mes_coleta]}"
     coleta_dir = os.path.join(base_dir, "coleta", "data-package", ano_dir, mes_dir)
 
-    # define path dos arquivos
-    def path(quinzena, filename):
-        return os.path.join(coleta_dir, f"QUINZENA-{quinzena}", "DATA", filename)
+    # As coletas foram divididas em dois arquivos CSV, um para cada quinzena
+    # subdiretórios conforme a quinzena de coleta
+    quinzena1_dir = os.path.join(coleta_dir, "QUINZENA-1", "DATA")
+    quinzena2_dir = os.path.join(coleta_dir, "QUINZENA-2", "DATA")
 
-    return FilePaths(
-        contratacoes_q1=path(1, "contratacoes.csv"),
-        contratacoes_q2=path(2, "contratacoes.csv"),
-        itens_q1=path(1, "itens-medicamentos.csv"),
-        itens_q2=path(2, "itens-medicamentos.csv"),
-        resultados_q1=path(1, "itens-medicamentos-resultados.csv"),
-        resultados_q2=path(2, "itens-medicamentos-resultados.csv")
+    # contratações paths
+    contratacoes_q1_path = os.path.join(quinzena1_dir, "contratacoes.csv")
+    contratacoes_q2_path = os.path.join(quinzena2_dir, "contratacoes.csv")
+
+    # caminhos path
+    itens_q1_path = os.path.join(quinzena1_dir, "itens-medicamentos.csv")
+    itens_q2_path = os.path.join(quinzena2_dir, "itens-medicamentos.csv")
+
+    # resultados path
+    resultados_q1_path = os.path.join(quinzena1_dir, "itens-medicamentos-resultados.csv")
+    resultados_q2_path = os.path.join(quinzena2_dir, "itens-medicamentos-resultados.csv")
+
+    return (
+        contratacoes_q1_path, contratacoes_q2_path,
+        itens_q1_path, itens_q2_path,
+        resultados_q1_path, resultados_q2_path
     )
 
-# chamando a função
-paths = get_filepaths(base_dir, ano_coleta, mes_coleta)
+# As coletas foram divididas em dois arquivos CSV, um para cada quinzena
+# Pegamos os dois arquivos e concatenamos em um único DataFrame
+contratacoes_q1_path, contratacoes_q2_path, itens_q1_path, itens_q2_path, resultados_q1_path, resultados_q2_path = get_filepaths(base_dir, ano_coleta, mes_coleta)
 
 
 # : CARREGA DADOS --------------------------------------------------------------
 
-def carregar_e_concatenar(path1, path2):
-    return pd.concat([
-        pd.read_csv(path1, low_memory=False),
-        pd.read_csv(path2, low_memory=False)
-    ], ignore_index=True)
+# Contratações
+contratacoes_q1 = pd.read_csv(contratacoes_q1_path, low_memory=False)
+contratacoes_q2 = pd.read_csv(contratacoes_q2_path, low_memory=False)
+contratacoes = pd.concat([contratacoes_q1, contratacoes_q2], ignore_index=True)
 
-contratacoes = carregar_e_concatenar(paths.contratacoes_q1, paths.contratacoes_q2)
-itens = carregar_e_concatenar(paths.itens_q1, paths.itens_q2)
-resultados = carregar_e_concatenar(paths.resultados_q1, paths.resultados_q2)
+# Itens
+itens_q1 = pd.read_csv(itens_q1_path, low_memory=False)
+itens_q2 = pd.read_csv(itens_q2_path, low_memory=False)
+itens = pd.concat([itens_q1, itens_q2], ignore_index=True)
 
-
-# : REMOVE COLUNAS DESNECESSÁRIAS ----------------------------------------------
-
-# colunas de metadados da API
-colunas_desnecessaria = [
-    'totalRegistros',
-    'totalPaginas',
-    'numeroPagina',
-    'paginasRestantes',
-    'empty',
-    'endpoint'
-]
-
-# drop colunas de metadados da API
-contratacoes = contratacoes.drop(columns= colunas_desnecessaria, errors='ignore')
+# Resultados
+resultados_q1 = pd.read_csv(resultados_q1_path, low_memory=False)
+resultados_q2 = pd.read_csv(resultados_q2_path, low_memory=False)
+resultados = pd.concat([resultados_q1, resultados_q2], ignore_index=True)
 
 
 # : REMOVE DUPLICATAS ----------------------------------------------------------
 
+# contratações
+contratacoes = contratacoes.drop(columns=['totalRegistros','totalPaginas','numeroPagina','paginasRestantes','empty', 'endpoint'], errors='ignore')
 contratacoes = contratacoes.drop_duplicates()
-itens = itens.drop_duplicates()
-resultados = resultados.drop_duplicates()
 
+# itens
+itens = itens.drop_duplicates()
+
+# resultados
+resultados = resultados.drop_duplicates()
 
 # : FUNÇÕES AUXILIARES ---------------------------------------------------------
 
@@ -158,6 +148,7 @@ def extrair_parametros(numero_controle):
     sequencial = str(int(sequencial))  # remove zeros à esquerda
     return pd.Series([cnpj, ano, sequencial])
 
+
 # Função para verificar se o endpoint do item bate com os campos da contratação
 def match_endpoint(endpoint, cnpj, ano, sequencial):
     return (
@@ -166,10 +157,56 @@ def match_endpoint(endpoint, cnpj, ano, sequencial):
         f'/{int(sequencial)}/' in str(endpoint)  # evita colisões tipo 81, 181, etc.
     )
 
+# contratacoes[contratacoes['data.numeroControlePNCP'] == "46374500000194-1-002024/2024"]
+# : CRIA COLUNAS CNPJ, ANO, SEQUENCIAL -----------------------------------------
 
-# : REMOVE DATAS DE PUBLICAÇÃO INVÁLIDA ----------------------------------------
+# Aplica extração
+contratacoes[['cnpj', 'ano', 'sequencial']] = contratacoes['data.numeroControlePNCP'].apply(extrair_parametros)
 
-def remove_e_separa_contratacoes_por_data_publicacao(df):
+# Exibe todas as linhas -> Quantidade de contratações por UF
+pd.set_option('display.max_rows', None)
+print(contratacoes.groupby('data.unidadeOrgao.ufNome').size())
+pd.reset_option('display.max_rows')
+
+
+# : FILTRO DE ITENS POR CONTRATAÇÃO --------------------------------------------
+contratacoes = contratacoes[contratacoes['data.numeroControlePNCP'] == "46374500000194-1-002024/2024"]
+
+# Para cada linha de contratacoes, filtra os itens correspondentes
+itens_filtrados_por_contratacao = []
+contratacoes_filtradas = []
+
+# Filtro para realizar testes
+# contratacoes = contratacoes[contratacoes['data.unidadeOrgao.ufNome'].isin(['Santa Catarina'])]
+
+print("FILTRANDO ITENS POR CONTRATAÇÃO...")
+
+# A lista de itens não possui o campo 'numeroControlePNCP', então precisamos filtrar os itens
+# com base nos campos cnpj, ano e sequencial da contratação, presente no endpoint do item.
+for idx, row in tqdm(contratacoes.iterrows(), total=len(contratacoes)):
+    itens_match = itens[
+        itens['endpoint'].apply(lambda ep: match_endpoint(ep, row['cnpj'], row['ano'], row['sequencial']))
+    ].copy()
+
+    if not itens_match.empty:
+        # Adiciona número de controle (pode ajudar na rastreabilidade depois)
+        itens_match['numeroControlePNCP'] = row['data.numeroControlePNCP']
+
+        itens_filtrados_por_contratacao.append(itens_match)
+
+        # Filtra a lista de contratações para manter apenas as que têm itens correspondentes
+        # Assim, criamos o json apenas para as contratações que relativas aos itens filtrados (medicamentos)
+        contratacoes_filtradas.append(row)
+
+contratacoes_filtradas_df = pd.DataFrame(contratacoes_filtradas)
+
+
+# Junta todos os itens encontrados
+itens_filtrados = pd.concat(itens_filtrados_por_contratacao, ignore_index=True)
+
+# : TESTE ----------------------- TESTE INICIO #################################
+
+def separar_contratacoes_por_data_publicacao(df):
     """
     Aplica a função to_ocds_dt() no campo dataPublicacaoPncp e separa o DataFrame em dois:
     - contratacoes_sem_data: linhas onde a data convertida é NA
@@ -181,91 +218,36 @@ def remove_e_separa_contratacoes_por_data_publicacao(df):
     contratacoes_sem_data = df[df['data.dataPublicacaoPncp_ocds'].isna()].copy()
     contratacoes_com_data = df[df['data.dataPublicacaoPncp_ocds'].notna()].copy()
 
-    # quantos erros tiveram?
+    # Salva as contratações sem data em um arquivo CSV para análise posterior
+    errors_dir = os.path.join(base_dir, "tasks", "mapeamento-ocds", "output", "errors")
+    os.makedirs(errors_dir, exist_ok=True)
+    error_file = os.path.join(errors_dir, f"errors-{mes_coleta}-{ano_coleta}.csv")
+    contratacoes_sem_data.to_csv(error_file, index=False, encoding="utf-8")
     total_erros = len(contratacoes_sem_data)
-
-    # total_erros > 0? Salva as contratações sem data em um arquivo CSV para análise posterior
-    if total_erros > 0:
-        errors_dir = os.path.join(base_dir, "tasks", "mapeamento-ocds", "output", "errors")
-        os.makedirs(errors_dir, exist_ok=True)
-        error_file = os.path.join(errors_dir, f"errors-{mes_coleta}-{ano_coleta}.csv")
-        contratacoes_sem_data.to_csv(error_file, index=False, encoding="utf-8")
-        print(f"{total_erros} foram encontrados e salvos em {error_file}")
-    else:
-        print("Nenhuma contratação sem data encontrada.")
+    print(f"{total_erros} foram encontrados e salvos em {error_file}")
 
     return contratacoes_com_data
 
-contratacoes = remove_e_separa_contratacoes_por_data_publicacao(contratacoes)
+# Exemplo de uso:
+contratacoes_filtradas_df = separar_contratacoes_por_data_publicacao(contratacoes_filtradas_df)
 
 
-# : CRIA COLUNA NÚMERO CONTROLE PNCP -------------------------------------------
+# # : CRIA COLUNAS CNPJ, ANO, SEQUENCIAL -----------------------------------------
 
-def endpoint_para_numero_controle(endpoint):
-    """
-    Converte um endpoint da API PNCP em um número de controle PNCP.
+# # Aplica extração
+# contratacoes[['cnpj', 'ano', 'sequencial']] = contratacoes['data.numeroControlePNCP'].apply(extrair_parametros)
 
-    O número de controle da contratação (id contratação PNCP) segue a máscara:
-    99999999999999-1-999999/9999
+# # Exibe todas as linhas -> Quantidade de contratações por UF
+# pd.set_option('display.max_rows', None)
+# print(contratacoes.groupby('data.unidadeOrgao.ufNome').size())
+# pd.reset_option('display.max_rows')
 
-    Cada contratação receberá um número de controle composto por:
-    • CNPJ do Órgão/Entidade da contratação (14 dígitos)
-    • Dígito "1" - marcador que indica tratar-se de uma contratação
-    • Número sequencial da contratação no PNCP *
-    • Ano da contratação (4 dígitos)
+ex = contratacoes[contratacoes['data.numeroControlePNCP'] == "46374500000194-1-002024/2024"]
 
-    * O número PNCP será gerado sequencialmente com 6 dígitos e reiniciado a cada mudança de ano.
+contratacoes_filtradas.iloc[1879]
+itens_filtrados[itens_filtrados['data.numeroControlePNCP'] == "03130778000103-1-000025/2024"]
 
-    Fonte: Página 30 do Manual de Integração do PNCP
-    Link: https://www.gov.br/pncp/pt-br/central-de-conteudo/manuais/manual-de-integracao-pncp
-    """
-    try:
-        partes = endpoint.strip("/").split("/")
-        cnpj = partes[-5]
-        ano = partes[-3]
-        sequencial = partes[-2]
-
-        sequencial_formatado = f"{int(sequencial):06d}"  # zero à esquerda
-        numero_controle = f"{cnpj}-1-{sequencial_formatado}/{ano}"
-        return numero_controle
-
-    except Exception as e:
-        print(f"Erro ao converter endpoint: {e} ->> {endpoint}")
-        return None
-
-itens['data.numeroControlePNCP'] = itens['endpoint'].apply(endpoint_para_numero_controle)
-
-
-# : FILTRA ITENS ---------------------------------------------------------------
-
-def filtrar_itens_e_contratacoes_validas(itens, contratacoes):
-    """
-    Filtra DataFrames mantendo apenas registros com numeroControlePNCP em comum.
-
-    Parâmetros:
-       itens (DataFrame): DataFrame com dados de itens
-       contratacoes (DataFrame): DataFrame com dados de contratações
-
-    Retorna:
-        tuple: (itens_validos, contratacoes_validas)
-            - itens_validos (pd.DataFrame): Itens cujo 'data.numeroControlePNCP' existe em contratações.
-            - contratacoes_validas (pd.DataFrame): Contratações cujo 'data.numeroControlePNCP' existe em itens.
-    """
-
-    if 'data.numeroControlePNCP' not in itens.columns or 'data.numeroControlePNCP' not in contratacoes.columns:
-        raise ValueError("Ambos os DataFrames devem conter a coluna 'data.numeroControlePNCP'")
-
-    # Números de controle presentes em ambos os DataFrames
-    numeros_controle_comuns = set(itens['data.numeroControlePNCP'].dropna()) & set(contratacoes['data.numeroControlePNCP'].dropna())
-
-    # Filtra os itens e contratações para manter apenas os registros com correspondência
-    itens_validos = itens[itens['data.numeroControlePNCP'].isin(numeros_controle_comuns)].copy()
-    contratacoes_validas = contratacoes[contratacoes['data.numeroControlePNCP'].isin(numeros_controle_comuns)].copy()
-
-    return itens_validos, contratacoes_validas
-
-# Chama a função e filtra itens e contratações:
-itens_filtrados, contratacoes_filtradas = filtrar_itens_e_contratacoes_validas(itens, contratacoes)
+# : TESTE ----------------------- TESTE FIM ####################################
 
 
 # : CRIANDO ESTRUTURA OCDS -----------------------------------------------------
@@ -274,12 +256,12 @@ itens_filtrados, contratacoes_filtradas = filtrar_itens_e_contratacoes_validas(i
 releases = {}
 
 print("PROCESSANDO CONTRATAÇÕES...")
-for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_filtradas)):
+for _, row in tqdm(contratacoes_filtradas_df.iterrows(), total=len(contratacoes_filtradas_df)):
     # Cria ocid concatenando campos
     ocid = str(row['data.orgaoEntidade.cnpj']) + '_' + str(row['data.anoCompra']) + '_' + str(row['data.sequencialCompra'])
 
     # Itens relacionados - filtramos pelo número de controle do PNCP
-    itens_rel = itens_filtrados[itens_filtrados['data.numeroControlePNCP'] == row['data.numeroControlePNCP']]
+    itens_rel = itens_filtrados[itens_filtrados['numeroControlePNCP'] == row['data.numeroControlePNCP']]
     items = []
     items_by_id = {}
     lots = []
@@ -478,8 +460,7 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
             **({"statusDetails": res['motivoCancelamento']} if pd.notna(res['motivoCancelamento']) else {}),
             "quantity": int(res['quantidadeHomologada']),
             "unit": {
-                **({"name": items_by_id[str(res['numeroItem'])]['unit']['name']} if "name" in items_by_id[str(res['numeroItem'])]['unit'] else {}),
-
+                "name": items_by_id[str(res['numeroItem'])]['unit']['name'],
                 "value": {
                 "amount": res['valorUnitarioHomologado'],
                 "currency": "BRL"
@@ -520,42 +501,42 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
 
     # "traduzindo" os IDs do PNCP
     poder_id = {
-        "E": "Executivo",
-        "L": "Legislativo",
-        "J": "Judiciário",
-        "N": "Não se aplica"
+    "E": "Executivo",
+    "L": "Legislativo",
+    "J": "Judiciário",
+    "N": "Não se aplica"
     }
 
     esfera_id = {
-        "F": "Federal",
-        "E": "Estadual",
-        "M": "Municipal",
-        "D": "Distrital",
-        "N": "Não se aplica"
+    "F": "Federal",
+    "E": "Estadual",
+    "M": "Municipal",
+    "D": "Distrital",
+    "N": "Não se aplica"
     }
 
     tipo_instrumento_convocatorio = {
-        "1": "open",  # Edital
-        "2": "limited",  # Aviso de Contratação Direta
-        "3": "direct",  # Ato que autoriza a contratação direta
-        "4": "selective", # Edital de Chamamento Público
+    "1": "open",  # Edital
+    "2": "limited",  # Aviso de Contratação Direta
+    "3": "direct",  # Ato que autoriza a contratação direta
+    "4": "selective", # Edital de Chamamento Público
     }
 
     modalidade_contratacao = {
-        "1": "electronicAuction",  # Leilão - Eletrônico
-        "2": None,  # Diálogo Competitivo
-        "3": None,  # Concurso
-        "4": "electronicSubmission",  # Concorrência - Eletrônica
-        "5": "written",  # Concorrência - Presencial
-        "6": "electronicSubmission",  # Pregão - Eletrônico
-        "7": "written",  # Pregão - Presencial
-        "8": None,  # Dispensa
-        "9": None,  # Inexigibilidade
-        "10": None,  # Manifestação de Interesse
-        "11": None,  # Pré-qualificação
-        "12": None,  # Credenciamento
-        "13": "written",  # Leilão - Presencial
-        "14": None,  # Inaplicabilidade da Licitação
+    "1": "electronicAuction",  # Leilão - Eletrônico
+    "2": None,  # Diálogo Competitivo
+    "3": None,  # Concurso
+    "4": "electronicSubmission",  # Concorrência - Eletrônica
+    "5": "written",  # Concorrência - Presencial
+    "6": "electronicSubmission",  # Pregão - Eletrônico
+    "7": "written",  # Pregão - Presencial
+    "8": None,  # Dispensa
+    "9": None,  # Inexigibilidade
+    "10": None,  # Manifestação de Interesse
+    "11": None,  # Pré-qualificação
+    "12": None,  # Credenciamento
+    "13": "written",  # Leilão - Presencial
+    "14": None,  # Inaplicabilidade da Licitação
     }
 
     # Montagem do release
