@@ -173,6 +173,7 @@ template_contratacoes <- tibble(
   # srp
   data.srp = character(),
   # orgaoEntidade
+  data.orgaoEntidade = character(),
   data.orgaoEntidade.cnpj = character(),
   data.orgaoEntidade.razaoSocial = character(),
   data.orgaoEntidade.poderId = character(),
@@ -187,6 +188,7 @@ template_contratacoes <- tibble(
   # ids
   data.numeroCompra = character(), #
   # unidadeOrgao
+  data.unidadeOrgao = character(),
   data.unidadeOrgao.ufNome = character(),
   data.unidadeOrgao.codigoIbge = character(),
   data.unidadeOrgao.codigoUnidade = character(),
@@ -194,6 +196,7 @@ template_contratacoes <- tibble(
   data.unidadeOrgao.ufSigla = character(),
   data.unidadeOrgao.municipioNome = character(),
   # ampareLegal
+  data.amparoLegal = character(),
   data.amparoLegal.descricao = character(),
   data.amparoLegal.nome = character(),
   data.amparoLegal.codigo = character(),
@@ -211,6 +214,7 @@ template_contratacoes <- tibble(
   # jsutificativa presencial
   data.justificativaPresencial = character(),
   # unidadeSubRogada
+  data.unidadeSubRogada = character(),
   data.unidadeSubRogada.ufNome = character(),
   data.unidadeSubRogada.codigoIbge = character(),
   data.unidadeSubRogada.codigoUnidade = character(),
@@ -218,6 +222,7 @@ template_contratacoes <- tibble(
   data.unidadeSubRogada.ufSigla = character(),
   data.unidadeSubRogada.municipioNome = character(),
   # orgaoSubRogado
+  data.orgaoSubRogado = character(),
   data.orgaoSubRogado.cnpj = character(),
   data.orgaoSubRogado.razaoSocial = character(),
   data.orgaoSubRogado.poderId = character(),
@@ -244,6 +249,7 @@ template_contratacoes <- tibble(
   data.tipoInstrumentoConvocatorioCodigo = character(),
   data.tipoInstrumentoConvocatorioNome = character(),
   # fontes orçamentárias
+  data.fontesOrcamentarias = character(),
   data.fontesOrcamentarias.codigo = character(),
   data.fontesOrcamentarias.nome = character(),
   data.fontesOrcamentarias.descricao = character(),

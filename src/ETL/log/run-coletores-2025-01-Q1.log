@@ -7,7 +7,7 @@ INÍCIO DA COLETA ÀS '09-Apr-2025 07:53:51'
 Diretório:
 /mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp
 
-PARÂMETROS: 
+PARÂMETROS:
  - PRIMEIRO_DIA='2025-01-01' - é a data de início da coleta
  - ULTIMO_DIA='2025-01-15' - é a data final da coleta
  - ALIAS_COLETA='2025-01-Q1' - é um alias para identificar a coleta e apontar um destino no diretório de /coletas
@@ -27,7 +27,7 @@ Screen criada para coletar contratações:
 Saída sendo registrada em:
  - 'coleta/contratacoes/2025-01-Q1/run-coletor-contratacoes-2025-01-01-ate-2025-01-15.log'.
 
-Parâmetros do coletor: 
+Parâmetros do coletor:
  - PATH_OUTPUT_DIR="coleta/contratacoes/2025-01-Q1"
  - PRIMEIRO_DIA="2025-01-01"
  - ULTIMO_DIA="2025-01-15"

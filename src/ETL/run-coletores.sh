@@ -280,11 +280,11 @@ cp "${RESULTADOS_PATH}"/*.log "${PACOTE_PATH_LOG}/" 2>/dev/null || true
 # Exibe a árvore de diretórios do pacote
 echo -e "\nEstrutura do pacote de dados:\n"
 if command -v tree &> /dev/null; then
-    tree -h $PACOTE_PATH
+  tree -h -- "${PACOTE_PATH}"
 else
     echo "Comando 'tree' não encontrado. Instalando..."
     sudo apt-get update && sudo apt-get install tree -y
-    tree -h $PACOTE_PATH
+    tree -h -- "${PACOTE_PATH}"
 fi
 
 # Encontra o arquivo de log mais recente em src/ETL e seus subdiretórios

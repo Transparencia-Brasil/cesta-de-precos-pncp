@@ -1,5 +1,6 @@
 use medicamentos_transparentes;
 
+select * from contratacao limit 1;
 
 -- CONTRATANTES ----------------------------------------------------------------
 SELECT COUNT(*)
@@ -18,6 +19,8 @@ FROM medicamentos_transparentes.public.contratante;
 -- Pós Qui2-Maio: 10.044
 -- Pós Qui1-Junho: 10.229
 -- Pós Qui2-Junho: 10.472
+-- Pós Qui1-Julho: 10.553
+-- Pós Qui2-Julho: 10.732
 
 select *
 from contratante
@@ -42,6 +45,8 @@ FROM medicamentos_transparentes.public.fornecedor;
 -- Pós Qui2-Maio: 8.149
 -- Pós Qui1-Junho: 8.340
 -- Pós Qui2-Junho: 8.505
+-- Pós Qui1-Julho: 8.569
+-- Pós Qui2-Julho: 8.744
 
 select *
 from fornecedor
@@ -65,6 +70,8 @@ FROM medicamentos_transparentes.public.contratacao;
 -- Pós Qui2-Maio: 62.611
 -- Pós Qui1-Junho: 64.666
 -- Pós Qui2-Junho: 67.373
+-- Pós Qui1-Julho: 68.221
+-- Pós Qui2-Julho: 70.297
 
 select *
 from contratacao
@@ -89,6 +96,8 @@ FROM medicamentos_transparentes.public.item_homologado;
 -- Pós Qui2-Maio: 117.125
 -- Pós Qui1-Junho: 120.774
 -- Pós Qui2-Junho: 124.794
+-- Pós Qui1-Julho: 127.249
+-- Pós Qui2-Julho: 131.383
 
 
 -- ITEM LICITADO ---------------------------------------------------------------
@@ -107,3 +116,5 @@ FROM medicamentos_transparentes.public.item_licitado;
 -- Pós Qui2-Maio: 107.414
 -- Pós Qui1-Junho: 112.656
 -- Pós Qui2-Junho: 119.635
+-- Pós Qui1-Julho: 122.751
+-- Pós Qui1-Julho: 128.029

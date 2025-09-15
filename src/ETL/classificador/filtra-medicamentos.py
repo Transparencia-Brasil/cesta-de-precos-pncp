@@ -63,7 +63,8 @@ dir_catalogo = os.path.dirname(args.catalogo)
 
 # Carrega os dados
 catmat_df = pd.read_csv(args.catalogo)  # CATMAT
-itens_df = pd.read_csv(args.itens)      # Itens PNCP
+itens_df = pd.read_csv(args.itens, on_bad_lines='warn', encoding='utf-8', engine='python')      # Itens PNCP
+
 
 ### DETECÇÃO DE PDMS ######################################################################
 
@@ -179,7 +180,7 @@ def detecta_pdm(descricao):
 itens_df['codigo_pdm'] = itens_df['descricao_limpa'].apply(detecta_pdm)
 
 # Filtra só os itens detectados como medicamentos
-medicamentos_df = itens_df[itens_df['codigo_pdm'].notna()]
+medicamentos_df = itens_df[itens_df['codigo_pdm'].notna()].copy()
 
 
 ### MODELO (TRANSFORMER) #################################################################
