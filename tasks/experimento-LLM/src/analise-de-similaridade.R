@@ -178,10 +178,10 @@ bind_rows(itens_baixa_similaridade, itens) %>%
   mutate(dataInclusao = as_date(dataInclusao)) %>%
   filter(dataInclusao >= dmy("01-03-2025")) %>%
   glimpse()
-googlesheets4::write_sheet(
-  ss = "https://docs.google.com/spreadsheets/d/1RX7oHGxdJv2tWAtU93GsZQQpdO-p8gQ9VarEIqTyQJE",
-  sheet = "relação de endpoints"
-)
+# googlesheets4::write_sheet(
+#   ss = "https://docs.google.com/spreadsheets/d/1RX7oHGxdJv2tWAtU93GsZQQpdO-p8gQ9VarEIqTyQJE",
+#   sheet = "relação de endpoints"
+# )
 
 bind_rows(itens_baixa_similaridade, itens) %>%
   filter(sistema != "Compras.gov.br") %>%
@@ -202,31 +202,33 @@ bind_rows(itens_baixa_similaridade, itens) %>%
   filter(valorTotalEstimado >= 1000000) %>%
   filter(qtde_itens >= 50) %>%
   slice_max(perc_valor_baixa_similaridade, n = 50) %>%
-  googlesheets4::write_sheet(
-    ss = PLAN_SIMILARIDADE,
-    sheet = "Top 50 orgaos com baixa similaridade - por valor"
-  )
+  glimpse()
+  # googlesheets4::write_sheet(
+  #   ss = PLAN_SIMILARIDADE,
+  #   sheet = "Top 50 orgaos com baixa similaridade - por valor"
+  # )
 
 
-bind_rows(itens_baixa_similaridade, itens) %>%
-  filter(sistema != "Compras.gov.br") %>%
-  filter(similaridade >= .4) %>%
-  summarise(
-    .by = c(orgao_cnpj, orgao_nome, orgao_municipio, orgao_uf, orgao_esfera),
-    qtde_itens = n(),
-    # media_similaridade = mean(similaridade, na.rm = TRUE),
-    # total_similaridade_ate_50 = sum(similaridade <= 0.5),
-    qtde_similaridade_ate_60 = sum(similaridade <= 0.6),
-    # valor_baixa_similaridade = sum(valor_baixa_similaridade, na.rm = TRUE),
-    # total_similaridade_acima_60 = sum(similaridade > 0.6)
-  ) %>%
-  mutate(perc_qtde_baixa_similaridade = qtde_similaridade_ate_60 / qtde_itens) %>%
-  filter(qtde_itens >= 50) %>%
-  slice_max(perc_qtde_baixa_similaridade, n = 50) %>%
-  googlesheets4::write_sheet(
-    ss = PLAN_SIMILARIDADE,
-    sheet = "Top 50 orgaos com baixa similaridade - por quantidade"
-  )
+  bind_rows(itens_baixa_similaridade, itens) %>%
+    filter(sistema != "Compras.gov.br") %>%
+    filter(similaridade >= .4) %>%
+    summarise(
+      .by = c(orgao_cnpj, orgao_nome, orgao_municipio, orgao_uf, orgao_esfera),
+      qtde_itens = n(),
+      # media_similaridade = mean(similaridade, na.rm = TRUE),
+      # total_similaridade_ate_50 = sum(similaridade <= 0.5),
+      qtde_similaridade_ate_60 = sum(similaridade <= 0.6),
+      # valor_baixa_similaridade = sum(valor_baixa_similaridade, na.rm = TRUE),
+      # total_similaridade_acima_60 = sum(similaridade > 0.6)
+    ) %>%
+    mutate(perc_qtde_baixa_similaridade = qtde_similaridade_ate_60 / qtde_itens) %>%
+    filter(qtde_itens >= 50) %>%
+    slice_max(perc_qtde_baixa_similaridade, n = 50) %>%
+    glimpse()
+  # googlesheets4::write_sheet(
+  #   ss = PLAN_SIMILARIDADE,
+  #   sheet = "Top 50 orgaos com baixa similaridade - por quantidade"
+  # )
 
 bind_rows(itens_baixa_similaridade, itens) %>%
   filter(sistema != "Compras.gov.br") %>%
@@ -250,3 +252,80 @@ bind_rows(itens_baixa_similaridade, itens) %>%
     ss = PLAN_SIMILARIDADE,
     sheet = "Órgaos com baixa similaridade"
   )
+
+
+bind_rows(itens_baixa_similaridade, itens) %>%
+  filter(sistema != "Compras.gov.br") %>%
+  filter(similaridade >= .4) |>
+  filter(similaridade <= .5) |>
+  arrange(desc(similaridade)) |>
+  View()
+
+itens |>
+  # filter(sistema == "ECustomize Consultoria em Software S.A") |>
+  filter(sistema != "Compras.gov.br") |>
+  distinct(descricao) |>
+  mutate(descricao2 = limpa_texto(descricao)) |>
+  filter(str_detect(descricao2, "aciclovir")) |>
+  filter(str_detect(descricao2, "200mg")) |>
+  googlesheets4::write_sheet(
+    ss = PLAN_SIMILARIDADE,
+    sheet = "Variantes de Aciclovir - ECustomize"
+  )
+
+limpa_texto <- function(texto) {
+  # Carrega pacotes necessários
+  texto |>
+    tolower() |>
+    stringr::str_replace_all("[[:punct:]]", " ") |>
+    stringr::str_squish() |>
+    stringi::stri_trans_general(id = "Latin-ASCII")
+}
+
+itens |>
+  filter(sistema == "ECustomize Consultoria em Software S.A") |>
+  distinct(descricao) |>
+  arrange()
+
+
+itens |>
+  # filter(sistema == "ECustomize Consultoria em Software S.A") |>
+  filter(sistema != "Compras.gov.br") |>
+  filter(str_detect(tolower(descricao), "paracetamol")) |>
+  distinct(descricao, unidadeMedida, quantidade) |>
+  View()
+
+
+itens |>
+  filter(str_detect(tolower(descricao), "marca")) |>
+  distinct(descricao, unidadeMedida, quantidade) |>
+  print(n = Inf)
+
+
+itens |>
+  filter(descricao == "TRAMADOL 50 MG+ MELOXICAM 7,5 MG + PARACETAMOL 750 MG+ CICLOBENZAPRINA 5MG + FAMOTIDINA 20 MG+ PREDNISONA 5 MG, FRASCO CONTENDO 60 CAPSULAS.") |>
+  glimpse()
+
+itens_baixa_similaridade |>
+  filter(sistema != "Compras.gov.br") |>
+  filter(similaridade >= .45) |>
+  distinct(descricao, unidadeMedida, quantidade) |>
+  arrange(descricao) |>
+  sample_n(150) |>
+  print(n = Inf)
+
+itens_baixa_similaridade |>
+  filter(descricao == "02.02.01.018-0 DOSAGEM DE AMILASE\n02.02.01.055-4 DOSAGEM DE LIPASE\n02.02.07.025-5 DOSAGEM DE LITIO") |>
+  select(endpoint, descricao)
+
+
+options(width = 150)
+
+itens |>
+  filter(between(similaridade, 0.8, 0.81)) |>
+  sample_n(1) |>
+  glimpse()
+
+"Acido Poliacrílico 2mg/g - Gel Oftalmico (7250)"
+"Acetato de Medroxiprogesterona 150 mg/ml, suspensão injetável via intramuscular"
+"Adenosina 3 mg/mL solução injetável, 2mL"
