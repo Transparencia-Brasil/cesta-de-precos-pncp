@@ -41,7 +41,7 @@ C --> D[Coleta Resultados]
 
 ```bash
 cd src/ETL
-./run-coletores.sh "2025-01/QUINZENA-1" "2025-01-01" "2025-01-15" | tee run-coletores-2025-01-Q1.log
+./run-coletores.sh "2025-01/QUINZENA-1" "2025-01-01" "2025-01-15" | tee run-coletores-2025-01-QUINZENA-1.log
 ```
 
 * PARÂMETROS:
