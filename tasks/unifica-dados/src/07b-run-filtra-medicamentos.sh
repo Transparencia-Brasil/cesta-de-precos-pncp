@@ -7,8 +7,8 @@ CATALOGO="C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/data/catmat/ca
 # Caminho para o script Python
 SCRIPT="C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tasks/unifica-dados/src/05-filtra-medicamentos.py"
 
-# Executa o script Python com os argumentos
-python "$SCRIPT" "$ITENS" "$CATALOGO"
+# Executa o script Python com os argumentos usando o Python do .venv
+"C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/.venv/Scripts/python.exe" "$SCRIPT" "$ITENS" "$CATALOGO"
 
 # Exibe uma mensagem ao final
 echo "Execução do script concluída."
