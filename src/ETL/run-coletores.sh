@@ -58,6 +58,7 @@ SCREEN_CONTRATACOES="coletor-contratacoes-${PRIMEIRO_DIA}-ate-${ULTIMO_DIA}"
 SCREEN_ITENS="coletor-itens-${PRIMEIRO_DIA}-ate-${ULTIMO_DIA}"
 SCREEN_CLASSIFICADOR="classificador-itens-${PRIMEIRO_DIA}-ate-${ULTIMO_DIA}"
 SCREEN_RESULTADOS="coletor-resultados-${PRIMEIRO_DIA}-ate-${ULTIMO_DIA}"
+SCREEN_RECOLETA_RESULTADOS="recoletor-resultados-${PRIMEIRO_DIA}-ate-${ULTIMO_DIA}"
 
 
 # SCRIPTS ----------------------------------------------------------------------
@@ -67,6 +68,7 @@ COLETOR_CONTRATACOES="src/ETL/coletores/coletor-contratacoes.sh"
 COLETOR_ITENS="src/ETL/coletores/coletor-itens.sh"
 CLASSIFICADOR="src/ETL/classificador/filtra-medicamentos.sh"
 COLETOR_RESULTADOS="src/ETL/coletores/coletor-resultados.sh"
+RECOLETOR_RESULTADOS="src/ETL/coletores/recoletor-resultados.sh"
 
 
 # FILEPATHS --------------------------------------------------------------------
@@ -75,6 +77,7 @@ COLETOR_RESULTADOS="src/ETL/coletores/coletor-resultados.sh"
 CONTRATACOES_PATH="coleta/contratacoes/${ALIAS_COLETA}/dados.csv"
 ITENS_PATH="coleta/itens/${ALIAS_COLETA}/dados.csv"
 MEDICAMENTOS_PATH="coleta/itens/${ALIAS_COLETA}/medicamentos.csv"
+RESULTADOS_RECOLETA_DIR="coleta/resultados/${ALIAS_COLETA}/recoleta"
 
 
 # FUNÇÃO -----------------------------------------------------------------------
@@ -109,7 +112,7 @@ executar_coletor() {
   local SCREEN_NAME=$3
 
   # Se DADOS_COLETADOS existe e RODAR_COLETOR for o de resultados das contratações, rodar coletor.
-  if [ -f "$DADOS_COLETADOS" ] && [[ "$RODAR_COLETOR" =~ coletor-resultados.sh ]]; then
+  if [ -f "$DADOS_COLETADOS" ] && ([[ "$RODAR_COLETOR" =~ coletor-resultados.sh ]] || [[ "$RODAR_COLETOR" =~ recoletor-resultados.sh ]]); then
     eval "$RODAR_COLETOR"
     echo "coletando resultados das contratações de medicamentos"
   else
@@ -154,6 +157,7 @@ BASH_COLETA_CONTRATACOES="bash $COLETOR_CONTRATACOES ALIAS_COLETA=$ALIAS_COLETA 
 BASH_COLETA_ITENS="bash $COLETOR_ITENS ALIAS_COLETA=$ALIAS_COLETA PRIMEIRO_DIA=$PRIMEIRO_DIA ULTIMO_DIA=$ULTIMO_DIA"
 BASH_CLASSIFICADOR="bash $CLASSIFICADOR ALIAS_COLETA=$ALIAS_COLETA PRIMEIRO_DIA=$PRIMEIRO_DIA ULTIMO_DIA=$ULTIMO_DIA"
 BASH_RESULTADOS="bash $COLETOR_RESULTADOS ALIAS_COLETA=$ALIAS_COLETA PRIMEIRO_DIA=$PRIMEIRO_DIA ULTIMO_DIA=$ULTIMO_DIA"
+BASH_RECOLETA_RESULTADOS="bash $RECOLETOR_RESULTADOS ALIAS_COLETA=$ALIAS_COLETA PRIMEIRO_DIA=$PRIMEIRO_DIA ULTIMO_DIA=$ULTIMO_DIA"
 
 
 # :: CONTRATAÇÃO
@@ -188,6 +192,13 @@ echo -e "Arquivo $MEDICAMENTOS_PATH criado.\nClassificação e filtragem de MEDI
 echo -e "---\n## RESULTADOS\n"
 executar_coletor "$MEDICAMENTOS_PATH" "$BASH_RESULTADOS" "$SCREEN_RESULTADOS"
 echo -e "\nColeta de RESULTADOS de MEDICAMENTOS concluída!\n"
+
+
+# :: RECOLETA DE RESULTADOS (obrigatória)
+
+echo -e "---\n## RECOLETA DE RESULTADOS\n"
+executar_coletor "$RESULTADOS_RECOLETA_DIR/dados.csv" "$BASH_RECOLETA_RESULTADOS" "$SCREEN_RECOLETA_RESULTADOS"
+echo -e "\nRecoleta de RESULTADOS concluída!\n"
 
 
 # FINALIZA COLETA --------------------------------------------------------------
@@ -252,6 +263,7 @@ fi
 CONTRATACOES_PATH="coleta/contratacoes/${ALIAS_COLETA}"
 ITENS_PATH="coleta/itens/${ALIAS_COLETA}"
 RESULTADOS_PATH="coleta/resultados/${ALIAS_COLETA}"
+RESULTADOS_RECOLETA_PATH="${RESULTADOS_PATH}/recoleta"
 
 # Copiar arquivos de contratações
 cp "${CONTRATACOES_PATH}/dados.csv" "${PACOTE_PATH_DADOS}/contratacoes.csv"
@@ -269,6 +281,13 @@ cp "${RESULTADOS_PATH}/dados.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos-resul
 cp "${RESULTADOS_PATH}/erros.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos-resultados-erros.csv"
 cp "${RESULTADOS_PATH}/monitoramento.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos-resultados-monitoramento.csv"
 
+# Copiar arquivos de recoleta (se existirem)
+if [ -d "$RESULTADOS_RECOLETA_PATH" ]; then
+  cp "${RESULTADOS_RECOLETA_PATH}/dados.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos-resultados-recoleta.csv" 2>/dev/null || true
+  cp "${RESULTADOS_RECOLETA_PATH}/erros.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos-resultados-recoleta-erros.csv" 2>/dev/null || true
+  cp "${RESULTADOS_RECOLETA_PATH}/monitoramento.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos-resultados-recoleta-monitoramento.csv" 2>/dev/null || true
+fi
+
 # Confirmar cópia dos csv's
 echo -e "\nArquivos csv copiados para ${PACOTE_PATH_DADOS}"
 
@@ -276,6 +295,9 @@ echo -e "\nArquivos csv copiados para ${PACOTE_PATH_DADOS}"
 cp "${CONTRATACOES_PATH}"/*.log "${PACOTE_PATH_LOG}/" 2>/dev/null || true
 cp "${ITENS_PATH}"/*.log "${PACOTE_PATH_LOG}/" 2>/dev/null || true
 cp "${RESULTADOS_PATH}"/*.log "${PACOTE_PATH_LOG}/" 2>/dev/null || true
+if [ -d "$RESULTADOS_RECOLETA_PATH" ]; then
+  cp "${RESULTADOS_RECOLETA_PATH}"/*.log "${PACOTE_PATH_LOG}/" 2>/dev/null || true
+fi
 
 # Exibe a árvore de diretórios do pacote
 echo -e "\nEstrutura do pacote de dados:\n"
