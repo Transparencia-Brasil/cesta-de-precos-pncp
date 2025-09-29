@@ -62,7 +62,9 @@ dir_itens = os.path.dirname(args.itens)
 dir_catalogo = os.path.dirname(args.catalogo)
 
 # Carrega os dados
-catmat_df = pd.read_csv(args.catalogo)  # CATMAT
+catmat_df = pd.read_csv(args.catalogo)  # CATMAT (fonte)
+# Mantém uma cópia da fonte para reprocessar o catálogo quando necessário
+catmat_src_df = catmat_df.copy()
 itens_df = pd.read_csv(args.itens, on_bad_lines='warn', encoding='utf-8', engine='python')      # Itens PNCP
 
 
@@ -200,28 +202,65 @@ model = SentenceTransformer(model_name)
 # Caminho do cache de embeddings do catálogo. Pode ser sobrescrito por CATALOGO_VETORIZADO_PATH.
 NOME_CATALOGO_VETORIZADO = os.getenv('CATALOGO_VETORIZADO_PATH', os.path.join(dir_catalogo, 'catalogo-vetorizado.csv'))
 
+def _vectoriza_e_salva_catalogo(src_df: pd.DataFrame, output_csv: str) -> pd.DataFrame:
+    """Vectoriza o catálogo a partir do dataframe fonte, salva em CSV (com embedding em JSON
+    e coluna 'embedding_model') e retorna um dataframe com a coluna 'embedding' como arrays (para uso em memória)."""
+    print('\rCalculando os vetores do catálogo.', end="", flush=True)
+    documentos = src_df['nome_item']
+    embeddings = model.encode(documentos)
+
+    df_out = src_df.copy()
+    # Para persistir: salvar JSON e modelo
+    df_to_save = df_out.copy()
+    df_to_save['embedding'] = list(embeddings)
+    df_to_save['embedding'] = df_to_save['embedding'].apply(lambda x: json.dumps(x.tolist()))
+    df_to_save['embedding_model'] = model_name
+    print(f'\rVetorização do catálogo completa. Resultados salvos em {output_csv}', end="")
+    df_to_save.to_csv(output_csv, index=False)
+
+    # Para uso em memória: manter arrays numéricos
+    df_out['embedding'] = [np.array(e, dtype=np.float32) for e in embeddings]
+    return df_out
+
 # Verifica se já existe um arquivo vetorizado do catálogo.
 # Se não existir um catalogo vetorizado, cria-se um.
 if not os.path.exists(NOME_CATALOGO_VETORIZADO):
-    # Computa os vetores (embeddings)
-    print('\rCalculando os vetores do catálogo.', end="", flush=True)
-    documentos = catmat_df['nome_item']
-    embeddings = model.encode(documentos)
-
-    # Adiciona os embeddings como uma coluna no dataframe
-    catmat_df['embedding'] = list(embeddings)
-
-    # Coverte os embeddings para json antes de salvar para manter o formato
-    catmat_df['embedding'] = catmat_df['embedding'].apply(lambda x: json.dumps(x.tolist()))
-
-    # Salvando o catalogo vetorizado no formato CSV
-    print(f'\rVetorização do catálogo completa. Resultados salvos em {NOME_CATALOGO_VETORIZADO}', end="")
-    catmat_df.to_csv(NOME_CATALOGO_VETORIZADO, index=False)
+    # Primeiro run: gera e salva o cache e mantém arrays em memória
+    catmat_df = _vectoriza_e_salva_catalogo(catmat_src_df, NOME_CATALOGO_VETORIZADO)
 else:
-    catmat_df = pd.read_csv(NOME_CATALOGO_VETORIZADO)
+    cache_df = pd.read_csv(NOME_CATALOGO_VETORIZADO)
 
-    # Converte a coluna de embeddings para um array numpy
-    catmat_df['embedding'] = catmat_df['embedding'].apply(lambda x: np.array(json.loads(x)))
+    # Verifica compatibilidade do cache
+    needs_revectorize = False
+    if 'embedding_model' in cache_df.columns:
+        cache_model = str(cache_df['embedding_model'].iloc[0])
+        if cache_model != model_name:
+            print(f"\rModelo do cache ('{cache_model}') difere do modelo atual ('{model_name}'); recalculando...", end="", flush=True)
+            needs_revectorize = True
+    else:
+        # Cache legado: checar dimensão
+        try:
+            # Olha a primeira linha válida
+            first_emb = None
+            for val in cache_df['embedding']:
+                if isinstance(val, str) and val.strip():
+                    first_emb = np.array(json.loads(val))
+                    break
+            if first_emb is not None:
+                expected_dim = getattr(model, 'get_sentence_embedding_dimension', lambda: len(model.encode(["."])[0]))()
+                if len(first_emb) != expected_dim:
+                    print(f"\rDimensão do cache ({len(first_emb)}) difere da dimensão do modelo ({expected_dim}); recalculando...", end="", flush=True)
+                    needs_revectorize = True
+        except Exception:
+            # Em caso de erro ao ler, força revectorização para segurança
+            needs_revectorize = True
+
+    if needs_revectorize:
+        catmat_df = _vectoriza_e_salva_catalogo(catmat_src_df, NOME_CATALOGO_VETORIZADO)
+    else:
+        # Carrega do cache e mantém arrays em memória
+        cache_df['embedding'] = cache_df['embedding'].apply(lambda x: np.array(json.loads(x), dtype=np.float32))
+        catmat_df = cache_df
 
 # Define o código PDM como índice
 catmat_df.set_index('codigo_pdm', inplace=True)
