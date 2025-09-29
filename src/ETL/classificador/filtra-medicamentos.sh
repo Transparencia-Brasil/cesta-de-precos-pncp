@@ -100,8 +100,8 @@ echo ""
 
 # PYTHON DO PROJETO (.venv) ----------------------------------------------------
 
-# Usa sempre o Python do ambiente virtual local (.venv)
-PYTHON_BIN="/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/.venv/Scripts/python.exe"
+# Usa sempre o Python do ambiente virtual local (.venv) via caminho relativo
+PYTHON_BIN="./.venv/Scripts/python.exe"
 
 # Mensagem de confirmação
 echo "Python a ser utilizado:"
