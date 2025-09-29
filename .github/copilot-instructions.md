@@ -1,0 +1,51 @@
+# Instruções para agentes de IA neste repositório
+
+Este repo implementa um ETL para coletar e preparar dados de contratações do PNCP focados em medicamentos, com orquestração em Bash, coleta/processamento em R e uma etapa de classificação/filtragem com Python. Use estas diretrizes para manter compatibilidade com os fluxos atuais.
+
+## Visão geral da arquitetura e fluxos
+- Pipeline principal (arquivo-chave: `src/ETL/run-coletores.sh`):
+  1) Coleta de contratações → `src/ETL/coletores/coletor-contratacoes.sh` chama `coleta-contratacoes.R`.
+  2) Coleta de itens → `src/ETL/coletores/coletor-itens.sh` chama `coleta-itens.R`.
+  3) Classificação/filtragem de medicamentos → `src/ETL/classificador/filtra-medicamentos.sh` (usa Python/embeddings; ver abaixo).
+  4) Coleta de resultados → `src/ETL/coletores/coletor-resultados.sh` chama `coleta-resultados.R`.
+- Empacotamento pós-pipeline no próprio `run-coletores.sh`: copia CSVs e logs para `coleta/data-package/<ANO>/<MÊS>/<QUINZENA>/{DATA,LOG}`.
+- Verificações de carga/volume: `src/ETL/loaders/historico.sql` traz consultas de sanity check em tabelas do DW `medicamentos_transparentes.public` (ex.: `contratante`, `fornecedor`, `contratacao`, `item_homologado`, `item_licitado`).
+
+## Convenções e padrões do projeto
+- Alias de coleta: parâmetro 1 do `run-coletores.sh` (Ex.: `2025-08/QUINZENA-1`). Define a raiz dos diretórios de saída:
+  - `coleta/contratacoes/<ALIAS>` | `coleta/itens/<ALIAS>` | `coleta/resultados/<ALIAS>`
+- Saídas esperadas por etapa (mantenha esses nomes ao criar/alterar scripts):
+  - `dados.csv`, `erros.csv`, `monitoramento.csv` e, para itens, `medicamentos.csv`.
+- Execução desacoplada: scripts de coletor criam uma sessão `screen` (nomeado com datas) e salvam logs em `<DIR_SAIDA>/run-<coletor>-<periodo>.log`. O orquestrador aguarda encerramento das screens quando necessário.
+- Passagem de parâmetros: coletores R são invocados via `Rscript.exe` com args posicionais e/ou `PATH_OUTPUT_DIR=...`. Preserve esse formato (vide `coletor-*.sh`).
+- Normalização Windows/WSL: use `dos2unix` nos `.sh` ao trabalhar no Windows; os scripts assumem `screen` e `tree` disponíveis (ambiente Linux/WSL). `Rscript.exe` é usado explicitamente para compatibilidade com R no Windows.
+
+## Integrações e dependências
+- R 4.0+: scripts em `src/ETL/coletores/*.R` e loaders em `src/ETL/loaders/*.R`. Temas/estilo gráfico em `setup/rsetup.R` (não crítico para o ETL).
+- Python 3.8+: classificador em `src/ETL/classificador/filtra-medicamentos.py` (requisitos em `requirements.txt`: `sentence-transformers`, `nltk`, `pandas`, etc.). O shell `filtra-medicamentos.sh` integra no fluxo.
+- Banco/warehouse: consultas de auditoria em `src/ETL/loaders/historico.sql`. Se criar novos loaders, siga o padrão de contagens/“últimos inseridos”.
+
+## Como rodar localmente (resumo operacional)
+- Pré-passos no Windows/WSL: garantir `screen`, `tree`, R (acessível como `Rscript.exe`) e Python com deps instaladas. Converter finais de linha dos `.sh` se necessário.
+- Execução típica do pipeline:
+  - `src/ETL/run-coletores.sh "<ALIAS>" "<AAAA-MM-DD>" "<AAAA-MM-DD>"` → cria screens para cada etapa e escreve logs nos diretórios de `coleta/...`.
+  - O empacotamento final moverá CSVs e logs para `coleta/data-package/...` conforme a data inicial define `QUINZENA`.
+- Logs: procure o arquivo mais recente em `src/ETL/**/*.log` e nos diretórios de saída de cada etapa.
+
+## Ao editar/criar etapas
+- Scripts novos devem seguir nomes/padrão: `coletor-*.sh` que chamam `Rscript.exe <script>.R` ou `python` e escrevem em `<base>/<ALIAS>/{dados,erros,monitoramento}.csv`.
+- Orquestração: adicione a etapa em `src/ETL/run-coletores.sh` e ajuste a parte de empacotamento para copiar os novos artefatos.
+- Idempotência controlada: `run-coletores.sh` pergunta antes de sobrescrever saídas existentes (exceto resultados). Preserve essa UX ao alterar.
+
+## Exemplos úteis
+- Estrutura de saída esperada após rodar uma quinzena:
+  - `coleta/contratacoes/<ALIAS>/{dados,erros,monitoramento}.csv`
+  - `coleta/itens/<ALIAS>/{dados,erros,monitoramento,medicamentos}.csv`
+  - `coleta/resultados/<ALIAS>/{dados,erros,monitoramento}.csv`
+  - `coleta/data-package/<ANO>/<MÊS>/<QUINZENA>/{DATA,LOG}` com cópias dos CSVs e logs.
+
+---
+Dúvidas/itens a confirmar para melhorar estas instruções:
+- Engine/conexão do DW usado por `historico.sql` (há `use` e `schema public` juntos; documentar exatamente o client/DSN ajudaria).
+- Detalhes do classificador em `filtra-medicamentos.py` (modelo/embedding padrão e onde os vetores são persistidos).
+- Convenção oficial de aliases (observa-se uso de `2025-01/QUINZENA-1` e também `2025-01-Q1` nos dados). Deseja unificar?
