@@ -8,10 +8,10 @@ Arquivos de exemplo:
 Como rodar (PowerShell, usando o venv configurado pelo workspace):
 
 1) Garanta dependências instaladas (já fizemos, mas se precisar repetir):
-   C:\Users\rdurl\OneDrive\Documentos\cesta-de-precos-pncp\.venv-pncp\Scripts\python.exe -m pip install -r requirements.txt
+  .venv-pncp\Scripts\python.exe -m pip install -r requirements.txt
 
 2) Execute o classificador com os CSVs de teste:
-   C:\Users\rdurl\OneDrive\Documentos\cesta-de-precos-pncp\.venv-pncp\Scripts\python.exe src\ETL\classificador\filtra-medicamentos.py src\ETL\dados-de-teste\classificador\itens-sample.csv src\ETL\dados-de-teste\classificador\catmat-sample.csv
+  .venv-pncp\Scripts\python.exe src\ETL\classificador\filtra-medicamentos.py src\ETL\dados-de-teste\classificador\itens-sample.csv src\ETL\dados-de-teste\classificador\catmat-sample.csv
 
 3) Verifique as saídas:
 
