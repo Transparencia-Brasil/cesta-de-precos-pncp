@@ -51,6 +51,10 @@ Este repo implementa um ETL para coletar e preparar dados de contratações do P
   - `coleta/resultados/<ALIAS>/{dados,erros,monitoramento}.csv`
   - `coleta/data-package/<ANO>/<MÊS>/<QUINZENA>/{DATA,LOG}` com cópias dos CSVs e logs.
 
+## Testes rápidos
+- Classificador (smoke test): veja `src/ETL/dados-de-teste/classificador/README.md` para rodar um teste mínimo com fixtures (`itens-sample.csv`, `catmat-sample.csv`).
+- Parametrização opcional: defina `EMBEDDING_MODEL` e/ou `CATALOGO_VETORIZADO_PATH` para testar outros modelos/locais de cache; o script revectoriza se detectar incompatibilidade do cache com o modelo.
+
 ---
 Notas para evoluções futuras:
 - Documentar DSN/cliente PostgreSQL para uso do `historico.sql` quando houver padronização definida.
