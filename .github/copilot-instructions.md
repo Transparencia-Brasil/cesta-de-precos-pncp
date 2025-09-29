@@ -22,7 +22,10 @@ Este repo implementa um ETL para coletar e preparar dados de contratações do P
 
 ## Integrações e dependências
 - R 4.0+: scripts em `src/ETL/coletores/*.R` e loaders em `src/ETL/loaders/*.R`. Temas/estilo gráfico em `setup/rsetup.R` (não crítico para o ETL).
-- Python 3.8+: classificador em `src/ETL/classificador/filtra-medicamentos.py` (requisitos em `requirements.txt`: `sentence-transformers`, `nltk`, `pandas`, etc.). O shell `filtra-medicamentos.sh` integra no fluxo.
+- Python 3.8+: classificador em `src/ETL/classificador/filtra-medicamentos.py` (requisitos em `requirements.txt`: `sentence-transformers`, `nltk`, `pandas`, etc.). Detalhes:
+  - Modelo de embedding: `Snowflake/snowflake-arctic-embed-l-v2.0`.
+  - Cache dos embeddings do catálogo: `data/catmat/catalogo-vetorizado.csv`.
+  - Saída gerada: `coleta/itens/<ALIAS>/medicamentos.csv` com colunas incluindo `codigo_br` e `similaridade`.
 - Banco/warehouse: consultas de auditoria em `src/ETL/loaders/historico.sql`. Se criar novos loaders, siga o padrão de contagens/“últimos inseridos”.
 
 ## Como rodar localmente (resumo operacional)
@@ -31,6 +34,7 @@ Este repo implementa um ETL para coletar e preparar dados de contratações do P
   - `src/ETL/run-coletores.sh "<ALIAS>" "<AAAA-MM-DD>" "<AAAA-MM-DD>"` → cria screens para cada etapa e escreve logs nos diretórios de `coleta/...`.
   - O empacotamento final moverá CSVs e logs para `coleta/data-package/...` conforme a data inicial define `QUINZENA`.
 - Logs: procure o arquivo mais recente em `src/ETL/**/*.log` e nos diretórios de saída de cada etapa.
+  - Observação: `src/ETL/classificador/filtra-medicamentos.sh` referencia um caminho específico do Python no Windows (`/mnt/c/Users/.../WindowsApps/python.exe`); ajuste conforme seu ambiente.
 
 ## Ao editar/criar etapas
 - Scripts novos devem seguir nomes/padrão: `coletor-*.sh` que chamam `Rscript.exe <script>.R` ou `python` e escrevem em `<base>/<ALIAS>/{dados,erros,monitoramento}.csv`.
