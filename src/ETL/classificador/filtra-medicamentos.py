@@ -215,7 +215,7 @@ def _vectoriza_e_salva_catalogo(src_df: pd.DataFrame, output_csv: str) -> pd.Dat
     df_to_save['embedding'] = list(embeddings)
     df_to_save['embedding'] = df_to_save['embedding'].apply(lambda x: json.dumps(x.tolist()))
     df_to_save['embedding_model'] = model_name
-    print(f'\rVetorização do catálogo completa. Resultados salvos em {output_csv}', end="")
+    print(f'\rVetorização do catálogo completa. Resultados salvos em {output_csv}', end="\n")
     df_to_save.to_csv(output_csv, index=False)
 
     # Para uso em memória: manter arrays numéricos
@@ -350,4 +350,4 @@ medicamentos_df['codigo_br'] = medicamentos_df['codigo_br'].astype(int)
 # Salva o arquivo de medicamentos em formato CSV
 medicamentos_df.to_csv(NOME_ARQUIVO_MEDICAMENTOS, index=False)
 
-print(f'\rFim da execução. Medicamentos salvos em {NOME_ARQUIVO_MEDICAMENTOS}', end="")
+print(f'\rFim da execução. Medicamentos salvos em {NOME_ARQUIVO_MEDICAMENTOS}', end="\n")
