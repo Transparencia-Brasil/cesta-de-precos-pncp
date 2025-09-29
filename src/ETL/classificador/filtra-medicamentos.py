@@ -189,13 +189,16 @@ print('\rCarregando o modelo.', end="", flush=True)
 
 # Carrega o modelo
 # Mais informações em: https://huggingface.co/Snowflake/snowflake-arctic-embed-l-v2.0
-model_name = 'Snowflake/snowflake-arctic-embed-l-v2.0'
+# Permite parametrização via variável de ambiente EMBEDDING_MODEL, mantendo o padrão atual se não definida.
+model_name = os.getenv('EMBEDDING_MODEL', 'Snowflake/snowflake-arctic-embed-l-v2.0')
+print(f"\rUsando modelo de embedding: {model_name}", end="", flush=True)
 model = SentenceTransformer(model_name)
 
 
 ### VETORIZAÇÃO DO CATÁLOGO ###############################################################
 
-NOME_CATALOGO_VETORIZADO = dir_catalogo + "/catalogo-vetorizado.csv"
+# Caminho do cache de embeddings do catálogo. Pode ser sobrescrito por CATALOGO_VETORIZADO_PATH.
+NOME_CATALOGO_VETORIZADO = os.getenv('CATALOGO_VETORIZADO_PATH', os.path.join(dir_catalogo, 'catalogo-vetorizado.csv'))
 
 # Verifica se já existe um arquivo vetorizado do catálogo.
 # Se não existir um catalogo vetorizado, cria-se um.

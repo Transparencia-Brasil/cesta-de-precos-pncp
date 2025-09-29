@@ -12,7 +12,7 @@ Este repo implementa um ETL para coletar e preparar dados de contratações do P
 - Verificações de carga/volume: `src/ETL/loaders/historico.sql` traz consultas de sanity check em tabelas do DW `medicamentos_transparentes.public` (ex.: `contratante`, `fornecedor`, `contratacao`, `item_homologado`, `item_licitado`).
 
 ## Convenções e padrões do projeto
-- Alias de coleta: parâmetro 1 do `run-coletores.sh` (Ex.: `2025-08/QUINZENA-1`). Define a raiz dos diretórios de saída:
+- Alias de coleta (padrão oficial): `AAAA-MM/QUINZENA-1|2` (ex.: `2025-08/QUINZENA-1`). Define a raiz dos diretórios de saída:
   - `coleta/contratacoes/<ALIAS>` | `coleta/itens/<ALIAS>` | `coleta/resultados/<ALIAS>`
 - Saídas esperadas por etapa (mantenha esses nomes ao criar/alterar scripts):
   - `dados.csv`, `erros.csv`, `monitoramento.csv` e, para itens, `medicamentos.csv`.
@@ -23,10 +23,13 @@ Este repo implementa um ETL para coletar e preparar dados de contratações do P
 ## Integrações e dependências
 - R 4.0+: scripts em `src/ETL/coletores/*.R` e loaders em `src/ETL/loaders/*.R`. Temas/estilo gráfico em `setup/rsetup.R` (não crítico para o ETL).
 - Python 3.8+: classificador em `src/ETL/classificador/filtra-medicamentos.py` (requisitos em `requirements.txt`: `sentence-transformers`, `nltk`, `pandas`, etc.). Detalhes:
-  - Modelo de embedding: `Snowflake/snowflake-arctic-embed-l-v2.0`.
-  - Cache dos embeddings do catálogo: `data/catmat/catalogo-vetorizado.csv`.
+  - Modelo de embedding padrão: `Snowflake/snowflake-arctic-embed-l-v2.0`.
+  - Parametrização opcional (sem quebrar rotinas existentes):
+    - `EMBEDDING_MODEL` para trocar o modelo de embeddings.
+    - `CATALOGO_VETORIZADO_PATH` para sobrescrever o caminho do cache de embeddings do catálogo.
+  - Cache dos embeddings do catálogo (padrão): `data/catmat/catalogo-vetorizado.csv`.
   - Saída gerada: `coleta/itens/<ALIAS>/medicamentos.csv` com colunas incluindo `codigo_br` e `similaridade`.
-- Banco/warehouse: consultas de auditoria em `src/ETL/loaders/historico.sql`. Se criar novos loaders, siga o padrão de contagens/“últimos inseridos”.
+- Banco/warehouse (PostgreSQL): consultas de auditoria em `src/ETL/loaders/historico.sql`. Se criar novos loaders, siga o padrão de contagens/“últimos inseridos”. Documentar DSN/cliente quando disponível.
 
 ## Como rodar localmente (resumo operacional)
 - Pré-passos no Windows/WSL: garantir `screen`, `tree`, R (acessível como `Rscript.exe`) e Python com deps instaladas. Converter finais de linha dos `.sh` se necessário.
@@ -49,7 +52,6 @@ Este repo implementa um ETL para coletar e preparar dados de contratações do P
   - `coleta/data-package/<ANO>/<MÊS>/<QUINZENA>/{DATA,LOG}` com cópias dos CSVs e logs.
 
 ---
-Dúvidas/itens a confirmar para melhorar estas instruções:
-- Engine/conexão do DW usado por `historico.sql` (há `use` e `schema public` juntos; documentar exatamente o client/DSN ajudaria).
-- Detalhes do classificador em `filtra-medicamentos.py` (modelo/embedding padrão e onde os vetores são persistidos).
-- Convenção oficial de aliases (observa-se uso de `2025-01/QUINZENA-1` e também `2025-01-Q1` nos dados). Deseja unificar?
+Notas para evoluções futuras:
+- Documentar DSN/cliente PostgreSQL para uso do `historico.sql` quando houver padronização definida.
+- Se futuramente outro modelo de embedding for adotado, basta definir `EMBEDDING_MODEL` no ambiente; o fluxo atual permanece inalterado por padrão.
