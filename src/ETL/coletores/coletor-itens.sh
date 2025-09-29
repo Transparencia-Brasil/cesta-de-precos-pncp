@@ -103,7 +103,7 @@ echo ""
 # - RUN SCRIPT
 # Cria screen e roda o script de coletas
 # screen -dmS "$SCREEN_NAME" bash -c "Rscript \"$SCRIPT_R_COLETA_ITENS\" \"$INPUT_FILE\" \"$PATH_OUTPUT_DIR\" > \"$LOG_FILE\" 2>&1"
-screen -dmS "$SCREEN_NAME" bash -c "/mnt/c/Program\ Files/R/R-4.4.2/bin/Rscript.exe \"$SCRIPT_R_COLETA_ITENS\" \"$CONTRATACOES\" \"$PATH_OUTPUT_DIR\" > \"$LOG_FILE\" 2>&1"
+screen -dmS "$SCREEN_NAME" bash -c "Rscript.exe \"$SCRIPT_R_COLETA_ITENS\" \"$CONTRATACOES\" \"$PATH_OUTPUT_DIR\" > \"$LOG_FILE\" 2>&1"
 
 # Mensagem de confirmação
 echo "Coleta de ITENS em execução..."

@@ -43,6 +43,7 @@ PATH_OUTPUT_DIR <- ifelse(length(args) >= 1,
 
 con <- conecta_bd_medicamentos_transparentes()
 
+
 # EXTRAI LISTA DE ITENS AINDA NÃO HOMOLOGADOS -----------------------------
 
 # Tabela de itens licitados mas não homologados
@@ -51,6 +52,7 @@ tb_item_licitado <- dbGetQuery(con, query)
 
 # Gera endpoints de resultados a partir dos endpoints de itens
 endpoints_resultados = paste0(tb_item_licitado$url_api, "/resultados")
+
 
 # RECOLETA OS RESULTADOS --------------------------------------------------
 

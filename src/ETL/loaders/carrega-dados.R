@@ -19,6 +19,7 @@ suppressPackageStartupMessages(library(DBI))
 
 source(here("src/ETL/loaders/utils.R"))
 
+
 # LÊ ARQUIVOS  ------------------------------------------------------------
 
 # Captura os argumentos da linha de comando
@@ -41,11 +42,12 @@ CAMINHO_CONTRATACOES <- args[1]
 CAMINHO_MEDICAMENTOS <- args[2]
 CAMINHO_RESULTADOS <- args[3]
 
-# path_base <- here("coleta/data-package/2025/7 - Julho/QUINZENA-2/DATA")
+# path_base <- here("coleta/data-package/2025/8 - Agosto/QUINZENA-1/DATA")
+path_base <- here("coleta/data-package/2025/8 - Agosto/QUINZENA-2/DATA")
 
-# CAMINHO_CONTRATACOES <- here(path_base, "contratacoes.csv")
-# CAMINHO_MEDICAMENTOS <- here(path_base, "itens-medicamentos.csv")
-# CAMINHO_RESULTADOS <- here(path_base, "itens-medicamentos-resultados.csv")
+CAMINHO_CONTRATACOES <- here(path_base, "contratacoes.csv")
+CAMINHO_MEDICAMENTOS <- here(path_base, "itens-medicamentos.csv")
+CAMINHO_RESULTADOS <- here(path_base, "itens-medicamentos-resultados.csv")
 
 # Lê os arquivos de dados
 contratacoes <- read_csv(CAMINHO_CONTRATACOES, show_col_types = FALSE)
@@ -189,9 +191,11 @@ contratacoes <- contratacoes %>%
   tb_item_licitado <- tb_item_licitado[COLUNAS_ITEM_LICITADO]
 }
 
+
 # CONECTA-SE  COM O BD ----------------------------------------------------
 
 con <- conecta_bd_medicamentos_transparentes()
+
 
 # INSERE OS DADOS ---------------------------------------------------------
 

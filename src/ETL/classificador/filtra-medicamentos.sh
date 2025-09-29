@@ -100,9 +100,20 @@ echo ""
 # RODAR SCRIPT -----------------------------------------------------------------
 
 # - RUN SCRIPT
-# Cria screen e roda o script de coletas
-# screen -dmS "$SCREEN_NAME" bash -c "python3 \"$SCRIPT_PY_FILTRA_MEDICAMENTOS\" \"$ITENS\" \"$CATALOGO\" > \"$LOG_FILE\" 2>&1"
-screen -dmS "$SCREEN_NAME" bash -c "/mnt/c/Users/rdurl/AppData/Local/Microsoft/WindowsApps/python.exe \"$SCRIPT_PY_FILTRA_MEDICAMENTOS\" \"$ITENS\" \"$CATALOGO\" > \"$LOG_FILE\" 2>&1"
+# Cria screen e roda o classificador em Python.
+# Propaga variáveis de ambiente opcionais (EMBEDDING_MODEL e CATALOGO_VETORIZADO_PATH) apenas se definidas.
+
+# Monta prefixo de variáveis de ambiente apenas quando não vazias
+ENV_PREFIX=""
+if [ -n "$EMBEDDING_MODEL" ]; then
+  ENV_PREFIX="EMBEDDING_MODEL=\"$EMBEDDING_MODEL\" $ENV_PREFIX"
+fi
+if [ -n "$CATALOGO_VETORIZADO_PATH" ]; then
+  ENV_PREFIX="CATALOGO_VETORIZADO_PATH=\"$CATALOGO_VETORIZADO_PATH\" $ENV_PREFIX"
+fi
+
+# Registra no log os valores efetivos e executa o script Python
+screen -dmS "$SCREEN_NAME" bash -c "{ echo \"EMBEDDING_MODEL=${EMBEDDING_MODEL:-<não definido>}\"; echo \"CATALOGO_VETORIZADO_PATH=${CATALOGO_VETORIZADO_PATH:-<padrão>}\"; } > \"$LOG_FILE\"; ${ENV_PREFIX}/mnt/c/Users/rdurl/AppData/Local/Microsoft/WindowsApps/python.exe \"$SCRIPT_PY_FILTRA_MEDICAMENTOS\" \"$ITENS\" \"$CATALOGO\" >> \"$LOG_FILE\" 2>&1"
 
 # Mensagem de confirmação
 echo "Filtragem e classificação de MEDICAMENTOS em execução..."

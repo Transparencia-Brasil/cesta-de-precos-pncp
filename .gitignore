@@ -80,3 +80,4 @@ tasks/mapeamento-ocds-/output/**/zip/*
 tasks/experimento-LLM/inputs/demais-items.csv
 tasks/experimento-LLM/inputs/medicamentos-baixa-similaridade.csv
 /.venv-pncp
+src/ETL/instruções para rodar.txt
