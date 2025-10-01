@@ -1,6 +1,14 @@
 use medicamentos_transparentes;
 
 select * from contratacao limit 1;
+-- Listar todas as tabelas do schema public (PostgreSQL)
+SELECT table_schema, table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
+  AND table_type = 'BASE TABLE'
+ORDER BY table_name;
+
+select * from temp_ids;
 
 -- CONTRATANTES ----------------------------------------------------------------
 SELECT COUNT(*)
@@ -51,6 +59,7 @@ FROM medicamentos_transparentes.public.fornecedor;
 -- Pós Qui2-Julho: 8.744
 -- Pós Qui1-Agosto: 8.897
 -- Pós Qui2-Agosto: 9.043
+-- Pós Qui1-Setembro: 9.155 -> recoleta itens homologados
 
 select *
 from fornecedor
@@ -106,6 +115,7 @@ FROM medicamentos_transparentes.public.item_homologado;
 -- Pós Qui2-Julho: 131.383
 -- Pós Qui1-Agosto: 135.053
 -- Pós Qui2-Agosto: 139.164
+-- Pós Qui1-Setembro: 142.919 -> recoleta itens homologados
 
 
 -- ITEM LICITADO ---------------------------------------------------------------
@@ -128,3 +138,4 @@ FROM medicamentos_transparentes.public.item_licitado;
 -- Pós Qui1-Julho: 128.029
 -- Pós Qui1-Agosto: 131.884
 -- Pós Qui2-Agosto: 133.247
+-- Pós Qui1-Setembro: 118.704 -> recoleta itens homologados
