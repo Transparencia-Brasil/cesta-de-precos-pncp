@@ -38,7 +38,7 @@ args <- commandArgs(trailingOnly = TRUE)
 PATH_OUTPUT_DIR <- ifelse(length(args) >= 1,
                           args[1],
                           here("coleta", "resultados", "itens-licitados"))
-
+# PATH_OUTPUT_DIR <- here("coleta/resultados/2025-09/QUINZENA-2/recoleta")
 
 # CONECTA-SE AO BANCO ----------------------------------------------------------
 
@@ -133,6 +133,7 @@ coleta(endpoints = endpoints_resultados, output_dir = PATH_OUTPUT_DIR, template 
 CAMINHO_RESULTADOS <- here(PATH_OUTPUT_DIR, "dados.csv")
 resultados <- read_csv(CAMINHO_RESULTADOS, show_col_types = FALSE)
 
+
 # Colunas da tabela item_licitado + colunas dos resultados do PNCP
 COLUNAS_ITEM_HOMOLOGADO <- c(
   "numero_controle_pncp",
@@ -170,7 +171,7 @@ COLUNAS_ITEM_HOMOLOGADO <- c(
   "valorUnitarioHomologado",           # Essa coluna vem dos resultados
   "valorTotalHomologado",              # Essa coluna vem dos resultados
   "quantidadeHomologada",              # Essa coluna vem dos resultados
-  "moedaEstrangeira",                  # Essa coluna vem dos resultados
+  "moedaEstrangeira.simbolo",          # Essa coluna vem dos resultados
   "valorNominalMoedaEstrangeira",      # Essa coluna vem dos resultados
   "dataResultado",                     # Essa coluna vem dos resultados
   "dataCancelamento",                  # Essa coluna vem dos resultados
@@ -179,15 +180,19 @@ COLUNAS_ITEM_HOMOLOGADO <- c(
   "url_pncp"
 )
 
+
 # Cria a tabela "fornecedor"
 {
+  message('Cria a tabela "fornecedor"')
   tb_fornecedor <- resultados %>%
     select(all_of(COLUNAS_FORNECEDOR)) %>%
     distinct(niFornecedor, .keep_all = TRUE)
 }
 
+
 # Une os resultados dos itens ao restante das informações para criar a tabela item_homologado
 {
+  message('Une os resultados dos itens ao restante das informações para criar a tabela item_homologado')
   tb_item_homologado <- tb_item_licitado %>%
     inner_join(
       resultados,
@@ -198,6 +203,7 @@ COLUNAS_ITEM_HOMOLOGADO <- c(
       suffix = c("", "Resultado"),
       multiple = "first" # se ouver mais de um resultado, usar só o primeiro
     ) %>%
+    as_tibble() |>
     select(all_of(COLUNAS_ITEM_HOMOLOGADO))
 }
 
