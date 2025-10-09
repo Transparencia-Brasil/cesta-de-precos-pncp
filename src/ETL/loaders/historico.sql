@@ -31,6 +31,8 @@ FROM medicamentos_transparentes.public.contratante;
 -- Pós Qui2-Julho: 10.732
 -- Pós Qui1-Agosto: 10.914
 -- Pós Qui2-Agosto: 11.054
+-- Pós Qui1-Setembro: 11.226
+-- Pós Qui2-Setembro: 11.445
 
 select *
 from contratante
@@ -60,6 +62,9 @@ FROM medicamentos_transparentes.public.fornecedor;
 -- Pós Qui1-Agosto: 8.897
 -- Pós Qui2-Agosto: 9.043
 -- Pós Qui1-Setembro: 9.155 -> recoleta itens homologados
+-- Pós Qui2-Setembro: 9.172 -> recoleta itens homologados
+-- Pós Qui1-Setembro: 9.312
+-- Pós Qui2-Setembro: 9.486
 
 select *
 from fornecedor
@@ -87,6 +92,8 @@ FROM medicamentos_transparentes.public.contratacao;
 -- Pós Qui2-Julho: 70.297
 -- Pós Qui1-Agosto: 72.082
 -- Pós Qui2-Agosto: 73.808
+-- Pós Qui1-Setembro: 76.326
+-- Pós Qui2-Setembro: 79.778
 
 select *
 from contratacao
@@ -116,6 +123,10 @@ FROM medicamentos_transparentes.public.item_homologado;
 -- Pós Qui1-Agosto: 135.053
 -- Pós Qui2-Agosto: 139.164
 -- Pós Qui1-Setembro: 142.919 -> recoleta itens homologados
+-- Pós Qui2-Setembro: 143.344 -> recoleta itens homologados
+-- Pós Qui1-Setembro: 146.556
+-- Pós Qui2-Setembro: 150.930
+
 
 
 -- ITEM LICITADO ---------------------------------------------------------------
@@ -139,3 +150,6 @@ FROM medicamentos_transparentes.public.item_licitado;
 -- Pós Qui1-Agosto: 131.884
 -- Pós Qui2-Agosto: 133.247
 -- Pós Qui1-Setembro: 118.704 -> recoleta itens homologados
+-- Pós Qui2-Setembro: 118.279 -> recoleta itens homologados
+-- Pós Qui1-Setembro: 124.329
+-- Pós Qui2-Setembro: 133.758

@@ -42,8 +42,8 @@ CAMINHO_CONTRATACOES <- args[1]
 CAMINHO_MEDICAMENTOS <- args[2]
 CAMINHO_RESULTADOS <- args[3]
 
-# path_base <- here("coleta/data-package/2025/8 - Agosto/QUINZENA-1/DATA")
-path_base <- here("coleta/data-package/2025/8 - Agosto/QUINZENA-2/DATA")
+# path_base <- here("coleta/data-package/2025/9 - Setembro/QUINZENA-1/DATA")
+# path_base <- here("coleta/data-package/2025/9 - Setembro/QUINZENA-2/DATA")
 
 CAMINHO_CONTRATACOES <- here(path_base, "contratacoes.csv")
 CAMINHO_MEDICAMENTOS <- here(path_base, "itens-medicamentos.csv")
@@ -54,6 +54,11 @@ contratacoes <- read_csv(CAMINHO_CONTRATACOES, show_col_types = FALSE)
 medicamentos <- read_csv(CAMINHO_MEDICAMENTOS, show_col_types = FALSE)
 resultados <- read_csv(CAMINHO_RESULTADOS, show_col_types = FALSE)
 
+list(
+  nrow(contratacoes),
+  nrow(medicamentos),
+  nrow(resultados)
+) %>% walk(~ message("Linhas lidas: ", .x))
 
 # TRANSFORMA DADOS --------------------------------------------------------
 
@@ -63,6 +68,13 @@ resultados <- read_csv(CAMINHO_RESULTADOS, show_col_types = FALSE)
 contratacoes <- contratacoes %>% filter(!is.na(endpoint))
 medicamentos <- medicamentos %>% filter(!is.na(endpoint))
 resultados <- resultados %>% filter(!is.na(endpoint))
+
+
+list(
+  nrow(contratacoes),
+  nrow(medicamentos),
+  nrow(resultados)
+) %>% walk(~ message("Linhas lidas (após remover NA's): ", .x))
 
 # Cria chaves para fazer joins e adiciona a url do item na API
 medicamentos <- medicamentos %>%
@@ -195,7 +207,6 @@ contratacoes <- contratacoes %>%
 # CONECTA-SE  COM O BD ----------------------------------------------------
 
 con <- conecta_bd_medicamentos_transparentes()
-
 
 # INSERE OS DADOS ---------------------------------------------------------
 
