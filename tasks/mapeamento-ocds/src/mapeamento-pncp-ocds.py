@@ -764,6 +764,7 @@ for estado in releases:
                 "uri": "https://medicamentos.transparencia.org.br/",
             },
             "version": "1.1",
+            "license": "https://creativecommons.org/licenses/by/4.0/",
             "extensions": [
                 "https://raw.githubusercontent.com/open-contracting-extensions/ocds_partyDetails_scale_extension/master/extension.json",
                 "https://raw.githubusercontent.com/open-contracting-extensions/ocds_lots_extension/v1.1.5/extension.json",
