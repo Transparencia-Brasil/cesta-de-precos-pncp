@@ -131,13 +131,14 @@ resultados = resultados.drop_duplicates()
 
 # Função para converter data para o formato OCDS
 # Formato esperado: 'YYYY-MM-DDTHH:MM:SSZ'
-def to_ocds_dt(data):
+def to_ocds_dt(data, field=None):
     try:
         dt = datetime.fromisoformat(data).astimezone(timezone.utc)
         ocds_dt = dt.strftime('%Y-%m-%dT%H:%M:%SZ')
         return ocds_dt
     except Exception as e:
-        print(f"Erro ao converter data: {e} ->> {data}: {type(data)}")
+        field_str = f" campo='{field}'" if field else ""
+        print(f"Erro ao converter data:{field_str} valor='{data}' tipo={type(data)} erro={e}")
         return None
 
 # Função para calcular a duração em dias entre duas datas no formato ISO
@@ -177,7 +178,9 @@ def remove_e_separa_contratacoes_por_data_publicacao(df):
     Retorna (contratacoes_sem_data, contratacoes_com_data)
     """
     df = df.copy()
-    df['data.dataPublicacaoPncp_ocds'] = df['data.dataPublicacaoPncp'].apply(to_ocds_dt)
+    df['data.dataPublicacaoPncp_ocds'] = df['data.dataPublicacaoPncp'].apply(
+        lambda x: to_ocds_dt(x, 'data.dataPublicacaoPncp')
+    )
     contratacoes_sem_data = df[df['data.dataPublicacaoPncp_ocds'].isna()].copy()
     contratacoes_com_data = df[df['data.dataPublicacaoPncp_ocds'].notna()].copy()
 
@@ -186,17 +189,48 @@ def remove_e_separa_contratacoes_por_data_publicacao(df):
 
     # total_erros > 0? Salva as contratações sem data em um arquivo CSV para análise posterior
     if total_erros > 0:
-        errors_dir = os.path.join(base_dir, "tasks", "mapeamento-ocds", "output", "errors")
+        errors_dir = os.path.join(base_dir, "tasks", "mapeamento-ocds", "output", str(ano_coleta), str(mes_coleta), "errors", "sem-data-publicacao")
         os.makedirs(errors_dir, exist_ok=True)
         error_file = os.path.join(errors_dir, f"errors-{mes_coleta}-{ano_coleta}.csv")
         contratacoes_sem_data.to_csv(error_file, index=False, encoding="utf-8")
-        print(f"{total_erros} foram encontrados e salvos em {error_file}")
+        print(f"\n{total_erros} foram encontrados e salvos em {error_file}.\n -> Essas contratações NÃO foram processadas!\n")
     else:
         print("Nenhuma contratação sem data encontrada.")
 
     return contratacoes_com_data
 
 contratacoes = remove_e_separa_contratacoes_por_data_publicacao(contratacoes)
+
+
+def remove_e_separa_resultados_por_data_resultado(df):
+    """
+    Aplica a função to_ocds_dt() no campo dataResultado e separa o DataFrame em dois:
+    - resultados_sem_data: linhas onde a data convertida é NA
+    - resultados_com_data: linhas onde a data convertida não é NA
+    Retorna apenas resultados_com_data
+    """
+    df = df.copy()
+    df['dataResultado_ocds'] = df['dataResultado'].apply(
+        lambda x: to_ocds_dt(x, 'dataResultado')
+    )
+    resultados_sem_data = df[df['dataResultado_ocds'].isna()].copy()
+    resultados_com_data = df[df['dataResultado_ocds'].notna()].copy()
+
+    total_erros = len(resultados_sem_data)
+
+    if total_erros > 0:
+        errors_dir = os.path.join(base_dir, "tasks", "mapeamento-ocds", "output", str(ano_coleta), str(mes_coleta), "errors", "sem-data-resultado")
+        os.makedirs(errors_dir, exist_ok=True)
+        error_file = os.path.join(errors_dir, f"errors-resultados-{mes_coleta}-{ano_coleta}.csv")
+        resultados_sem_data.to_csv(error_file, index=False, encoding="utf-8")
+        print(f"\n{total_erros} foram encontrados e salvos em {error_file}.\n -> Essas contratações NÃO foram processadas!\n")
+    else:
+        print("Nenhum resultado sem data encontrado.")
+
+    return resultados_com_data
+
+# Aplicando ao dataset de resultados
+resultados = remove_e_separa_resultados_por_data_resultado(resultados)
 
 
 # : CRIA COLUNA NÚMERO CONTROLE PNCP -------------------------------------------
@@ -461,7 +495,7 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
             "id": str(idx),  # substituindo res['sequencialResultado'], pois não possui um ID único para cada award
             "title": row['data.tipoInstrumentoConvocatorioNome'] + ' - ' + str(row['data.processo']),
             "description": row['data.objetoCompra'],
-            "date": to_ocds_dt(res['dataResultado']),
+            "date": to_ocds_dt(res['dataResultado'], field='dataResultado'),
             "hasSubcontracting": res['indicadorSubcontratacao'],
             "value": {
             "amount": res['valorTotalHomologado'],
@@ -562,7 +596,7 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
     release = {
         "ocid": 'ocds-ye9ov3-' + ocid,
         "id": row['data.numeroControlePNCP'],
-        "date": to_ocds_dt(row['data.dataPublicacaoPncp']),
+        "date": to_ocds_dt(row['data.dataPublicacaoPncp'], field='data.dataPublicacaoPncp'),
         "tag": ["tender", "award"],
         "initiationType": "tender",
         "buyer": {
@@ -691,9 +725,9 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
             **({"submissionMethod": [modalidade_contratacao[str(row['data.modalidadeId'])]]} if pd.notna(modalidade_contratacao[str(row['data.modalidadeId'])]) else {}),
             "submissionMethodDetails": str(row['data.modalidadeNome']),
             **({"tenderPeriod": {
-                **({"startDate": to_ocds_dt(row['data.dataAberturaProposta'])} if pd.notna(row['data.dataAberturaProposta']) else {}),
-                **({"endDate": to_ocds_dt(row['data.dataEncerramentoProposta'])} if pd.notna(row['data.dataEncerramentoProposta']) else {}),
-                **({"maxExtentDate": to_ocds_dt(row['data.dataEncerramentoProposta'])} if pd.notna(row['data.dataEncerramentoProposta']) else {}),
+                **({"startDate": to_ocds_dt(row['data.dataAberturaProposta'], field='data.dataAberturaProposta')} if pd.notna(row['data.dataAberturaProposta']) else {}),
+                **({"endDate": to_ocds_dt(row['data.dataEncerramentoProposta'], field='data.dataEncerramentoProposta')} if pd.notna(row['data.dataEncerramentoProposta']) else {}),
+                **({"maxExtentDate": to_ocds_dt(row['data.dataEncerramentoProposta'], field='data.dataEncerramentoProposta')} if pd.notna(row['data.dataEncerramentoProposta']) else {}),
                 **({"durationInDays": duracao_em_dias(row['data.dataAberturaProposta'], row['data.dataEncerramentoProposta'])} if pd.notna(row['data.dataAberturaProposta']) and pd.notna(row['data.dataEncerramentoProposta']) else {}),
             }} if pd.notna(row['data.dataAberturaProposta']) or pd.notna(row['data.dataEncerramentoProposta']) else {}),
             "items": items,
@@ -758,7 +792,7 @@ for estado in releases:
         # Montagem do objeto OCDS
         ocds = {
             "uri": f"https://medicamentos-transparentes-dados-abertos.s3.sa-east-1.amazonaws.com/{id}-json.zip",  # link no qual o OCDS poderá ser acessado, alterar após definir a URL correta
-            "publishedDate": to_ocds_dt(datetime.now().isoformat()),
+            "publishedDate": to_ocds_dt(datetime.now().isoformat(), field='publisherDate'),
             "publisher": {
                 "name": "Medicamentos Transparentes",
                 "uri": "https://medicamentos.transparencia.org.br/",
@@ -779,14 +813,19 @@ for estado in releases:
 
         # Exportar para JSON
         json_file = f'{id}-{i // lote_tamanho + 1}.json' if total_lotes > 1 else f'{id}.json'
-        with open(os.path.join(base_dir, 'tasks', 'mapeamento-ocds', 'output', json_file), 'w', encoding='utf-8') as f:
+        json_dir = os.path.join(base_dir, 'tasks', 'mapeamento-ocds', 'output', str(ano_coleta), str(mes_coleta), 'JSON')
+        os.makedirs(json_dir, exist_ok=True)
+        json_file = os.path.join(json_dir, json_file)
+        with open(json_file, 'w', encoding='utf-8') as f:
             json.dump(ocds, f, ensure_ascii=False, indent=2)
 
         json_files.append(json_file)
 
     # Exportar para Zip
     zip_file = f"{id}-json.zip"
-    zip_file = os.path.join(base_dir, 'tasks', 'mapeamento-ocds', 'output', zip_file)
+    zip_dir = os.path.join(base_dir, 'tasks', 'mapeamento-ocds', 'output', str(ano_coleta), str(mes_coleta), 'ZIP')
+    os.makedirs(zip_dir, exist_ok=True)
+    zip_file = os.path.join(zip_dir, zip_file)
     with zipfile.ZipFile(zip_file, "w", zipfile.ZIP_DEFLATED) as zipf:
         for json_file in json_files:
             json_path = os.path.join(base_dir, 'tasks', 'mapeamento-ocds', 'output', json_file)
