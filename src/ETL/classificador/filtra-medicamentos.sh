@@ -84,6 +84,7 @@ echo "Saída sendo registrada em:"
 echo " - '$LOG_FILE'."
 echo ""
 
+
 # PARÂMETROS DO COLETOR --------------------------------------------------------
 
 # Caminhos para os arquivos de entrada
@@ -94,6 +95,17 @@ CATALOGO="data/catmat/catmat.csv"
 echo "Parâmetros do classificador:"
 echo "ITENS='$ITENS'"
 echo "CATALOGO='$CATALOGO'"
+echo ""
+
+
+# PYTHON DO PROJETO (.venv) ----------------------------------------------------
+
+# Usa sempre o Python do ambiente virtual local (.venv) via caminho relativo
+PYTHON_BIN="./.venv/Scripts/python.exe"
+
+# Mensagem de confirmação
+echo "Python a ser utilizado:"
+echo " - '$PYTHON_BIN'"
 echo ""
 
 
@@ -112,8 +124,8 @@ if [ -n "$CATALOGO_VETORIZADO_PATH" ]; then
   ENV_PREFIX="CATALOGO_VETORIZADO_PATH=\"$CATALOGO_VETORIZADO_PATH\" $ENV_PREFIX"
 fi
 
-# Registra no log os valores efetivos e executa o script Python
-screen -dmS "$SCREEN_NAME" bash -c "{ echo \"EMBEDDING_MODEL=${EMBEDDING_MODEL:-<não definido>}\"; echo \"CATALOGO_VETORIZADO_PATH=${CATALOGO_VETORIZADO_PATH:-<padrão>}\"; } > \"$LOG_FILE\"; ${ENV_PREFIX}/mnt/c/Users/rdurl/AppData/Local/Microsoft/WindowsApps/python.exe \"$SCRIPT_PY_FILTRA_MEDICAMENTOS\" \"$ITENS\" \"$CATALOGO\" >> \"$LOG_FILE\" 2>&1"
+# Registra no log os valores efetivos e executa o script Python do .venv
+screen -dmS "$SCREEN_NAME" bash -c "{ echo \"EMBEDDING_MODEL=${EMBEDDING_MODEL:-<não definido>}\"; echo \"CATALOGO_VETORIZADO_PATH=${CATALOGO_VETORIZADO_PATH:-<padrão>}\"; echo \"PYTHON_BIN=$PYTHON_BIN\"; } > \"$LOG_FILE\"; ${ENV_PREFIX}$PYTHON_BIN \"$SCRIPT_PY_FILTRA_MEDICAMENTOS\" \"$ITENS\" \"$CATALOGO\" >> \"$LOG_FILE\" 2>&1"
 
 # Mensagem de confirmação
 echo "Filtragem e classificação de MEDICAMENTOS em execução..."

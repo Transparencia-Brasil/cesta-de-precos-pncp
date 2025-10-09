@@ -1,0 +1,210 @@
+---
+# COLETORES
+---
+
+INÍCIO DA COLETA ÀS '05-Oct-2025 14:21:39'
+
+Diretório: ENTRADA
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp
+
+
+Diretório:
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp
+
+PARÂMETROS: 
+ - PRIMEIRO_DIA='2025-09-16' - é a data de início da coleta
+ - ULTIMO_DIA='2025-09-30' - é a data final da coleta
+ - ALIAS_COLETA='2025-09/QUINZENA-2' - é um alias para identificar a coleta e apontar um destino no diretório de /coletas
+
+---
+## CONTRATAÇÃO
+
+Script:
+ - 'src/ETL/coletores/coleta-contratacoes.R'
+
+Diretório de saída:
+ - 'coleta/contratacoes/2025-09/QUINZENA-2'
+
+Screen criada para coletar contratações:
+ - 'coletor-contratacoes-2025-09-16-ate-2025-09-30'
+
+Saída sendo registrada em:
+ - 'coleta/contratacoes/2025-09/QUINZENA-2/run-coletor-contratacoes-2025-09-16-ate-2025-09-30.log'.
+
+Parâmetros do coletor: 
+ - PATH_OUTPUT_DIR="coleta/contratacoes/2025-09/QUINZENA-2"
+ - PRIMEIRO_DIA="2025-09-16"
+ - ULTIMO_DIA="2025-09-30"
+
+Coleta de CONTRATAÇÕES em execução...
+
+There is a screen on:
+	1210.coletor-contratacoes-2025-09-16-ate-2025-09-30	(10/05/25 14:21:39)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+
+Aguardando a screen 'coletor-contratacoes-2025-09-16-ate-2025-09-30' encerrar...
+Screen coletor-contratacoes-2025-09-16-ate-2025-09-30 encerrada
+
+Coleta de CONTRATAÇÕES concluída!
+
+---
+## ITENS
+
+Script:
+ - 'src/ETL/coletores/coleta-itens.R'
+
+Diretório de saída:
+ - 'coleta/itens/2025-09/QUINZENA-2'
+
+Screen criada para coletar itens:
+ - 'coletor-itens-2025-09-16-ate-2025-09-30'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2025-09/QUINZENA-2/run-coletor-itens-2025-09-16-ate-2025-09-30.log'.
+
+Parâmetro do coletor:
+ - CONTRATACOES='coleta/contratacoes/2025-09/QUINZENA-2/dados.csv'
+
+Coleta de ITENS em execução...
+
+There is a screen on:
+	4192.coletor-itens-2025-09-16-ate-2025-09-30	(10/05/25 16:44:39)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+Aguardando a screen 'coletor-itens-2025-09-16-ate-2025-09-30' encerrar...
+Screen coletor-itens-2025-09-16-ate-2025-09-30 encerrada
+
+Coleta de ITENS concluída!
+
+---
+## CLASSIFICADOR - FILTRA MEDICAMENTOS
+
+Script:
+ - 'src/ETL/classificador/filtra-medicamentos.py'
+
+Diretório de saída:
+ - 'coleta/itens/2025-09/QUINZENA-2'
+
+Screen criada para coletar contratações:
+ - 'classificador-2025-09-16-ate-2025-09-30'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2025-09/QUINZENA-2/run-classificador-2025-09-16-ate-2025-09-30.log'.
+
+Parâmetros do classificador:
+ITENS='coleta/itens/2025-09/QUINZENA-2/dados.csv'
+CATALOGO='data/catmat/catmat.csv'
+
+Python a ser utilizado:
+ - './.venv/Scripts/python.exe'
+
+Filtragem e classificação de MEDICAMENTOS em execução...
+
+There is a screen on:
+	28245.classificador-2025-09-16-ate-2025-09-30	(10/06/25 15:37:43)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+
+Aguardando o arquivo 'coleta/itens/2025-09/QUINZENA-2/medicamentos.csv' ser criado...
+
+Arquivo coleta/itens/2025-09/QUINZENA-2/medicamentos.csv criado.
+Classificação e filtragem de MEDICAMENTOS de ITENS concluída!
+
+---
+## RESULTADOS
+
+Script:
+ - 'src/ETL/coletores/coleta-resultados.R'
+
+Diretório de saída:
+ - 'coleta/resultados/2025-09/QUINZENA-2'
+
+Screen criada para coletar resultados:
+ - 'coletor-resultados-2025-09-16-ate-2025-09-30'
+
+Saída sendo registrada em:
+ - 'coleta/resultados/2025-09/QUINZENA-2/run-coletor-resultados-2025-09-16-ate-2025-09-30.log'.
+
+Parâmetro do coletor:
+ - 'coleta/itens/2025-09/QUINZENA-2/medicamentos.csv'
+
+Coleta de RESULTADOS em execução...
+
+There are screens on:
+	30178.coletor-resultados-2025-09-16-ate-2025-09-30	(10/06/25 20:43:27)	(Detached)
+	28245.classificador-2025-09-16-ate-2025-09-30	(10/06/25 16:07:17)	(Detached)
+2 Sockets in /run/screen/S-rdurl0.
+coletando resultados das contratações de medicamentos
+
+Aguardando a screen 'coletor-resultados-2025-09-16-ate-2025-09-30' encerrar...
+Screen coletor-resultados-2025-09-16-ate-2025-09-30 encerrada
+
+Coleta de RESULTADOS de MEDICAMENTOS concluída!
+
+---
+## RECOLETA DE RESULTADOS
+
+Script:
+ - 'src/ETL/coletores/recoleta-resultados.R'
+
+Diretório de saída:
+ - 'coleta/resultados/2025-09/QUINZENA-2/recoleta'
+
+Screen criada para RECOLETA de resultados:
+ - 'recoletor-resultados-2025-09-16-ate-2025-09-30'
+
+Saída sendo registrada em:
+ - 'coleta/resultados/2025-09/QUINZENA-2/recoleta/run-recoletor-resultados-2025-09-16-ate-2025-09-30.log'.
+
+Recoleta de RESULTADOS em execução...
+
+There is a screen on:
+	36207.recoletor-resultados-2025-09-16-ate-2025-09-30	(10/07/25 02:37:26)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+
+Aguardando a screen 'recoletor-resultados-2025-09-16-ate-2025-09-30' encerrar...
+Screen recoletor-resultados-2025-09-16-ate-2025-09-30 encerrada
+
+Recoleta de RESULTADOS concluída!
+
+
+COLETA ENCERRADA ÀS '07-Oct-2025 22:29:48'!
+---
+## PACOTE DE DADOS
+
+Diretório 'coleta/data-package/2025/9 - Setembro/QUINZENA-2/DATA' criado.
+Diretório 'coleta/data-package/2025/9 - Setembro/QUINZENA-2/LOG' criado.
+
+Arquivos csv copiados para coleta/data-package/2025/9 - Setembro/QUINZENA-2/DATA
+
+Estrutura do pacote de dados:
+
+[ 512]  coleta/data-package/2025/9 - Setembro/QUINZENA-2
+├── [ 512]  DATA
+│   ├── [   0]  contratacoes-erros.csv
+│   ├── [ 286]  contratacoes-monitoramento.csv
+│   ├── [165M]  contratacoes.csv
+│   ├── [2.1K]  itens-erros.csv
+│   ├── [1.8M]  itens-medicamentos-resultados-erros.csv
+│   ├── [2.9K]  itens-medicamentos-resultados-monitoramento.csv
+│   ├── [ 14M]  itens-medicamentos-resultados-recoleta-erros.csv
+│   ├── [9.6K]  itens-medicamentos-resultados-recoleta-monitoramento.csv
+│   ├── [234K]  itens-medicamentos-resultados-recoleta.csv
+│   ├── [8.2M]  itens-medicamentos-resultados.csv
+│   ├── [ 16M]  itens-medicamentos.csv
+│   ├── [ 11K]  itens-monitoramento.csv
+│   └── [270M]  itens.csv
+└── [ 512]  LOG
+    ├── [ 591]  run-classificador-2025-09-16-ate-2025-09-30.log
+    ├── [ 63K]  run-coletor-contratacoes-2025-09-16-ate-2025-09-30.log
+    ├── [3.2M]  run-coletor-itens-2025-09-16-ate-2025-09-30.log
+    ├── [1.3M]  run-coletor-resultados-2025-09-16-ate-2025-09-30.log
+    └── [6.7M]  run-recoletor-resultados-2025-09-16-ate-2025-09-30.log
+
+3 directories, 18 files
+
+Arquivos de log copiados para coleta/data-package/2025/9 - Setembro/QUINZENA-2/LOG
+
+Fim! =)

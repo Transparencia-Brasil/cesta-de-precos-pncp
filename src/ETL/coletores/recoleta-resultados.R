@@ -29,7 +29,8 @@ suppressPackageStartupMessages(library(DBI))
 source(here("src/ETL/coletores/utils.R"))
 source(here("src/ETL/loaders/utils.R"))
 
-# PARÂMETROS DE ENTRADAS --------------------------------------------------
+
+# PARÂMETROS DE ENTRADAS -------------------------------------------------------
 
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -37,26 +38,29 @@ args <- commandArgs(trailingOnly = TRUE)
 PATH_OUTPUT_DIR <- ifelse(length(args) >= 1,
                           args[1],
                           here("coleta", "resultados", "itens-licitados"))
+# PATH_OUTPUT_DIR <- here("coleta/resultados/2025-09/QUINZENA-2/recoleta")
 
-
-# CONECTA-SE AO BANCO -----------------------------------------------------
+# CONECTA-SE AO BANCO ----------------------------------------------------------
 
 con <- conecta_bd_medicamentos_transparentes()
 
 
-# EXTRAI LISTA DE ITENS AINDA NÃO HOMOLOGADOS -----------------------------
+# EXTRAI LISTA DE ITENS AINDA NÃO HOMOLOGADOS ----------------------------------
 
 # Tabela de itens licitados mas não homologados
 query <- "SELECT * FROM item_licitado;"
 tb_item_licitado <- dbGetQuery(con, query)
 
+message("Itens licitados ainda não homologados:")
+print(as_tibble(tb_item_licitado))
+
 # Gera endpoints de resultados a partir dos endpoints de itens
 endpoints_resultados = paste0(tb_item_licitado$url_api, "/resultados")
 
 
-# RECOLETA OS RESULTADOS --------------------------------------------------
+# RECOLETA OS RESULTADOS -------------------------------------------------------
 
-# TEMPLATE ----------------------------------------------------------------
+# TEMPLATE ---------------------------------------------------------------------
 # Mapear todas as colunas que serão coletadas e garantir balanceamento do dataset
 
 # referência: https://pncp.gov.br/api/pncp/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/recuperarResultados
@@ -124,10 +128,11 @@ template_resultados_itens <- tibble::tibble(
 coleta(endpoints = endpoints_resultados, output_dir = PATH_OUTPUT_DIR, template = template_resultados_itens)
 
 
-# INSERE RESULTADOS NO BANCO ----------------------------------------------
+# INSERE RESULTADOS NO BANCO ---------------------------------------------------
 
 CAMINHO_RESULTADOS <- here(PATH_OUTPUT_DIR, "dados.csv")
 resultados <- read_csv(CAMINHO_RESULTADOS, show_col_types = FALSE)
+
 
 # Colunas da tabela item_licitado + colunas dos resultados do PNCP
 COLUNAS_ITEM_HOMOLOGADO <- c(
@@ -166,7 +171,7 @@ COLUNAS_ITEM_HOMOLOGADO <- c(
   "valorUnitarioHomologado",           # Essa coluna vem dos resultados
   "valorTotalHomologado",              # Essa coluna vem dos resultados
   "quantidadeHomologada",              # Essa coluna vem dos resultados
-  "moedaEstrangeira",                  # Essa coluna vem dos resultados
+  "moedaEstrangeira.simbolo",          # Essa coluna vem dos resultados
   "valorNominalMoedaEstrangeira",      # Essa coluna vem dos resultados
   "dataResultado",                     # Essa coluna vem dos resultados
   "dataCancelamento",                  # Essa coluna vem dos resultados
@@ -175,15 +180,19 @@ COLUNAS_ITEM_HOMOLOGADO <- c(
   "url_pncp"
 )
 
+
 # Cria a tabela "fornecedor"
 {
+  message('Cria a tabela "fornecedor"')
   tb_fornecedor <- resultados %>%
     select(all_of(COLUNAS_FORNECEDOR)) %>%
     distinct(niFornecedor, .keep_all = TRUE)
 }
 
+
 # Une os resultados dos itens ao restante das informações para criar a tabela item_homologado
 {
+  message('Une os resultados dos itens ao restante das informações para criar a tabela item_homologado')
   tb_item_homologado <- tb_item_licitado %>%
     inner_join(
       resultados,
@@ -194,22 +203,60 @@ COLUNAS_ITEM_HOMOLOGADO <- c(
       suffix = c("", "Resultado"),
       multiple = "first" # se ouver mais de um resultado, usar só o primeiro
     ) %>%
+    as_tibble() |>
     select(all_of(COLUNAS_ITEM_HOMOLOGADO))
 }
 
-# Insere os fornecedores
+# Contages antes da inserção
+
+n_fornecedores_antes <- get_query("select count(*) from fornecedor;") |>
+  pull(count) |>
+  as.integer()
+
+n_itens_hmologados_antes <- get_query("select count(*) from item_homologado;") |>
+  pull(count) |>
+  as.integer()
+
+
+# Insere os fornecedores -------------------------------------------------------
+
 insere_tabela(con, tb_fornecedor, CONSULTA_INSERIR_FORNECEDOR)
 
-# Insere os itens homologados
+n_fornecedores_depois <- get_query("select count(*) from fornecedor;") |>
+  pull(count) |>
+  as.integer()
+
+msg <- sprintf("Foram inseridos %d novos fornecedores.", n_fornecedores_depois - n_fornecedores_antes)
+message(msg)
+message("\r\nAntes:", n_fornecedores_antes, "\r\nDepois:", n_fornecedores_depois)
+
+
+# Insere os itens homologados --------------------------------------------------
+
 insere_tabela(con, tb_item_homologado, CONSULTA_INSERIR_ITEM_HOMOLOGADO)
 
+n_itens_homologados_depois <- get_query("select count(*) from item_homologado;") |>
+  pull(count) |>
+  as.integer()
+
+msg <- sprintf("Foram inseridos %d novos fornecedores.", n_itens_homologados_depois - n_itens_homologados_antes)
+message(msg)
+message("\r\nAntes:", n_itens_homologados_antes, "\r\nDepois:", n_itens_homologados_depois)
 
 # REMOVE ITENS HOMOLOGADOS DA TABELA ITEM_LICITADO ------------------------
 
-ids_itens_homologados <- tb_item_homologado %>% select(numero_controle_pncp, numero_item)
+ids_itens_homologados <- tb_item_homologado %>%
+  select(numero_controle_pncp, numero_item) |>
+  as_tibble()
+
+message("IDs dos itens homologados que serão removidos da tabela item_licitado:")
+print(ids_itens_homologados)
 
 # Inicia a transação manualmente
 dbBegin(con)
+
+# Exemplo: dropar se existir e recriar
+dbExecute(con, "DROP TABLE IF EXISTS temp_ids")
 
 # Cria uma tabela temporária no banco para inserir IDs
 dbExecute(
@@ -223,6 +270,15 @@ dbExecute(
 # Inseri os IDs na tabela temporária
 dbWriteTable(con, "temp_ids", ids_itens_homologados, overwrite = TRUE, row.names = FALSE)
 
+message("Conteúdo da tabela temporária temp_ids:")
+get_query("select * from temp_ids;")
+
+message("Removendo itens homologados da tabela item_licitado...")
+n_itens_licitado_antes <- get_query("select count(*) from item_licitado") |>
+  pull(count) |>
+  as.integer()
+
+
 # Executa o DELETE usando JOIN
 dbExecute(
   con,
@@ -231,8 +287,24 @@ dbExecute(
   AND item_licitado.numero_item = temp_ids.numero_item"
 )
 
+
 # Confirmar as mudanças (commit da transação)
 dbCommit(con)
 
+# Confirmação da remoção
+n_itens_licitado_depois <- get_query("select count(*) from item_licitado") |>
+  pull(count) |>
+  as.integer()
+
+msg <- sprintf(
+  "Foram removidos %d itens homologados da tabela item_licitado.",
+  n_itens_licitado_antes - n_itens_licitado_depois
+)
+message(msg)
+message("\r\nAntes:", n_itens_licitado_antes, "\r\nDepois:", n_itens_licitado_depois)
+
+
 # Fecha a conexão com o BD
 dbDisconnect(con)
+
+message("Fim da recoleta de resultados.")
