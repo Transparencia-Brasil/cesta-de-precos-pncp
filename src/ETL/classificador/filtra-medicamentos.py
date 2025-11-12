@@ -251,6 +251,8 @@ else:
                 if len(first_emb) != expected_dim:
                     print(f"\rDimensão do cache ({len(first_emb)}) difere da dimensão do modelo ({expected_dim}); recalculando...", end="", flush=True)
                     needs_revectorize = True
+                else:
+                    print(f"\rDimensão do cache compatível com o modelo ({expected_dim}); usando cache.", end="", flush=True)
         except Exception:
             # Em caso de erro ao ler, força revectorização para segurança
             needs_revectorize = True
