@@ -1,0 +1,7 @@
+EMBEDDING_MODEL=<nÃ£o definido>
+CATALOGO_VETORIZADO_PATH=<padrÃ£o>
+PYTHON_BIN=./.venv/Scripts/python.exe
+[nltk_data] Downloading package stopwords to
+[nltk_data]     C:\Users\rdurl\AppData\Roaming\nltk_data...
+[nltk_data]   Unzipping corpora\stopwords.zip.
+Validando os argumentos.Detectando nomes PDM nos itens.Carregando o modelo.Usando modelo de embedding: Snowflake/snowflake-arctic-embed-l-v2.0Dimensão do cache compatível com o modelo (1024); usando cache.Calculando os vetores das descrições dos itens do PNCP.Identificando os medicamentosFim da execução. Medicamentos salvos em coleta/itens/2025-11/QUINZENA-1/medicamentos.csv
