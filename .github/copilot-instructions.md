@@ -55,6 +55,18 @@ Este repo implementa um ETL para coletar e preparar dados de contratações do P
 - Classificador (smoke test): veja `src/ETL/dados-de-teste/classificador/README.md` para rodar um teste mínimo com fixtures (`itens-sample.csv`, `catmat-sample.csv`).
 - Parametrização opcional: defina `EMBEDDING_MODEL` e/ou `CATALOGO_VETORIZADO_PATH` para testar outros modelos/locais de cache; o script revectoriza se detectar incompatibilidade do cache com o modelo.
 
+## Boas práticas de versionamento (Git)
+- **Mensagens e idioma**: Sempre em português (PT-BR).
+- **Branches**:
+  - Use prefixos simples para organizar: `feat/` (funcionalidade), `fix/` (correção), `docs/` (documentação), `chore/` (tarefas gerais).
+  - Exemplo: `feat/novo-coletor`, `fix/caminho-windows`.
+- **Commits**:
+  - Mensagens no imperativo (“Adiciona...”, “Corrige...”, “Remove...”).
+  - Estrutura sugerida: `tipo: descrição breve`.
+  - Tipos comuns: `feat`, `fix`, `docs`, `refactor`, `chore`.
+  - Exemplos: `feat: adiciona validação de data`, `fix: corrige erro de encoding`.
+  - Mantenha commits pequenos e com contexto único (evite misturar muitas tarefas num só commit).
+
 ---
 Notas para evoluções futuras:
 - Documentar DSN/cliente PostgreSQL para uso do `historico.sql` quando houver padronização definida.
