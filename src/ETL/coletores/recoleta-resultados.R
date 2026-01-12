@@ -213,7 +213,7 @@ n_fornecedores_antes <- get_query("select count(*) from fornecedor;") |>
   pull(count) |>
   as.integer()
 
-n_itens_hmologados_antes <- get_query("select count(*) from item_homologado;") |>
+n_itens_homologados_antes <- get_query("select count(*) from item_homologado;") |>
   pull(count) |>
   as.integer()
 
@@ -239,7 +239,7 @@ n_itens_homologados_depois <- get_query("select count(*) from item_homologado;")
   pull(count) |>
   as.integer()
 
-msg <- sprintf("Foram inseridos %d novos fornecedores.", n_itens_homologados_depois - n_itens_homologados_antes)
+msg <- sprintf("Foram inseridos %d novos itens homologados.", n_itens_homologados_depois - n_itens_homologados_antes)
 message(msg)
 message("\r\nAntes:", n_itens_homologados_antes, "\r\nDepois:", n_itens_homologados_depois)
 
@@ -268,7 +268,7 @@ dbExecute(
 )
 
 # Inseri os IDs na tabela temporária
-dbWriteTable(con, "temp_ids", ids_itens_homologados, overwrite = TRUE, row.names = FALSE)
+dbWriteTable(con, "temp_ids", ids_itens_homologados, append = TRUE, row.names = FALSE)
 
 message("Conteúdo da tabela temporária temp_ids:")
 get_query("select * from temp_ids;")
