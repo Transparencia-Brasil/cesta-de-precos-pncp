@@ -14,7 +14,7 @@ select * from temp_ids;
 SELECT COUNT(*)
 FROM medicamentos_transparentes.public.contratante;
 
--- Pré-atualização:  8.295 registros
+-- Pré-atualização: 8.295 registros
 -- Pós Qui1-Janeiro: 8.346 (+51)
 -- Pós Qui2-Janeiro: 8.491
 -- Pós Qui1-Fevereiro: 8.637
@@ -33,6 +33,9 @@ FROM medicamentos_transparentes.public.contratante;
 -- Pós Qui2-Agosto: 11.054
 -- Pós Qui1-Setembro: 11.226
 -- Pós Qui2-Setembro: 11.445
+-- Pós Qui1-Outubro: 11.550
+-- Pós Qui2-Outubro: 11.668
+
 
 select *
 from contratante
@@ -44,7 +47,7 @@ limit 10;
 SELECT COUNT(*)
 FROM medicamentos_transparentes.public.fornecedor;
 
--- Pré-atualização:  6.135 registros
+-- Pré-atualização: 6.135 registros
 -- Pós Qui1-Janeiro: 6.313
 -- Pós Qui2-Janeiro: 6.498
 -- Pós Qui1-Fevereiro: 6.673
@@ -65,6 +68,10 @@ FROM medicamentos_transparentes.public.fornecedor;
 -- Pós Qui2-Setembro: 9.172 -> recoleta itens homologados
 -- Pós Qui1-Setembro: 9.312
 -- Pós Qui2-Setembro: 9.486
+-- Pós Qui1-Outubro: 9.715 -> Recoleta itens homologados
+-- Pós Qui1-Outubro: 9.810
+-- Pós Qui2-Outubro: 9.904
+
 
 select *
 from fornecedor
@@ -75,7 +82,8 @@ limit 10;
 -- CONTRATACAO -----------------------------------------------------------------
 SELECT COUNT(*)
 FROM medicamentos_transparentes.public.contratacao;
--- Pré-atualização:  46.652 registros
+
+-- Pré-atualização: 46.652 registros
 -- Pós Qui1-Janeiro: 47.141
 -- Pós Qui2-Janeiro: 48.186
 -- Pós Qui1-Fevereiro: 49.658
@@ -94,6 +102,8 @@ FROM medicamentos_transparentes.public.contratacao;
 -- Pós Qui2-Agosto: 73.808
 -- Pós Qui1-Setembro: 76.326
 -- Pós Qui2-Setembro: 79.778
+-- Pós Qui1-Outubro: 81.256
+-- Pós Qui2-Outubro: 82.723
 
 select *
 from contratacao
@@ -105,7 +115,7 @@ limit 10;
 SELECT COUNT(*)
 FROM medicamentos_transparentes.public.item_homologado;
 
--- Pré-atualização:  88.709 registros
+-- Pré-atualização: 88.709 registros
 -- Pós Qui1-Janeiro: 89.567
 -- Pós Qui2-Janeiro: 90.861
 -- Pós Qui1-Fevereiro: 93.201
@@ -126,13 +136,15 @@ FROM medicamentos_transparentes.public.item_homologado;
 -- Pós Qui2-Setembro: 143.344 -> recoleta itens homologados
 -- Pós Qui1-Setembro: 146.556
 -- Pós Qui2-Setembro: 150.930
-
+-- Pós Qui1-Outubro: 161.400
+-- Pós Qui2-Outubro: 162.289
 
 
 -- ITEM LICITADO ---------------------------------------------------------------
 SELECT COUNT(*)
 FROM medicamentos_transparentes.public.item_licitado;
--- Pré-atualização:  73.683 registros
+
+-- Pré-atualização: 73.683 registros
 -- Pós Qui1-Janeiro: 74.760
 -- Pós Qui2-Janeiro: 75.628 // 77.202 (4 registros inconsistentes, verificar motivo)
 -- Pós Qui1-Fevereiro: 80.162
@@ -153,3 +165,5 @@ FROM medicamentos_transparentes.public.item_licitado;
 -- Pós Qui2-Setembro: 118.279 -> recoleta itens homologados
 -- Pós Qui1-Setembro: 124.329
 -- Pós Qui2-Setembro: 133.758
+-- Pós Qui1-Outubro: 137.383
+-- Pós Qui2-Outubro: 140.167
