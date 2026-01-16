@@ -1,6 +1,8 @@
 use medicamentos_transparentes;
 
+-- Teste de conexão e visualização de dados
 select * from contratacao limit 1;
+
 -- Listar todas as tabelas do schema public (PostgreSQL)
 SELECT table_schema, table_name
 FROM information_schema.tables
@@ -35,6 +37,8 @@ FROM medicamentos_transparentes.public.contratante;
 -- Pós Qui2-Setembro: 11.445
 -- Pós Qui1-Outubro: 11.550
 -- Pós Qui2-Outubro: 11.668
+-- Pós Qui1-Novembro: 11.822
+-- Pós Qui2-Novembro: 11.935
 
 
 select *
@@ -71,6 +75,8 @@ FROM medicamentos_transparentes.public.fornecedor;
 -- Pós Qui1-Outubro: 9.715 -> Recoleta itens homologados
 -- Pós Qui1-Outubro: 9.810
 -- Pós Qui2-Outubro: 9.904
+-- Pós Qui1-Novembro: 10.015
+-- Pós Qui2-Novembro: 10.136
 
 
 select *
@@ -104,6 +110,8 @@ FROM medicamentos_transparentes.public.contratacao;
 -- Pós Qui2-Setembro: 79.778
 -- Pós Qui1-Outubro: 81.256
 -- Pós Qui2-Outubro: 82.723
+-- Pós Qui1-Novembro: 84.317
+-- Pós Qui2-Novembro: 85.890
 
 select *
 from contratacao
@@ -138,6 +146,8 @@ FROM medicamentos_transparentes.public.item_homologado;
 -- Pós Qui2-Setembro: 150.930
 -- Pós Qui1-Outubro: 161.400
 -- Pós Qui2-Outubro: 162.289
+-- Pós Qui1-Novembro: 164.979
+-- Pós Qui2-Novembro: 168.170
 
 
 -- ITEM LICITADO ---------------------------------------------------------------
@@ -167,3 +177,5 @@ FROM medicamentos_transparentes.public.item_licitado;
 -- Pós Qui2-Setembro: 133.758
 -- Pós Qui1-Outubro: 137.383
 -- Pós Qui2-Outubro: 140.167
+-- Pós Qui1-Novembro: 143.188
+-- Pós Qui2-Novembro: 146.321
