@@ -35,9 +35,19 @@ source(here("src/ETL/loaders/utils.R"))
 args <- commandArgs(trailingOnly = TRUE)
 
 # Verifica se o argumento foi passado, caso contrário, define um padrão
-PATH_OUTPUT_DIR <- ifelse(length(args) >= 1,
-                          args[1],
-                          here("coleta", "resultados", "itens-licitados"))
+# Observação: `output_dir` precisa funcionar tanto para caminhos absolutos quanto relativos.
+raw_output_dir <- ifelse(
+  length(args) >= 1,
+  args[1],
+  file.path("coleta", "resultados", "itens-licitados")
+)
+
+# Considera absoluto se for Windows (C:/... ou C:\...) ou Unix (/...)
+is_absolute_path <- function(p) {
+  grepl("^[A-Za-z]:[\\\\/]", p) || startsWith(p, "/")
+}
+
+PATH_OUTPUT_DIR <- if (is_absolute_path(raw_output_dir)) raw_output_dir else here(raw_output_dir)
 # PATH_OUTPUT_DIR <- here("coleta/resultados/2025-09/QUINZENA-2/recoleta")
 
 # CONECTA-SE AO BANCO ----------------------------------------------------------
@@ -121,7 +131,7 @@ template_resultados_itens <- tibble::tibble(
   # resultado/cancelamento
   dataResultado = character(),
   dataCancelamento = character(),
-  motivoCancelamento = character(),
+  motivoCancelamento = character()
 )
 
 # Executa a coleta com template definido
@@ -130,8 +140,16 @@ coleta(endpoints = endpoints_resultados, output_dir = PATH_OUTPUT_DIR, template 
 
 # INSERE RESULTADOS NO BANCO ---------------------------------------------------
 
-CAMINHO_RESULTADOS <- here(PATH_OUTPUT_DIR, "dados.csv")
-resultados <- read_csv(CAMINHO_RESULTADOS, show_col_types = FALSE)
+CAMINHO_RESULTADOS <- file.path(PATH_OUTPUT_DIR, "dados.csv")
+resultados <- read_csv(
+  CAMINHO_RESULTADOS,
+  show_col_types = FALSE,
+  col_types = readr::cols(.default = readr::col_character())
+)
+
+# Normaliza tipos mínimos para compatibilidade com o join (item_licitado.numero_item costuma ser inteiro)
+resultados <- resultados %>%
+  mutate(numeroItem = suppressWarnings(as.integer(numeroItem)))
 
 
 # Colunas da tabela item_licitado + colunas dos resultados do PNCP
@@ -209,42 +227,90 @@ COLUNAS_ITEM_HOMOLOGADO <- c(
 
 # Contages antes da inserção
 
-n_fornecedores_antes <- get_query("select count(*) from fornecedor;") |>
-  pull(count) |>
-  as.integer()
 
-n_itens_hmologados_antes <- get_query("select count(*) from item_homologado;") |>
-  pull(count) |>
-  as.integer()
+#' @title Contagem segura de uma consulta
+#' @description Executa uma consulta via `get_query()` e retorna o primeiro valor como inteiro.
+#' Em caso de erro, emite mensagem e retorna `NA_integer_`.
+#' @param qry Objeto/consulta a ser executada por `get_query()`.
+#' @return Um inteiro com a contagem ou `NA_integer_` se falhar.
+#' @keywords internal
+safe_count <- function(qry) {
+  tryCatch({
+    get_query(qry) |>
+      dplyr::pull(1) |>
+      as.integer()
+  }, error = function(e) {
+    message("Falha ao obter contagem (retornando NA): ", e$message)
+    NA_integer_
+  })
+}
+
+# Contagens antes da inserção
+n_fornecedores_antes <- safe_count("select count(*) from fornecedor;")
+n_itens_homologados_antes <- safe_count("select count(*) from item_homologado;")
 
 
-# Insere os fornecedores -------------------------------------------------------
+# Insere os fornecedores =======================================================
 
 insere_tabela(con, tb_fornecedor, CONSULTA_INSERIR_FORNECEDOR)
 
-n_fornecedores_depois <- get_query("select count(*) from fornecedor;") |>
-  pull(count) |>
-  as.integer()
 
-msg <- sprintf("Foram inseridos %d novos fornecedores.", n_fornecedores_depois - n_fornecedores_antes)
-message(msg)
+# Insere os fornecedores - LOG -------------------------------------------------
+
+# Contagens depois da inserção
+n_fornecedores_depois <- safe_count("select count(*) from fornecedor;")
+
+# Calcula e exibe a diferença
+delta_fornecedores <- if (is.na(n_fornecedores_antes) || is.na(n_fornecedores_depois)) {
+  NA_integer_
+} else {
+  n_fornecedores_depois - n_fornecedores_antes
+}
+
+# Exibe a mensagem apropriada
+if (is.na(delta_fornecedores)) {
+  message("Não foi possível calcular a quantidade de novos fornecedores (contagens indisponíveis).")
+} else {
+  msg <- sprintf("Foram inseridos %d novos fornecedores.", delta_fornecedores)
+  message(msg)
+}
+
+# Exibe as contagens antes e depois
 message("\r\nAntes:", n_fornecedores_antes, "\r\nDepois:", n_fornecedores_depois)
 
 
-# Insere os itens homologados --------------------------------------------------
+# Insere os itens homologados ==================================================
 
 insere_tabela(con, tb_item_homologado, CONSULTA_INSERIR_ITEM_HOMOLOGADO)
 
-n_itens_homologados_depois <- get_query("select count(*) from item_homologado;") |>
-  pull(count) |>
-  as.integer()
 
-msg <- sprintf("Foram inseridos %d novos fornecedores.", n_itens_homologados_depois - n_itens_homologados_antes)
-message(msg)
+# Insere os itens homologados - LOG --------------------------------------------
+
+# Contagens depois da inserção
+n_itens_homologados_depois <- safe_count("select count(*) from item_homologado;")
+
+# Calcula e exibe a diferença
+delta_itens_homologados <- if (is.na(n_itens_homologados_antes) || is.na(n_itens_homologados_depois)) {
+  NA_integer_
+} else {
+  n_itens_homologados_depois - n_itens_homologados_antes
+}
+
+# Exibe a mensagem apropriada
+if (is.na(delta_itens_homologados)) {
+  message("Não foi possível calcular a quantidade de novos itens homologados (contagens indisponíveis).")
+} else {
+  msg <- sprintf("Foram inseridos %d novos itens homologados.", delta_itens_homologados)
+  message(msg)
+}
+
+# Exibe as contagens antes e depois
 message("\r\nAntes:", n_itens_homologados_antes, "\r\nDepois:", n_itens_homologados_depois)
 
-# REMOVE ITENS HOMOLOGADOS DA TABELA ITEM_LICITADO ------------------------
 
+# REMOVE ITENS HOMOLOGADOS DA TABELA ITEM_LICITADO =============================
+
+# IDs dos itens homologados
 ids_itens_homologados <- tb_item_homologado %>%
   select(numero_controle_pncp, numero_item) |>
   as_tibble()
@@ -252,56 +318,67 @@ ids_itens_homologados <- tb_item_homologado %>%
 message("IDs dos itens homologados que serão removidos da tabela item_licitado:")
 print(ids_itens_homologados)
 
-# Inicia a transação manualmente
-dbBegin(con)
+if (nrow(ids_itens_homologados) == 0) {
+  message("Nenhum item homologado para remover de item_licitado.")
+} else {
+  # Inicia a transação manualmente
+  dbBegin(con)
 
-# Exemplo: dropar se existir e recriar
-dbExecute(con, "DROP TABLE IF EXISTS temp_ids")
+  tryCatch({
+    # Exemplo: dropar se existir e recriar
+    dbExecute(con, "DROP TABLE IF EXISTS temp_ids")
 
-# Cria uma tabela temporária no banco para inserir IDs
-dbExecute(
-  con,
-  "CREATE TEMP TABLE temp_ids (
-      numero_controle_pncp VARCHAR(30),
-      numero_item INTEGER,
-      PRIMARY KEY (numero_controle_pncp, numero_item)) ON COMMIT DROP"
-)
+    # Cria uma tabela temporária no banco para inserir IDs
+    dbExecute(
+      con,
+      "CREATE TEMP TABLE temp_ids (
+          numero_controle_pncp VARCHAR(30),
+          numero_item INTEGER,
+          PRIMARY KEY (numero_controle_pncp, numero_item)) ON COMMIT DROP"
+    )
 
-# Inseri os IDs na tabela temporária
-dbWriteTable(con, "temp_ids", ids_itens_homologados, overwrite = TRUE, row.names = FALSE)
+    # Insere os IDs na tabela temporária
+    dbWriteTable(con, "temp_ids", ids_itens_homologados, append = TRUE, row.names = FALSE)
 
-message("Conteúdo da tabela temporária temp_ids:")
-get_query("select * from temp_ids;")
+    message("Conteúdo da tabela temporária temp_ids:")
+    get_query("select * from temp_ids;")
 
-message("Removendo itens homologados da tabela item_licitado...")
-n_itens_licitado_antes <- get_query("select count(*) from item_licitado") |>
-  pull(count) |>
-  as.integer()
+    message("Removendo itens homologados da tabela item_licitado...")
+    n_itens_licitado_antes <- safe_count("select count(*) from item_licitado")
 
+    # Executa o DELETE usando JOIN
+    dbExecute(
+      con,
+      "DELETE FROM item_licitado USING temp_ids
+      WHERE item_licitado.numero_controle_pncp = temp_ids.numero_controle_pncp
+      AND item_licitado.numero_item = temp_ids.numero_item"
+    )
 
-# Executa o DELETE usando JOIN
-dbExecute(
-  con,
-  "DELETE FROM item_licitado USING temp_ids
-  WHERE item_licitado.numero_controle_pncp = temp_ids.numero_controle_pncp
-  AND item_licitado.numero_item = temp_ids.numero_item"
-)
+    # Confirmar as mudanças (commit da transação)
+    dbCommit(con)
+  }, error = function(e) {
+    message("Erro ao remover itens homologados de item_licitado; aplicando rollback.\n", e$message)
+    try(dbRollback(con), silent = TRUE)
+    stop(e)
+  })
 
+  # Confirmação da remoção
+  n_itens_licitado_depois <- safe_count("select count(*) from item_licitado")
 
-# Confirmar as mudanças (commit da transação)
-dbCommit(con)
+  if (is.na(n_itens_licitado_antes) || is.na(n_itens_licitado_depois)) {
+    message("Remoção concluída, mas não foi possível calcular a quantidade removida (contagens indisponíveis).")
+  } else {
+    # Mensagem de log da remoção
+    msg <- sprintf(
+      "Foram removidos %d itens homologados da tabela item_licitado.",
+      n_itens_licitado_antes - n_itens_licitado_depois
+    )
+    message(msg)
+  }
 
-# Confirmação da remoção
-n_itens_licitado_depois <- get_query("select count(*) from item_licitado") |>
-  pull(count) |>
-  as.integer()
-
-msg <- sprintf(
-  "Foram removidos %d itens homologados da tabela item_licitado.",
-  n_itens_licitado_antes - n_itens_licitado_depois
-)
-message(msg)
-message("\r\nAntes:", n_itens_licitado_antes, "\r\nDepois:", n_itens_licitado_depois)
+  # Exibe as contagens antes e depois
+  message("\r\nAntes:", n_itens_licitado_antes, "\r\nDepois:", n_itens_licitado_depois)
+}
 
 
 # Fecha a conexão com o BD
