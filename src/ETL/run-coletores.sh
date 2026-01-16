@@ -218,6 +218,9 @@ ANO_COLETA=${PRIMEIRO_DIA:0:4}
 MES_COLETA=${PRIMEIRO_DIA:5:2}
 DIA_COLETA=${PRIMEIRO_DIA:8:2}
 
+# Preserva mês numérico para nome de arquivo de log do orquestrador
+MES_NUM=$MES_COLETA
+
 # Determinar qual quinzena
 if [ "$DIA_COLETA" = "01" ]; then
   QUINZENA="QUINZENA-1"
@@ -309,11 +312,16 @@ else
     tree -h -- "${PACOTE_PATH}"
 fi
 
-# Encontra o arquivo de log mais recente em src/ETL e seus subdiretórios
-LATEST_LOG=$(find src/ETL -type f -name "*.log" -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" ")
-
-if [ -n "$LATEST_LOG" ]; then
-  cp "$LATEST_LOG" "${PACOTE_PATH_LOG}/"
+# Copia o log do orquestrador (run-coletores) para o pacote de logs
+ORQUESTRADOR_LOG="src/ETL/log/run-coletores-${ANO_COLETA}-${MES_NUM}-${QUINZENA}.log"
+if [ -f "$ORQUESTRADOR_LOG" ]; then
+  cp "$ORQUESTRADOR_LOG" "${PACOTE_PATH_LOG}/"
+else
+  echo -e "\nAviso: log do orquestrador não encontrado em '$ORQUESTRADOR_LOG'. Copiando o log mais recente em src/ETL como fallback."
+  LATEST_LOG=$(find src/ETL -type f -name "*.log" -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" ")
+  if [ -n "$LATEST_LOG" ]; then
+    cp "$LATEST_LOG" "${PACOTE_PATH_LOG}/"
+  fi
 fi
 
 # Confirmar cópia dos logs
