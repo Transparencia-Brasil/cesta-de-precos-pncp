@@ -20,7 +20,9 @@ pwd
 echo ""
 
 
+# ------------------------------------------------------------------------------
 # PARÂMETROS DO BASH -----------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # Verifica se os argumentos foram fornecidos
 if [ -z "$1" ]; then
@@ -80,7 +82,9 @@ MEDICAMENTOS_PATH="coleta/itens/${ALIAS_COLETA}/medicamentos.csv"
 RESULTADOS_RECOLETA_DIR="coleta/resultados/${ALIAS_COLETA}/recoleta"
 
 
+# ------------------------------------------------------------------------------
 # FUNÇÃO -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # Função: executar_coletor
 # Descrição:
@@ -151,7 +155,28 @@ executar_coletor() {
 }
 
 
+# CONFIRMAÇÃO (RECOLETA RESULTADOS) --------------------------------------------
+
+# Pergunta ao usuário se deseja executar a recoleta (obrigando resposta válida)
+while true; do
+  read -r -p "Deseja executar a RECOLETA DE ITENS NÃO HOMOLOGADOS (recoleta de resultados)? (S/N): " RECOLETAR_RESULTADOS
+  case "$RECOLETAR_RESULTADOS" in
+    [Ss]) RECOLETAR_RESULTADOS="S"; break ;;
+    [Nn]) RECOLETAR_RESULTADOS="N"; break ;;
+    *) echo "Resposta inválida. Digite 'S' para Sim ou 'N' para Não." ;;
+  esac
+done
+
+echo -e "Resposta: $RECOLETAR_RESULTADOS\n"
+
+
+# ------------------------------------------------------------------------------
 # EXECUÇÃO ---------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
+# Aqui se iniciam as execuções dos coletores e classificadores. Primeiro, são
+# definidos os comandos bash para cada etapa, que serão passados para a função
+# executar_coletor.
 
 BASH_COLETA_CONTRATACOES="bash $COLETOR_CONTRATACOES ALIAS_COLETA=$ALIAS_COLETA PRIMEIRO_DIA=$PRIMEIRO_DIA ULTIMO_DIA=$ULTIMO_DIA"
 BASH_COLETA_ITENS="bash $COLETOR_ITENS ALIAS_COLETA=$ALIAS_COLETA PRIMEIRO_DIA=$PRIMEIRO_DIA ULTIMO_DIA=$ULTIMO_DIA"
@@ -160,27 +185,29 @@ BASH_RESULTADOS="bash $COLETOR_RESULTADOS ALIAS_COLETA=$ALIAS_COLETA PRIMEIRO_DI
 BASH_RECOLETA_RESULTADOS="bash $RECOLETOR_RESULTADOS ALIAS_COLETA=$ALIAS_COLETA PRIMEIRO_DIA=$PRIMEIRO_DIA ULTIMO_DIA=$ULTIMO_DIA"
 
 
-# :: CONTRATAÇÃO
+# Agora, cada etapa é executada em sequência, utilizando a função executar_coletor.
+
+# :: CONTRATAÇÃO ---
 
 echo -e "---\n## CONTRATAÇÃO\n"
 executar_coletor "$CONTRATACOES_PATH" "$BASH_COLETA_CONTRATACOES" "$SCREEN_CONTRATACOES"
 echo -e "\nColeta de CONTRATAÇÕES concluída!\n"
 
 
-# :: ITENS
+# :: ITENS ---
 
 echo -e "---\n## ITENS\n"
 executar_coletor "$ITENS_PATH" "$BASH_COLETA_ITENS" "$SCREEN_ITENS"
 echo -e "\nColeta de ITENS concluída!\n"
 
 
-# :: CLASSIFICADOR - FILTRA MEDICAMENTOS
+# :: CLASSIFICADOR - FILTRA MEDICAMENTOS ---
 
 echo -e "---\n## CLASSIFICADOR - FILTRA MEDICAMENTOS\n"
 executar_coletor "$MEDICAMENTOS_PATH" "$BASH_CLASSIFICADOR"
 
 
-# :: RESULTADOS
+# :: RESULTADOS ---
 
 # Aguarda o arquivo 'medicamentos.csv' ser criado
 echo -e "\nAguardando o arquivo '$MEDICAMENTOS_PATH' ser criado...\n"
@@ -189,24 +216,39 @@ while [ ! -f "$MEDICAMENTOS_PATH" ]; do
 done
 echo -e "Arquivo $MEDICAMENTOS_PATH criado.\nClassificação e filtragem de MEDICAMENTOS de ITENS concluída!\n"
 
+# A coleta de resultados só pode iniciar após o arquivo de medicamentos ser criado
 echo -e "---\n## RESULTADOS\n"
 executar_coletor "$MEDICAMENTOS_PATH" "$BASH_RESULTADOS" "$SCREEN_RESULTADOS"
 echo -e "\nColeta de RESULTADOS de MEDICAMENTOS concluída!\n"
 
 
-# :: RECOLETA DE RESULTADOS (obrigatória)
+# :: RECOLETA DE RESULTADOS ---
 
 echo -e "---\n## RECOLETA DE RESULTADOS\n"
-executar_coletor "$RESULTADOS_RECOLETA_DIR/dados.csv" "$BASH_RECOLETA_RESULTADOS" "$SCREEN_RECOLETA_RESULTADOS"
-echo -e "\nRecoleta de RESULTADOS concluída!\n"
 
+# A recoleta de resultados é opcional, dependendo da escolha do usuário. Ela só
+# será executada se o usuário tiver respondido "S" na confirmação anterior.
+if [ "$RECOLETAR_RESULTADOS" = "S" ]; then
+  executar_coletor "$RESULTADOS_RECOLETA_DIR/dados.csv" "$BASH_RECOLETA_RESULTADOS" "$SCREEN_RECOLETA_RESULTADOS"
+  echo -e "\nRecoleta de RESULTADOS concluída!\n"
+else
+  echo -e "\nRecoleta de RESULTADOS ignorada (usuário optou por não executar).\n"
+fi
+
+
+# ------------------------------------------------------------------------------
+# FIM DA EXECUÇÃO --------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # FINALIZA COLETA --------------------------------------------------------------
 
 AGORA=$(date +"%d-%b-%Y %H:%M:%S")
 echo -e "\nCOLETA ENCERRADA ÀS '$AGORA'!"
 
+
+# ------------------------------------------------------------------------------
 # EMPACOTADOR ------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 echo -e "---\n## PACOTE DE DADOS\n"
 
