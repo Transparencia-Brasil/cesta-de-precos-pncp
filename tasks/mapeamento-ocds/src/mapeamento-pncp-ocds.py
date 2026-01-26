@@ -821,12 +821,12 @@ for estado in releases:
 
         json_files.append(json_file)
 
-    # Exportar para Zip
+    # Exportar para Zip (sem subdiretórios dentro do ZIP)
     zip_file = f"{id}-json.zip"
-    zip_dir = os.path.join(base_dir, 'tasks', 'mapeamento-ocds', 'output', str(ano_coleta), str(mes_coleta), 'ZIP')
+    zip_dir = os.path.join(base_dir, "tasks", "mapeamento-ocds", "output", str(ano_coleta), str(mes_coleta), "ZIP", "JSON")
     os.makedirs(zip_dir, exist_ok=True)
     zip_file = os.path.join(zip_dir, zip_file)
+
     with zipfile.ZipFile(zip_file, "w", zipfile.ZIP_DEFLATED) as zipf:
         for json_file in json_files:
-            json_path = os.path.join(base_dir, 'tasks', 'mapeamento-ocds', 'output', json_file)
-            zipf.write(json_path, arcname=json_file)
+            zipf.write(json_file, arcname=os.path.basename(json_file))

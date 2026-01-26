@@ -248,3 +248,7 @@ tasks/mapeamento-ocds/output.old/2025-6/zip/se-6-2025-json.zip
 tasks/mapeamento-ocds/output.old/2025-6/zip/sp-6-2025-json.zip
 tasks/mapeamento-ocds/output.old/2025-6/zip/to-6-2025-json.zip
 tasks/mapeamento-ocds/output.old/exemplo/exemplo.json
+# Ignora todos os CSVs...
+tasks/mapeamento-ocds/output/2025/**/*.csv
+# ...exceto os que têm "erro" no nome
+!tasks/mapeamento-ocds/output/2025/**/*erro*.csv
