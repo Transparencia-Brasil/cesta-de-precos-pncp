@@ -1,21 +1,28 @@
-"""Gera CSVs/ZIPs a partir dos JSONs OCDS produzidos pelo mapeamento.
+"""
+Gera CSVs/ZIPs a partir dos JSONs OCDS produzidos pelo mapeamento.
 
 O script busca JSONs em:
     tasks/mapeamento-ocds/output/<ANO>/**/JSON/*.json
 
-Para cada JSON (alias = nome do arquivo sem extensão), ele:
-1) Executa o `flattentool` para gerar CSVs.
-2) Compacta os CSVs em um ZIP.
+Os JSONs seguem o padrão de nome `{uf}-{mes}-{ano}[-{parte}].json`.
+Aliases com a mesma chave `{uf}-{mes}-{ano}` são agrupados e seus CSVs
+compactados num único ZIP.
+
+Para cada grupo (group_key = `{uf}-{mes}-{ano}`):
+1) Executa o `flattentool` para cada JSON do grupo, gerando CSVs.
+2) Compacta todos os CSVs do grupo em um único ZIP.
 
 Convenções de saída (por mês):
-    .../<ANO>/<MES>/CSV/<alias>*
-    .../<ANO>/<MES>/ZIP/CSV/<alias>-csv.zip
+    .../<ANO>/<MES>/CSV/<alias>*        (CSVs individuais por alias)
+    .../<ANO>/<MES>/ZIP/CSV/<group_key>-csv.zip  (ZIP único por grupo)
 
 Observação: o ZIP fica em `ZIP/CSV` por decisão do pipeline (evita misturar
 outros ZIPs que não sejam de CSVs).
 """
 
 import argparse
+import re
+from collections import defaultdict
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
@@ -33,29 +40,48 @@ def _discover_jsons(output_root: Path) -> list[Path]:
     return sorted(p for p in output_root.glob("**/JSON/*.json") if p.is_file())
 
 
-def _zip_from_prefix(output_csv_prefix: Path, output_zip: Path) -> None:
-    """Compacta em ZIP os CSVs gerados pelo `flattentool`.
+# Padrão: {uf}-{mes}-{ano} seguido opcionalmente de -{parte}
+_ALIAS_RE = re.compile(r"^([a-z]{2}-\d+-\d{4})(?:-\d+)?$")
 
-    O `flattentool` pode:
+
+def _group_key(alias: str) -> str:
+    """Extrai a chave de agrupamento `{uf}-{mes}-{ano}` de um alias.
+
+    Exemplos:
+        'sp-1-2025-1' -> 'sp-1-2025'
+        'sp-1-2025-2' -> 'sp-1-2025'
+        'ac-1-2025'   -> 'ac-1-2025'
+    """
+    m = _ALIAS_RE.match(alias)
+    if m:
+        return m.group(1)
+    # Fallback: o próprio alias (sem parte) já é a chave.
+    return alias
+
+
+def _zip_from_prefixes(csv_prefixes: list[Path], output_zip: Path) -> None:
+    """Compacta em um único ZIP os CSVs gerados por múltiplos prefixos.
+
+    Para cada prefixo o `flattentool` pode:
     - criar uma pasta `output_name/` com múltiplos CSVs; ou
     - gerar CSVs diretamente no diretório pai, com prefixo `output_name`.
     """
     output_zip.parent.mkdir(parents=True, exist_ok=True)
 
     with ZipFile(output_zip, "w", compression=ZIP_DEFLATED) as zf:
-        # Se o flattentool criar uma pasta (p.ex. .../CSV/<alias>/...), zipa recursivamente
-        if output_csv_prefix.exists() and output_csv_prefix.is_dir():
-            for p in output_csv_prefix.rglob("*"):
-                if p.is_file():
-                    # Normaliza o separador para '/' dentro do ZIP (melhor compatibilidade).
-                    arc = p.relative_to(output_csv_prefix).as_posix()
-                    zf.write(p, arcname=arc)
-            return
+        for prefix in csv_prefixes:
+            # Se o flattentool criar uma pasta (p.ex. .../CSV/<alias>/...), zipa recursivamente
+            if prefix.exists() and prefix.is_dir():
+                for p in prefix.rglob("*"):
+                    if p.is_file():
+                        arc = p.relative_to(prefix.parent).as_posix()
+                        zf.write(p, arcname=arc)
+                continue
 
-        # Caso contrário, zipa os CSVs gerados no diretório pai com o prefixo definido
-        for p in output_csv_prefix.parent.glob(f"{output_csv_prefix.name}*.csv"):
-            if p.is_file():
-                zf.write(p, arcname=p.name)
+            # Caso contrário, zipa os CSVs gerados no diretório pai com o prefixo definido
+            for p in prefix.parent.glob(f"{prefix.name}*.csv"):
+                if p.is_file():
+                    zf.write(p, arcname=p.name)
 
 
 def main() -> int:
@@ -117,55 +143,79 @@ def main() -> int:
         print(f"Nenhum JSON encontrado em {output_root} (padrão: **/JSON/*.json)")
         return 0
 
-    total = len(json_paths)
+    # Agrupa JSONs pela chave {uf}-{mes}-{ano}.
+    # Aliases como sp-1-2025-1 e sp-1-2025-2 ficam no mesmo grupo "sp-1-2025".
+    groups: dict[str, list[Path]] = defaultdict(list)
+    for p in json_paths:
+        groups[_group_key(p.stem)].append(p)
+
+    total_groups = len(groups)
+    total_jsons = len(json_paths)
     failures: list[tuple[str, str]] = []
 
-    for i, input_json in enumerate(json_paths, start=1):
-        alias = input_json.stem
+    print(f"{total_jsons} JSONs em {total_groups} grupos\n")
 
-        # Estrutura esperada: .../<ANO>/<MES>/JSON/<alias>.json
-        # `base_output_dir` é a pasta do mês (pai de `JSON/`).
-        base_output_dir = input_json.parent.parent
-        output_csv_prefix = base_output_dir / "CSV" / alias
+    for g_idx, (gkey, group_jsons) in enumerate(sorted(groups.items()), start=1):
+        # Todos os JSONs de um grupo estão no mesmo mês → mesmo base_output_dir.
+        base_output_dir = group_jsons[0].parent.parent
+        output_zip = base_output_dir / "ZIP" / "CSV" / f"{gkey}-csv.zip"
 
-        # Requisito do projeto: o ZIP dos CSVs deve ficar em `ZIP/CSV/`.
-        output_zip = base_output_dir / "ZIP" / "CSV" / f"{alias}-csv.zip"
+        print(f"[grupo {g_idx}/{total_groups}] {gkey} ({len(group_jsons)} arquivo(s))")
 
-        print(f"[{i}/{total}] {alias}")
+        if args.skip_existing_zip and output_zip.exists() and output_zip.stat().st_size > 0:
+            print(f"  - pulando (ZIP já existe): {output_zip}")
+            continue
 
-        try:
-            # Garante que a pasta de CSV exista (o flattentool também precisa disso).
-            output_csv_prefix.parent.mkdir(parents=True, exist_ok=True)
+        csv_prefixes: list[Path] = []
+        group_failed = False
 
-            # Garante a existência do subdiretório `ZIP/CSV`.
-            output_zip.parent.mkdir(parents=True, exist_ok=True)
+        for input_json in group_jsons:
+            alias = input_json.stem
+            output_csv_prefix = base_output_dir / "CSV" / alias
 
-            if args.skip_existing_zip and output_zip.exists() and output_zip.stat().st_size > 0:
-                print(f"  - pulando (ZIP já existe): {output_zip}")
-                continue
+            print(f"  flatten: {alias}")
 
-            flattentool.flatten(
-                str(input_json),
-                root_list_path="releases",
-                main_sheet_name="releases",
-                sheet_prefix=f"{alias}-",
-                root_id="ocid",
-                output_format="csv",
-                output_name=str(output_csv_prefix),
-            )
+            try:
+                # Garante que a pasta de CSV exista (o flattentool também precisa disso).
+                output_csv_prefix.parent.mkdir(parents=True, exist_ok=True)
 
-            _zip_from_prefix(output_csv_prefix, output_zip)
-        except KeyboardInterrupt:
-            print("Interrompido pelo usuário.")
-            return 130
-        except Exception as exc:
-            failures.append((alias, repr(exc)))
-            print(f"  - ERRO em {alias}: {exc!r}")
+                flattentool.flatten(
+                    str(input_json),
+                    root_list_path="releases",
+                    main_sheet_name="releases",
+                    sheet_prefix=f"{alias}-",
+                    root_id="ocid",
+                    output_format="csv",
+                    output_name=str(output_csv_prefix),
+                )
+
+                csv_prefixes.append(output_csv_prefix)
+            except KeyboardInterrupt:
+                print("Interrompido pelo usuário.")
+                return 130
+            except Exception as exc:
+                group_failed = True
+                failures.append((alias, repr(exc)))
+                print(f"    ERRO em {alias}: {exc!r}")
+
+        # Gera o ZIP unificado do grupo (mesmo que algum alias tenha falhado,
+        # zipa os que deram certo).
+        if csv_prefixes:
+            try:
+                output_zip.parent.mkdir(parents=True, exist_ok=True)
+                _zip_from_prefixes(csv_prefixes, output_zip)
+                print(f"  zip: {output_zip.name}")
+            except KeyboardInterrupt:
+                print("Interrompido pelo usuário.")
+                return 130
+            except Exception as exc:
+                failures.append((gkey, repr(exc)))
+                print(f"    ERRO ao criar ZIP {gkey}: {exc!r}")
 
     if failures:
         print("\nFalhas:")
-        for alias, err in failures:
-            print(f"- {alias}: {err}")
+        for name, err in failures:
+            print(f"- {name}: {err}")
         return 1
 
     return 0
