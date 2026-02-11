@@ -252,3 +252,5 @@ tasks/mapeamento-ocds/output.old/exemplo/exemplo.json
 tasks/mapeamento-ocds/output/2025/**/*.csv
 # ...exceto os que têm "erro" no nome
 !tasks/mapeamento-ocds/output/2025/**/*erro*.csv
+tasks/contratacoes-inexigibilidade/outputs/contratacoes.csv
+tasks/contratacoes-inexigibilidade/outputs/itens.csv
