@@ -157,6 +157,8 @@ executar_coletor() {
 
 # CONFIRMAÇÃO (RECOLETA RESULTADOS) --------------------------------------------
 
+echo "Deseja executar a RECOLETA DE ITENS NÃO HOMOLOGADOS (recoleta de resultados)? (S/N): "
+
 # Pergunta ao usuário se deseja executar a recoleta (obrigando resposta válida)
 while true; do
   read -r -p "Deseja executar a RECOLETA DE ITENS NÃO HOMOLOGADOS (recoleta de resultados)? (S/N): " RECOLETAR_RESULTADOS
