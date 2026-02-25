@@ -39,6 +39,11 @@ FROM medicamentos_transparentes.public.contratante;
 -- Pós Qui2-Outubro: 11.668
 -- Pós Qui1-Novembro: 11.822
 -- Pós Qui2-Novembro: 11.935
+-- Pós Qui1-Dezembro: 12.066
+-- Pós Qui2-Dezembro: 12.190
+-- 2026
+-- Pós Qui1-Janeiro: 12.257
+-- Pós Qui2-Janeiro: 12.320
 
 
 select *
@@ -77,6 +82,11 @@ FROM medicamentos_transparentes.public.fornecedor;
 -- Pós Qui2-Outubro: 9.904
 -- Pós Qui1-Novembro: 10.015
 -- Pós Qui2-Novembro: 10.136
+-- Pós Qui1-Dezembro: 10.284
+-- Pós Qui2-Dezembro: 10.400
+-- 2026
+-- Pós Qui1-Janeiro: 10.437
+-- Pós Qui2-Janeiro: 10.489
 
 
 select *
@@ -112,6 +122,11 @@ FROM medicamentos_transparentes.public.contratacao;
 -- Pós Qui2-Outubro: 82.723
 -- Pós Qui1-Novembro: 84.317
 -- Pós Qui2-Novembro: 85.890
+-- Pós Qui1-Dezembro: 87.771
+-- Pós Qui2-Dezembro: 89.922
+-- 2026
+-- Pós Qui1-Janeiro: 90.837
+-- Pós Qui2-Janeiro: 91.577
 
 select *
 from contratacao
@@ -148,6 +163,11 @@ FROM medicamentos_transparentes.public.item_homologado;
 -- Pós Qui2-Outubro: 162.289
 -- Pós Qui1-Novembro: 164.979
 -- Pós Qui2-Novembro: 168.170
+-- Pós Qui1-Dezembro: 172.282
+-- Pós Qui2-Dezembro: 175.634
+-- 2026
+-- Pós Qui1-Janeiro: 177.191
+-- Pós Qui2-Janeiro: 179.079
 
 
 -- ITEM LICITADO ---------------------------------------------------------------
@@ -179,3 +199,8 @@ FROM medicamentos_transparentes.public.item_licitado;
 -- Pós Qui2-Outubro: 140.167
 -- Pós Qui1-Novembro: 143.188
 -- Pós Qui2-Novembro: 146.321
+-- Pós Qui1-Dezembro: 139.789
+-- Pós Qui2-Dezembro: 144.217
+-- 2026
+-- Pós Qui1-Janeiro: 146.385
+-- Pós Qui2-Janeiro: 149.113

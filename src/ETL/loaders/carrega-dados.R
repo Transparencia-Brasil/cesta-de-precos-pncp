@@ -42,8 +42,10 @@ CAMINHO_CONTRATACOES <- args[1]
 CAMINHO_MEDICAMENTOS <- args[2]
 CAMINHO_RESULTADOS <- args[3]
 
-# path_base <- here("coleta/data-package/2025/11 - Novembro/QUINZENA-1/DATA")
-# path_base <- here("coleta/data-package/2025/11 - Novembro/QUINZENA-2/DATA")
+# path_base <- here("coleta/data-package/2025/12 - Dezembro/QUINZENA-1/DATA")
+# path_base <- here("coleta/data-package/2025/12 - Dezembro/QUINZENA-2/DATA")
+# path_base <- here("coleta/data-package/2026/1 - Janeiro/QUINZENA-1/DATA")
+# path_base <- here("coleta/data-package/2026/1 - Janeiro/QUINZENA-2/DATA")
 
 CAMINHO_CONTRATACOES <- here(path_base, "contratacoes.csv")
 CAMINHO_MEDICAMENTOS <- here(path_base, "itens-medicamentos.csv")
