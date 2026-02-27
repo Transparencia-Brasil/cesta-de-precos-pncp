@@ -1,3 +1,7 @@
+
+[<img src="https://medicamentos.transparencia.org.br/brand/logo.png" alt="Medicamentos Transparentes" width="220">](https://medicamentos.transparencia.org.br/)
+<br>
+
 # Cesta de preços - coletores
 
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](LICENSE)
@@ -63,6 +67,4 @@ cd src/ETL
 
 [<img src="ocp-logo.png" alt="open Contract Partnership" width="220">](https://www.open-contracting.org/)<br>
 
-[<img src="https://medicamentos.transparencia.org.br/brand/logo.png" alt="Medicamentos Transparentes" width="220">](https://medicamentos.transparencia.org.br/)
-<br>
 [![Creative Commons BY 4.0](https://licensebuttons.net/l/by/4.0/88x31.png)](https://creativecommons.org/licenses/by/4.0/)
