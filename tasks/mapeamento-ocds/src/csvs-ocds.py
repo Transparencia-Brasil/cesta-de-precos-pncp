@@ -1,8 +1,22 @@
 """
 Gera CSVs/ZIPs a partir dos JSONs OCDS produzidos pelo mapeamento.
 
+Uso:
+    python csvs-ocds.py --ano <ANO> [--mes <MES>] [--aliases ...] [--limit N] [--skip-existing-zip]
+
+Parâmetros obrigatórios:
+    --ano           Ano dos dados a processar (ex.: 2026).
+
+Parâmetros opcionais:
+    --mes           Mês específico (1-12). Se omitido, processa todos os meses do ano.
+    --base-dir      Raiz do repositório (detectado automaticamente por padrão).
+    --aliases       Lista de aliases específicos para processar.
+    --limit         Limita a N JSONs processados (útil para smoke test).
+    --skip-existing-zip  Pula grupos cujo ZIP já existe.
+
 O script busca JSONs em:
-    tasks/mapeamento-ocds/output/<ANO>/**/JSON/*.json
+    tasks/mapeamento-ocds/output/<ANO>/**/JSON/*.json          (sem --mes)
+    tasks/mapeamento-ocds/output/<ANO>/<MES>/**/JSON/*.json    (com --mes)
 
 Os JSONs seguem o padrão de nome `{uf}-{mes}-{ano}[-{parte}].json`.
 Aliases com a mesma chave `{uf}-{mes}-{ano}` são agrupados e seus CSVs
@@ -98,7 +112,18 @@ def main() -> int:
             "Gera CSVs (via flattentool) e ZIPs a partir dos JSONs OCDS gerados em tasks/mapeamento-ocds/output/<ANO>/**/JSON/*.json"
         )
     )
-    parser.add_argument("--ano", type=int, default=2025)
+    parser.add_argument(
+        "--ano",
+        type=int,
+        required=True,
+        help="Ano para processar."
+    )
+    parser.add_argument(
+        "--mes",
+        type=int,
+        default=None,
+        help="Mês específico para processar (1-12). Se omitido, processa todos os meses do ano.",
+    )
     parser.add_argument(
         "--base-dir",
         type=Path,
@@ -126,6 +151,8 @@ def main() -> int:
 
     # Diretório onde o mapeamento OCDS escreve os JSONs (organizados por ano/mês).
     output_root = args.base_dir / "tasks" / "mapeamento-ocds" / "output" / str(args.ano)
+    if args.mes is not None:
+        output_root = output_root / str(args.mes)
     if not output_root.exists():
         print(f"ERRO: diretório não encontrado: {output_root}")
         return 2
