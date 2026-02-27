@@ -61,6 +61,8 @@ cd src/ETL
 
 [<img src="logo-tb.png" alt="Transparencia Brasil" width="220">](https://www.transparencia.org.br/)<br>
 
+[<img src="ocp-logo.png" alt="open Contract Partnership" width="220">](https://www.open-contracting.org/)<br>
+
 [<img src="https://medicamentos.transparencia.org.br/brand/logo.png" alt="Medicamentos Transparentes" width="220">](https://medicamentos.transparencia.org.br/)
 <br>
 [![Creative Commons BY 4.0](https://licensebuttons.net/l/by/4.0/88x31.png)](https://creativecommons.org/licenses/by/4.0/)
