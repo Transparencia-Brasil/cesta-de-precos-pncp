@@ -254,3 +254,4 @@ tasks/mapeamento-ocds/output/2025/**/*.csv
 !tasks/mapeamento-ocds/output/2025/**/*erro*.csv
 tasks/contratacoes-inexigibilidade/outputs/contratacoes.csv
 tasks/contratacoes-inexigibilidade/outputs/itens.csv
+tasks/mapeamento-ocds/output/2026/**/**/*.csv
