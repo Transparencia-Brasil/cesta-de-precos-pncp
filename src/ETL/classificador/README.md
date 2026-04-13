@@ -21,7 +21,7 @@ A métrica usada para comparar dois embeddings é a **similaridade do cosseno**,
 ## Tecnologias utilizadas
 
 | Tecnologia | Papel |
-|---|---|
+| --- | --- |
 | [Snowflake Arctic Embed L v2.0](https://huggingface.co/Snowflake/snowflake-arctic-embed-l-v2.0) | Modelo de linguagem que gera os embeddings das descrições textuais |
 | [sentence-transformers](https://www.sbert.net/) | Biblioteca Python que carrega e executa o modelo de embedding |
 | [NLTK](https://www.nltk.org/) | Remoção de stopwords em português durante o pré-processamento |
@@ -53,7 +53,7 @@ Para cada item candidato, seus embeddings são comparados **apenas** com os embe
 
 Itens cuja correspondência mais similar tenha similaridade **≥ 0,5** são classificados como medicamentos. Os demais são descartados.
 
-```
+```text
 Itens PNCP ──► Pré-filtragem por PDM ──► Vetorização ──► Similaridade do cosseno ──► medicamentos.csv
                     (textual)              (modelo LLM)       (threshold ≥ 0.5)
 ```
@@ -63,7 +63,7 @@ Itens PNCP ──► Pré-filtragem por PDM ──► Vetorização ──► Si
 A metodologia foi validada com um experimento sobre **1.000 itens rotulados manualmente** (642 medicamentos, 175 não-medicamentos, 183 incertos descartados), totalizando 817 itens processados.
 
 | Métrica | Resultado |
-|---|---|
+| --- | --- |
 | **Acurácia na detecção de medicamentos** (item é ou não medicamento) | **98%** |
 | **Acurácia na identificação do código BR** (item correto do catálogo) | **86%** |
 
@@ -72,7 +72,7 @@ O threshold de 0,5 foi determinado por análise experimental como o valor que ma
 ## Riscos técnicos e mitigações
 
 | Risco | Descrição | Mitigação |
-|---|---|---|
+| --- | --- | --- |
 | **Qualidade das descrições** | Descrições mal redigidas ou abreviadas nos itens do PNCP podem reduzir a similaridade com o catálogo | A pré-filtragem por PDM limita o espaço de busca, e o threshold de 0,5 foi calibrado para tolerar variações razoáveis |
 | **Cobertura do catálogo CATMAT** | Medicamentos ausentes do catálogo não serão identificados | Atualizar periodicamente o catálogo de referência conforme novas versões do CATMAT |
 | **Evolução do modelo de embedding** | Modelos podem ser descontinuados ou superados por versões melhores | O script aceita parametrização via variável de ambiente `EMBEDDING_MODEL`, permitindo trocar o modelo sem alterar código. O cache é regenerado automaticamente quando o modelo muda |
