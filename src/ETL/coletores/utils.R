@@ -14,41 +14,44 @@ suppressPackageStartupMessages(library(data.table))
 
 #' Faz uma requisição a um endpoint e retorna os dados em formato de dataframe
 #'
-#' @description
-#' Esta função realiza uma requisição HTTP GET para o endpoint fornecido, captura possíveis erros
-#' e retorna os dados da resposta em um dataframe.
-#'
 #' @param endpoint Uma string contendo a URL do endpoint a ser consultado.
+#' @param timeout_segundos Tempo máximo, em segundos, para cada tentativa de requisição.
+#' @param tentativas_timeout Número de novas tentativas em caso de timeout/falha de conexão.
 #'
-#' @return Um dataframe contendo os dados retornados pelo endpoint, acrescido de uma coluna:
-#'   - `endpoint`: a URL do endpoint consultado.
-#'
-#' @details
-#' A função utiliza a biblioteca `httr2` para realizar a requisição. O corpo da resposta é
-#' convertido de JSON para um dataframe. Em caso de erro na requisição, a função captura
-#' automaticamente a falha com `req_error()`.
+#' @return Um dataframe contendo os dados retornados pelo endpoint, acrescido da coluna `endpoint`.
 #'
 #' @import httr2 jsonlite
 #' @export
-#'
-#' @examples
-#'
-#' # Exemplo de uso da função
-#' df <- coleta_endpoint("https://api.exemplo.com/dados")
-#' print(df)
-coleta_endpoint <- function(endpoint) {
-  # Faz a requisição ao endpoint
+coleta_endpoint <- function(endpoint, timeout_segundos = 30, tentativas_timeout = 5) {
   resposta <- request(endpoint) %>%
     req_method("GET") %>%
     req_headers(accept = "*/*") %>%
-    req_error() %>% # Captura erros se houver
+    req_timeout(timeout_segundos) %>%
+    req_retry(
+      max_tries = tentativas_timeout + 1,
+      retry_on_failure = TRUE,
+      backoff = function(n_tentativa) {
+        cat(
+          "Falha ou timeout ao consultar o endpoint. ",
+          "Fazendo nova tentativa ",
+          n_tentativa,
+          " de ",
+          tentativas_timeout,
+          ".\r"
+        )
+        # tempo de espera antes da próxima tentativa, em segundos
+        1
+      }
+    ) %>%
+    req_error() %>%
     req_perform()
 
-  # Converte a resposta da requisicao em um dataframe
   df_itens <- resp_body_string(resposta) %>%
     fromJSON(flatten = TRUE) %>%
     as.data.frame()
+
   df_itens$endpoint <- endpoint
+
   return(df_itens)
 }
 
@@ -152,9 +155,7 @@ coleta <- function(endpoints, output_dir = here("coleta"), tamanho_lote = 1000, 
   }
 
   # Cria o diretório de saída, caso não exista
-  if (!dir.exists(output_dir)) {
-    dir.create(output_dir, recursive = TRUE)
-  }
+  if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
 
   # Caminho para o diretório temporário de resultados parciais
   PATH_DIR_TEMP <<- here(output_dir, "temp")
