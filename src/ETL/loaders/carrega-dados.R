@@ -44,8 +44,8 @@ CAMINHO_RESULTADOS <- args[3]
 
 # path_base <- here("coleta/data-package/2025/12 - Dezembro/QUINZENA-1/DATA")
 # path_base <- here("coleta/data-package/2025/12 - Dezembro/QUINZENA-2/DATA")
-# path_base <- here("coleta/data-package/2026/1 - Janeiro/QUINZENA-1/DATA")
-# path_base <- here("coleta/data-package/2026/1 - Janeiro/QUINZENA-2/DATA")
+# path_base <- here("coleta/data-package/2026/2 - Fevereiro/QUINZENA-1/DATA")
+path_base <- here("coleta/data-package/2026/2 - Fevereiro/QUINZENA-2/DATA")
 
 CAMINHO_CONTRATACOES <- here(path_base, "contratacoes.csv")
 CAMINHO_MEDICAMENTOS <- here(path_base, "itens-medicamentos.csv")
@@ -209,6 +209,7 @@ contratacoes <- contratacoes %>%
 # CONECTA-SE  COM O BD ----------------------------------------------------
 
 con <- conecta_bd_medicamentos_transparentes()
+
 
 # INSERE OS DADOS ---------------------------------------------------------
 
