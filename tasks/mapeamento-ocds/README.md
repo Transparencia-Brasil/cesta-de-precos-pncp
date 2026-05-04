@@ -1,27 +1,90 @@
 # Mapeamento PNCP → OCDS
 
-Esta task converte dados de contratações do PNCP para o padrão [OCDS](https://standard.open-contracting.org/) e, em seguida, gera CSVs/ZIPs a partir dos JSONs produzidos.
+Esta task converte dados de contratações do PNCP para o padrão [OCDS](https://standard.open-contracting.org/), gera CSVs/ZIPs a partir dos JSONs produzidos e transfere os artefatos para o AWS S3.
+
+## Fluxo de dados
+
+```mermaid
+flowchart TD
+    subgraph entrada["Dados de entrada — coleta/&lt;alias&gt;/"]
+        cont["contratacoes/.../dados.csv"]
+        itens["itens/.../dados.csv"]
+        res["resultados/.../dados.csv"]
+    end
+
+    subgraph e1["Etapa 1 · mapeamento-pncp-ocds.py"]
+        json["output/&lt;ANO&gt;/&lt;MES&gt;/JSON/\n{uf}-{mes}-{ano}[-{parte}].json"]
+    end
+
+    subgraph e2["Etapa 2 · csvs-ocds.py (flattentool)"]
+        csv["output/&lt;ANO&gt;/&lt;MES&gt;/CSV/&lt;alias&gt;/\n*.csv"]
+        zipcsv["output/&lt;ANO&gt;/&lt;MES&gt;/ZIP/CSV/\n{uf}-{mes}-{ano}-csv.zip"]
+        zipjson["output/&lt;ANO&gt;/&lt;MES&gt;/ZIP/JSON/\n{uf}-{mes}-{ano}-json.zip"]
+    end
+
+    subgraph e3["Etapa 3 · upload-zips-s3.py (boto3)"]
+        s3["AWS S3\nmedicamentos-transparentes-dados-abertos"]
+    end
+
+    subgraph orch["Orquestração (scripts Bash)"]
+        direction LR
+        sh_orch["run-dados-abertos-ocds.sh\n(orquestrador mensal)"]
+        sh1["run-mapeamento-\npncp-ocds.sh"]
+        sh2["run-csvs-ocds.sh"]
+        sh3["run-upload-\nzips-s3.sh"]
+        sh_orch -->|"1º"| sh1
+        sh_orch -->|"2º"| sh2
+        sh_orch -->|"3º"| sh3
+    end
+
+    entrada --> e1
+    e1 --> json
+    json --> e2
+    e2 --> csv
+    e2 --> zipcsv
+    e2 --> zipjson
+    zipcsv --> e3
+    zipjson --> e3
+    e3 --> s3
+
+    sh1 -.->|invoca| e1
+    sh2 -.->|invoca| e2
+    sh3 -.->|invoca| e3
+```
+
+## Scripts Bash — orquestração
+
+Os scripts `.sh` residem em `src/` e são a camada de entrada do pipeline. Todos validam `ANO` e `MES` antes de chamar os scripts Python, e gravam logs em `output/LOGS/`.
+
+| Script | Modo | Responsabilidade |
+|---|---|---|
+| `run-dados-abertos-ocds.sh` | **Orquestrador** | Aceita `--ano`/`--mes` por flag ou interativamente. Executa as três etapas em sequência, com log unificado. **Use este para o pipeline completo.** |
+| `run-mapeamento-pncp-ocds.sh` | Runner individual | Solicita `ANO` e `MES` via stdin, valida entradas e invoca `mapeamento-pncp-ocds.py`. |
+| `run-csvs-ocds.sh` | Runner individual | Solicita `ANO` e `MES` via stdin, invoca `csvs-ocds.py` e, ao final, chama o upload para S3. |
+| `run-upload-zips-s3.sh` | Runner individual | Solicita `ANO` e `MES` via stdin, carrega `.env` e invoca `upload-zips-s3.py`. |
+
+> **Atenção:** `run-csvs-ocds.sh` já aciona o upload ao término. Se você chamar os runners individuais em sequência, o upload será executado duas vezes. Para evitar duplicação, use o orquestrador `run-dados-abertos-ocds.sh`.
 
 ## Estrutura de diretórios
 
 ```
 tasks/mapeamento-ocds/
 ├── src/
-│   ├── mapeamento-pncp-ocds.py       # Script Python: mapeamento PNCP → JSON OCDS
-│   ├── csvs-ocds.py                   # Script Python: JSON OCDS → CSVs/ZIPs
-│   ├── upload-zips-s3.py              # Script Python: ZIPs locais → AWS S3
 │   ├── run-dados-abertos-ocds.sh      # Orquestrador mensal: mapeamento + CSVs/ZIPs + upload
 │   ├── run-mapeamento-pncp-ocds.sh    # Runner interativo do mapeamento
 │   ├── run-csvs-ocds.sh               # Runner interativo da geração de CSVs + upload
-│   └── run-upload-zips-s3.sh          # Runner interativo do upload para S3
+│   ├── run-upload-zips-s3.sh          # Runner interativo do upload para S3
+│   ├── mapeamento-pncp-ocds.py       # Script Python: mapeamento PNCP → JSON OCDS
+│   ├── csvs-ocds.py                   # Script Python: JSON OCDS → CSVs/ZIPs
+│   └── upload-zips-s3.py              # Script Python: ZIPs locais → AWS S3
 ├── output/
 │   ├── LOGS/                          # Logs de execução
 │   └── <ANO>/<MES>/
 │       ├── JSON/                      # JSONs OCDS gerados pelo mapeamento
 │       ├── CSV/                       # CSVs gerados pelo flattentool
 │       └── ZIP/
-│           ├── CSV/                   # ZIPs com os CSVs agrupados
-│           └── JSON/                  # ZIPs com os JSONs agrupados
+│           ├── CSV/                   # ZIPs com os CSVs agrupados por UF
+│           └── JSON/                  # ZIPs com os JSONs agrupados por UF
 └── README.md
 ```
 
@@ -56,10 +119,10 @@ bash tasks/mapeamento-ocds/src/run-dados-abertos-ocds.sh
 Também é possível passar o período por flags:
 
 ```bash
- bash tasks/mapeamento-ocds/src/run-dados-abertos-ocds.sh --ano 2026 --mes 3 2>&1 | tee tasks/mapeamento-ocds/output/LOGS/run-dados-abertos-ocds-2026-03.log
+bash tasks/mapeamento-ocds/src/run-dados-abertos-ocds.sh --ano 2026 --mes 3 2>&1 | tee tasks/mapeamento-ocds/output/LOGS/run-dados-abertos-ocds-2026-03.log
 ```
 
-Os runners individuais abaixo continuam disponíveis para executar etapas isoladas. Observação: `run-csvs-ocds.sh` também chama o upload ao final; use o orquestrador para o pipeline completo sem repetir prompts nem duplicar a etapa de upload.
+Os runners individuais abaixo continuam disponíveis para executar etapas isoladas.
 
 ## Etapa 1 — Mapeamento PNCP → JSON OCDS
 
