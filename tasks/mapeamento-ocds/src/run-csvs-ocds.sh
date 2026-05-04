@@ -88,12 +88,16 @@ OUTPUT_PATH="./tasks/mapeamento-ocds/output"
 LOG_DIR="${OUTPUT_PATH}/LOGS"
 MES_PAD=$(printf "%02d" "$MES")
 LOG_FILE="${LOG_DIR}/csvs-ocds-${ANO}-${MES_PAD}.log"
+UPLOAD_LOG_FILE="${LOG_DIR}/upload-zips-s3-${ANO}-${MES_PAD}.log"
 
 # Python do ambiente virtual local (.venv) na raiz do repo.
 PYTHON_BIN="./.venv/Scripts/python.exe"
 
 # Script Python que gera os CSVs/ZIPs.
 PYTHON_SCRIPT="./tasks/mapeamento-ocds/src/csvs-ocds.py"
+
+# Script Python que transfere os ZIPs para S3.
+UPLOAD_PYTHON_SCRIPT="./tasks/mapeamento-ocds/src/upload-zips-s3.py"
 
 
 # : DIRETÓRIOS -----------------------------------------------------------------
@@ -130,3 +134,23 @@ fi
 
 echo ""
 echo "Execução finalizada. Confira o log em: '$LOG_FILE'."
+
+
+# : TRANSFERIR ZIPS PARA S3 ----------------------------------------------------
+
+echo ""
+echo "Iniciando transferência dos ZIPs para S3..."
+echo "Saída da transferência sendo registrada em:"
+echo " - '$UPLOAD_LOG_FILE'."
+echo ""
+
+UPLOAD_PYTHON_SCRIPT_TO_RUN="${UPLOAD_PYTHON_SCRIPT}"
+if command -v wslpath >/dev/null 2>&1; then
+  UPLOAD_PYTHON_SCRIPT_TO_RUN="$(wslpath -w "${UPLOAD_PYTHON_SCRIPT}")"
+fi
+
+"${PYTHON_BIN}" "${UPLOAD_PYTHON_SCRIPT_TO_RUN}" --ano "${ANO}" --mes "${MES}" \
+  2>&1 | tee -a "${UPLOAD_LOG_FILE}"
+
+echo ""
+echo "Transferência finalizada. Confira o log em: '$UPLOAD_LOG_FILE'."
