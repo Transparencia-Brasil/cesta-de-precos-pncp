@@ -1,0 +1,40 @@
+Mensagen de aviso:
+One or more parsing issues, call `problems()` on your data frame for details,
+e.g.:
+  dat <- vroom(...)
+  problems(dat) 
+Mensagen de aviso:
+One or more parsing issues, call `problems()` on your data frame for details,
+e.g.:
+  dat <- vroom(...)
+  problems(dat) 
+Mensagen de aviso:
+One or more parsing issues, call `problems()` on your data frame for details,
+e.g.:
+  dat <- vroom(...)
+  problems(dat) 
+Linhas lidas: 78264
+Linhas lidas: 9610
+Linhas lidas: 5060
+Linhas lidas (após remover NA's): 78264
+Linhas lidas (após remover NA's): 9610
+Linhas lidas (após remover NA's): 5060
+Erro ao inserir a linha 2878 da tabela tabela: Failed to fetch row : ERROR:  invalid input syntax for type integer: "2.6400000000000001"
+CONTEXT:  unnamed portal parameter $30 = '...'
+
+Erro ao inserir a linha 3501 da tabela tabela: Failed to fetch row : ERROR:  invalid input syntax for type integer: "807.5"
+CONTEXT:  unnamed portal parameter $30 = '...'
+
+Mensagens de aviso:
+1: Closing open result set, cancelling previous query 
+2: Closing open result set, cancelling previous query 
+Erro ao inserir a linha 2214 da tabela tabela: Failed to fetch row : ERROR:  invalid input syntax for type integer: "false"
+CONTEXT:  unnamed portal parameter $18 = '...'
+
+Erro ao inserir a linha 3012 da tabela tabela: Failed to fetch row : ERROR:  invalid input syntax for type integer: "false"
+CONTEXT:  unnamed portal parameter $18 = '...'
+
+Mensagens de aviso:
+1: Closing open result set, cancelling previous query 
+2: Closing open result set, cancelling previous query 
+Historico de cargas atualizado em 'C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/src/ETL/loaders/historico-cargas.csv' (5 linhas anexadas).

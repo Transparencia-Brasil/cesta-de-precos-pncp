@@ -1,0 +1,204 @@
+---
+# COLETORES
+---
+
+INÍCIO DA COLETA ÀS '05-May-2026 16:30:55'
+
+Diretório: ENTRADA
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/src/ETL
+
+
+Diretório:
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp
+
+PARÂMETROS: 
+ - PRIMEIRO_DIA='2026-04-01' - é a data de início da coleta
+ - ULTIMO_DIA='2026-04-15' - é a data final da coleta
+ - ALIAS_COLETA='2026-04/QUINZENA-1' - é um alias para identificar a coleta e apontar um destino no diretório de /coletas
+
+Resposta: S
+
+Resposta: N
+
+---
+## CONTRATAÇÃO
+
+Script:
+ - 'src/ETL/coletores/coleta-contratacoes.R'
+
+Diretório de saída:
+ - 'coleta/contratacoes/2026-04/QUINZENA-1'
+
+Screen criada para coletar contratações:
+ - 'coletor-contratacoes-2026-04-01-ate-2026-04-15'
+
+Saída sendo registrada em:
+ - 'coleta/contratacoes/2026-04/QUINZENA-1/run-coletor-contratacoes-2026-04-01-ate-2026-04-15.log'.
+
+Parâmetros do coletor: 
+ - PATH_OUTPUT_DIR="coleta/contratacoes/2026-04/QUINZENA-1"
+ - PRIMEIRO_DIA="2026-04-01"
+ - ULTIMO_DIA="2026-04-15"
+
+Coleta de CONTRATAÇÕES em execução...
+
+There is a screen on:
+	794.coletor-contratacoes-2026-04-01-ate-2026-04-15	(05/05/26 16:31:21)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+
+Aguardando a screen 'coletor-contratacoes-2026-04-01-ate-2026-04-15' encerrar...
+Screen coletor-contratacoes-2026-04-01-ate-2026-04-15 encerrada
+
+Coleta de CONTRATAÇÕES concluída!
+
+---
+## ITENS
+
+Script:
+ - 'src/ETL/coletores/coleta-itens.R'
+
+Diretório de saída:
+ - 'coleta/itens/2026-04/QUINZENA-1'
+
+Screen criada para coletar itens:
+ - 'coletor-itens-2026-04-01-ate-2026-04-15'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2026-04/QUINZENA-1/run-coletor-itens-2026-04-01-ate-2026-04-15.log'.
+
+Parâmetro do coletor:
+ - CONTRATACOES='coleta/contratacoes/2026-04/QUINZENA-1/dados.csv'
+
+Coleta de ITENS em execução...
+
+There is a screen on:
+	9384.coletor-itens-2026-04-01-ate-2026-04-15	(05/05/26 23:33:05)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+Aguardando a screen 'coletor-itens-2026-04-01-ate-2026-04-15' encerrar...
+Screen coletor-itens-2026-04-01-ate-2026-04-15 encerrada
+
+Coleta de ITENS concluída!
+
+---
+## CLASSIFICADOR - FILTRA MEDICAMENTOS
+
+Script:
+ - 'src/ETL/classificador/filtra-medicamentos.py'
+
+Diretório de saída:
+ - 'coleta/itens/2026-04/QUINZENA-1'
+
+Screen criada para coletar contratações:
+ - 'classificador-2026-04-01-ate-2026-04-15'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2026-04/QUINZENA-1/run-classificador-2026-04-01-ate-2026-04-15.log'.
+
+Parâmetros do classificador:
+ITENS='coleta/itens/2026-04/QUINZENA-1/dados.csv'
+CATALOGO='data/catmat/catmat.csv'
+
+Python a ser utilizado:
+ - './.venv/Scripts/python.exe'
+
+Filtragem e classificação de MEDICAMENTOS em execução...
+
+There is a screen on:
+	22919.classificador-2026-04-01-ate-2026-04-15	(05/06/26 11:50:23)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+
+Aguardando o arquivo 'coleta/itens/2026-04/QUINZENA-1/medicamentos.csv' ser criado...
+
+Arquivo coleta/itens/2026-04/QUINZENA-1/medicamentos.csv criado.
+Classificação e filtragem de MEDICAMENTOS de ITENS concluída!
+
+---
+## RESULTADOS
+
+Script:
+ - 'src/ETL/coletores/coleta-resultados.R'
+
+Diretório de saída:
+ - 'coleta/resultados/2026-04/QUINZENA-1'
+
+Screen criada para coletar resultados:
+ - 'coletor-resultados-2026-04-01-ate-2026-04-15'
+
+Saída sendo registrada em:
+ - 'coleta/resultados/2026-04/QUINZENA-1/run-coletor-resultados-2026-04-01-ate-2026-04-15.log'.
+
+Parâmetro do coletor:
+ - 'coleta/itens/2026-04/QUINZENA-1/medicamentos.csv'
+
+Coleta de RESULTADOS em execução...
+
+There are screens on:
+	24040.coletor-resultados-2026-04-01-ate-2026-04-15	(05/06/26 14:53:03)	(Detached)
+	22919.classificador-2026-04-01-ate-2026-04-15	(05/06/26 12:05:47)	(Detached)
+2 Sockets in /run/screen/S-rdurl0.
+coletando resultados das contratações de medicamentos
+
+Aguardando a screen 'coletor-resultados-2026-04-01-ate-2026-04-15' encerrar...
+Screen coletor-resultados-2026-04-01-ate-2026-04-15 encerrada
+
+Coleta de RESULTADOS de MEDICAMENTOS concluída!
+
+---
+## PACOTE DE DADOS
+
+Diretório 'coleta/data-package/2026/4 - Abril/QUINZENA-1/DATA' criado.
+Diretório 'coleta/data-package/2026/4 - Abril/QUINZENA-1/LOG' criado.
+
+Arquivos csv principais copiados para coleta/data-package/2026/4 - Abril/QUINZENA-1/DATA
+---
+## CARGA NO BANCO
+
+Executando carga no banco com:
+ - CONTRATAÇÕES: 'coleta/data-package/2026/4 - Abril/QUINZENA-1/DATA/contratacoes.csv'
+ - MEDICAMENTOS: 'coleta/data-package/2026/4 - Abril/QUINZENA-1/DATA/itens-medicamentos.csv'
+ - RESULTADOS: 'coleta/data-package/2026/4 - Abril/QUINZENA-1/DATA/itens-medicamentos-resultados.csv'
+ - LOG: 'coleta/data-package/2026/4 - Abril/QUINZENA-1/LOG/run-carrega-dados-2026-04-QUINZENA-1.log'
+
+Carga no banco concluída!
+
+---
+## RECOLETA DE RESULTADOS
+
+
+Recoleta de RESULTADOS ignorada (usuário optou por não executar).
+
+
+Arquivos csv disponíveis em coleta/data-package/2026/4 - Abril/QUINZENA-1/DATA
+
+Arquivos de log copiados para coleta/data-package/2026/4 - Abril/QUINZENA-1/LOG
+
+Estrutura do pacote de dados:
+
+[ 512]  coleta/data-package/2026/4 - Abril/QUINZENA-1
+├── [ 512]  DATA
+│   ├── [2.5K]  contratacoes-erros.csv
+│   ├── [ 205]  contratacoes-monitoramento.csv
+│   ├── [ 97M]  contratacoes.csv
+│   ├── [ 409]  itens-erros.csv
+│   ├── [592K]  itens-medicamentos-resultados-erros.csv
+│   ├── [ 853]  itens-medicamentos-resultados-monitoramento.csv
+│   ├── [1.9M]  itens-medicamentos-resultados.csv
+│   ├── [4.4M]  itens-medicamentos.csv
+│   ├── [6.4K]  itens-monitoramento.csv
+│   └── [134M]  itens.csv
+└── [ 512]  LOG
+    ├── [1.7K]  run-carrega-dados-2026-04-QUINZENA-1.log
+    ├── [ 655]  run-classificador-2026-04-01-ate-2026-04-15.log
+    ├── [ 94K]  run-coletor-contratacoes-2026-04-01-ate-2026-04-15.log
+    ├── [1.9M]  run-coletor-itens-2026-04-01-ate-2026-04-15.log
+    ├── [391K]  run-coletor-resultados-2026-04-01-ate-2026-04-15.log
+    └── [4.8K]  run-coletores-2026-04-QUINZENA-1.log
+
+3 directories, 16 files
+
+COLETA ENCERRADA ÀS '06-May-2026 16:31:18'!
+
+Fim! =)
