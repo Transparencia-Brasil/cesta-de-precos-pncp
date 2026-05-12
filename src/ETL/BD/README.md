@@ -104,6 +104,7 @@ Armazena o catálogo CATMAT de medicamentos. Populada pelo loader [`carrega-cata
 | `data_insercao` | TIMESTAMP | DEFAULT NOW() | Timestamp automático de carga |
 
 **PK composta:** `(cnpj, codigo_unidade)`.
+
 **Comportamento em conflito:** `ON CONFLICT (cnpj, codigo_unidade) DO NOTHING`.
 
 > A tabela também serve como destino da FK de **contratante sub-rogado** em `item_homologado` e `item_licitado`. O sub-rogado é o órgão que assume a contratação em nome de outro (SRP/ata de registro de preços).
@@ -208,7 +209,9 @@ Itens de medicamentos que já receberam resultado de adjudicação ou cancelamen
 | `data_insercao` | TIMESTAMP | DEFAULT NOW() | Timestamp automático de carga |
 
 **PK composta:** `(numero_controle_pncp, numero_item)`.
+
 **Chaves estrangeiras:** todas com `ON DELETE RESTRICT`.
+
 **Comportamento em conflito:** `ON CONFLICT DO UPDATE` — atualiza todos os campos de resultado e valor.
 
 ---
@@ -217,12 +220,14 @@ Itens de medicamentos que já receberam resultado de adjudicação ou cancelamen
 
 Itens de medicamentos ainda sem resultado de adjudicação. Possui o mesmo conjunto de colunas descritivas de `item_homologado`, sem as colunas de resultado.
 
-Colunas presentes (subconjunto de `item_homologado`): `numero_controle_pncp`, `numero_item`, `codigo_item_catalogo`, `cnpj_contratante`, `codigo_unidade_contratante`, `cnpj_contratante_subrogado`, `codigo_unidade_contratante_subrogado`, `descricao`, `unidade_medida`, `material_servico`, campos de categoria e catálogo, NCM/NBS, critério de julgamento, situação do item, tipo de benefício, `orcamento_sigiloso`, valores e quantidades estimadas, `url_api`, `url_pncp`, `data_insercao`.
+**Colunas presentes (subconjunto de `item_homologado`)**: `numero_controle_pncp`, `numero_item`, `codigo_item_catalogo`, `cnpj_contratante`, `codigo_unidade_contratante`, `cnpj_contratante_subrogado`, `codigo_unidade_contratante_subrogado`, `descricao`, `unidade_medida`, `material_servico`, campos de categoria e catálogo, NCM/NBS, critério de julgamento, situação do item, tipo de benefício, `orcamento_sigiloso`, valores e quantidades estimadas, `url_api`, `url_pncp`, `data_insercao`.
 
 **Colunas ausentes em relação a `item_homologado`:** `ni_fornecedor` e todos os campos de resultado (`codigo_situacao_resultado`, `valor_unitario_homologado`, `valor_total_homologado`, `quantidade_homologada`, `moeda_estrangeira`, `valor_nominal_moeda_estrangeira`, `data_resultado`, `data_cancelamento`, `motivo_cancelamento`).
 
 **PK composta:** `(numero_controle_pncp, numero_item)`.
+
 **Sem FK para `fornecedor`** — o fornecedor só é registrado após adjudicação.
+
 **Comportamento em conflito:** `ON CONFLICT DO UPDATE` — atualiza campos descritivos e estimados.
 
 ---
