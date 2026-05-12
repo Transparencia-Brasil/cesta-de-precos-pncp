@@ -47,7 +47,7 @@ As seis tabelas do schema possuem a seguinte estrutura de dependências (ordem d
 
 ```txt
 catalogo         ─────────────────────────────┐
-contratante (contratante + sub-rogado) ────────┤──▶ item_homologado
+contratante (contratante + sub-rogado) ───────┤──▶ item_homologado
 fornecedor       ─────────────────────────────┤
 contratacao      ─────────────────────────────┘
 
