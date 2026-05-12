@@ -28,6 +28,7 @@ suppressPackageStartupMessages(library(DBI))
 
 source(here("src/ETL/coletores/utils.R"))
 source(here("src/ETL/loaders/utils.R"))
+source(here("src/ETL/loaders/utils-historico.R"))
 
 
 # PARÂMETROS DE ENTRADAS -------------------------------------------------------
@@ -246,8 +247,11 @@ safe_count <- function(qry) {
 }
 
 # Contagens antes da inserção
-n_fornecedores_antes <- safe_count("select count(*) from fornecedor;")
-n_itens_homologados_antes <- safe_count("select count(*) from item_homologado;")
+tabelas_historico_recoleta <- c("fornecedor", "item_homologado", "item_licitado")
+contagens_historico_antes <- contar_tabelas_historico(con, tabelas_historico_recoleta)
+n_fornecedores_antes <- contagens_historico_antes[["fornecedor"]]
+n_itens_homologados_antes <- contagens_historico_antes[["item_homologado"]]
+n_itens_licitado_antes <- contagens_historico_antes[["item_licitado"]]
 
 
 # Insere os fornecedores =======================================================
@@ -344,7 +348,6 @@ if (nrow(ids_itens_homologados) == 0) {
     get_query("select * from temp_ids;")
 
     message("Removendo itens homologados da tabela item_licitado...")
-    n_itens_licitado_antes <- safe_count("select count(*) from item_licitado")
 
     # Executa o DELETE usando JOIN
     dbExecute(
@@ -379,6 +382,17 @@ if (nrow(ids_itens_homologados) == 0) {
   # Exibe as contagens antes e depois
   message("\r\nAntes:", n_itens_licitado_antes, "\r\nDepois:", n_itens_licitado_depois)
 }
+
+contagens_historico_depois <- contar_tabelas_historico(con, tabelas_historico_recoleta)
+
+linhas_historico <- montar_linhas_historico(
+  rotina = "recoleta_resultados",
+  contagens_antes = contagens_historico_antes,
+  contagens_depois = contagens_historico_depois,
+  caminhos_origem = PATH_OUTPUT_DIR
+)
+
+registrar_historico_cargas(linhas_historico)
 
 
 # Fecha a conexão com o BD

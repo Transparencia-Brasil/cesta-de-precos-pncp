@@ -18,6 +18,7 @@ suppressPackageStartupMessages(library(purrr))
 suppressPackageStartupMessages(library(DBI))
 
 source(here("src/ETL/loaders/utils.R"))
+source(here("src/ETL/loaders/utils-historico.R"))
 
 
 # LÊ ARQUIVOS  ------------------------------------------------------------
@@ -41,12 +42,6 @@ for (arg in args) {
 CAMINHO_CONTRATACOES <- args[1]
 CAMINHO_MEDICAMENTOS <- args[2]
 CAMINHO_RESULTADOS <- args[3]
-
-path_base <- here("coleta/data-package/2026/3 - Março/QUINZENA-2/DATA")
-
-CAMINHO_CONTRATACOES <- here(path_base, "contratacoes.csv")
-CAMINHO_MEDICAMENTOS <- here(path_base, "itens-medicamentos.csv")
-CAMINHO_RESULTADOS <- here(path_base, "itens-medicamentos-resultados.csv")
 
 # Lê os arquivos de dados
 contratacoes <- read_csv(CAMINHO_CONTRATACOES, show_col_types = FALSE)
@@ -207,6 +202,8 @@ contratacoes <- contratacoes %>%
 
 con <- conecta_bd_medicamentos_transparentes()
 
+contagens_historico_antes <- contar_tabelas_historico(con)
+
 
 # INSERE OS DADOS ---------------------------------------------------------
 
@@ -224,6 +221,17 @@ insere_tabela(con, tb_item_homologado, CONSULTA_INSERIR_ITEM_HOMOLOGADO)
 
 # Itens licitados
 insere_tabela(con, tb_item_licitado, CONSULTA_INSERIR_ITEM_LICITADO)
+
+contagens_historico_depois <- contar_tabelas_historico(con)
+
+linhas_historico <- montar_linhas_historico(
+  rotina = "carga_dados",
+  contagens_antes = contagens_historico_antes,
+  contagens_depois = contagens_historico_depois,
+  caminhos_origem = c(CAMINHO_CONTRATACOES, CAMINHO_MEDICAMENTOS, CAMINHO_RESULTADOS)
+)
+
+registrar_historico_cargas(linhas_historico)
 
 # Fecha a conexão com o BD
 dbDisconnect(con)
