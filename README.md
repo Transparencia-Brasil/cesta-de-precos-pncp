@@ -30,10 +30,10 @@ C --> D[Coleta Resultados]
 
 | Descrição                                                                                           | Script                        | Gerenciador                     | Parâmetros                     |
 | --------------------------------------------------------------------------------------------------- | ----------------------------- | ------------------------------- | ------------------------------ |
-| 1. Coleta de contratações — coleta dados de contratações no PNCP                                    | `coleta-contratacoes.R`       | `coletor-contratacoes.sh`       | Data início, Data fim, _alias_ |
-| 2. Coleta de itens contratados — coleta itens das contratações                                      | `coleta-itens-contratacoes.R` | `coletor-itens-contratacoes.sh` | Data início, Data fim, _alias_ |
-| 3. Filtragem e classificação de medicamentos — filtra e classifica medicamentos, gerando embeddings | `classifica-medicamentos.R`   | `classificador.sh`              | Data início, Data fim, _alias_ |
-| 4. Resultado das contratações de medicamentos — coleta resultados das contratações de medicamentos  | `coleta-resultados.R`         | `coletor-resultados.sh`         | Data início, Data fim, _alias_ |
+| 1. Coleta de contratações: coleta dados de contratações no PNCP                                    | `coleta-contratacoes.R`       | `coletor-contratacoes.sh`       | Data início, Data fim, _alias_ |
+| 2. Coleta de itens contratados: coleta itens das contratações                                      | `coleta-itens-contratacoes.R` | `coletor-itens-contratacoes.sh` | Data início, Data fim, _alias_ |
+| 3. Filtragem e classificação de medicamentos: filtra e classifica medicamentos, gerando embeddings | `classifica-medicamentos.R`   | `classificador.sh`              | Data início, Data fim, _alias_ |
+| 4. Resultado das contratações de medicamentos: coleta resultados das contratações de medicamentos  | `coleta-resultados.R`         | `coletor-resultados.sh`         | Data início, Data fim, _alias_ |
 
 ---
 
