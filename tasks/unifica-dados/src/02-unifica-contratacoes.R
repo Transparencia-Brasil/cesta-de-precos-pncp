@@ -7,7 +7,7 @@
 #' - Coleta 2: https://drive.google.com/drive/folders/1ZZ5ysQixMzT4srwCpirGhGsm9OpWeKy9
 #' - Coleta 3: https://drive.google.com/drive/folders/13euL1rcl01dj3pQciLrMUj5yCnGf7ako
 #'
-#' Nota: Baixe os arquivos com o script `download-de-dados.R`, eles não serão enviados ao github, pois são grandes demais.
+#' @note Baixe os arquivos com o script `download-de-dados.R`, eles não serão enviados ao github, pois são grandes demais.
 #'
 #' @return Um arquivo CSV unificado contendo os dados de contratações de medicamentos,
 #' salvo em "tasks/unifica-dados/output/contratacoes.csv".

@@ -1,21 +1,25 @@
-#' Bugfix: consertar ids de endpoints = NA
+#' @title Bugfix: consertar ids de endpoints = NA
 #' ---
 #'
-#' Este script corrige inconsistências no campo `endpoint` do arquivo `itens3.rds`.
+#' @description Este script corrige inconsistências no campo `endpoint` do arquivo `itens3.rds`.
 #' O problema ocorre porque o campo `endpoint` está vazio e seu conteúdo foi armazenado na coluna `status_code`.
 #'
 #' - Parte a: Separa endpoints missings e faz a sanitização de dados afetados
 #' - Parte b: gerar embeddings deses endpoints restaurados (com script python)
 #' - Parte c: remover linhas inconsistes e incluir sanitizadas no dataset final
 #'
-#'
-#' Parte a:
+#' Parte a (este script):
 #' Passos realizados:
 #' - Filtra os itens com `endpoint = NA`.
 #' - Usa expressões regulares para limpar e corrigir os valores do campo `endpoint`.
 #' - Atualiza o campo `status_code` removendo partes inconsistentes.
 #' - Gera o campo `numeroControlePNCPCompra` com base no `endpoint` corrigido.
 #'
+#' @return Um arquivo CSV contendo os itens com endpoints corrigidos,
+#'   salvo em "tasks/unifica-dados/output/itens-endpoint-recuperado.csv".
+#'
+
+
 library(tidyverse)
 library(here)
 

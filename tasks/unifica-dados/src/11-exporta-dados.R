@@ -10,13 +10,14 @@ library(googledrive)
 LOCAL_PATH <- "tasks/unifica-dados/output"
 
 # Destino dos dados no googledrive
-DEST_PATH <- "https://drive.google.com/drive/folders/1lTEahEebtKeGG2Zjn7tn0Iu1pRkxi4OY"
+DEST_PATH <- "https://drive.google.com/drive/folders/1OHGfJ2Sz8YtwluLnkRzeIj2jaX-bJ0lK"
 
 # ARQUIVOS ---------------------------------------------------------------------
 
 files <- c(
   "contratacoes" = "contratacoes.csv",
   "medicamentos" = "medicamentos.csv",
+  "itens.csv" = "itens.csv",
   "itens-resultados" = "itens-resultados.csv",
   "itens-resultados-medicamentos" = "itens-resultados-medicamentos.csv"
 )
