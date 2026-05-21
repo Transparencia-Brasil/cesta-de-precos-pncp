@@ -2,6 +2,8 @@
 
 Scripts de coleta de dados da API do PNCP. Cada etapa segue o mesmo padrão: um **script R** com a lógica de coleta e um **wrapper Bash** que cria a sessão `screen`, define o diretório de saída e registra o log.
 
+Os scripts R carregam os templates versionados de [`../template/templates`](../template/templates), atualizados pelo validador antes da execução do orquestrador principal.
+
 ## Estrutura
 
 ```
@@ -69,9 +71,10 @@ Os wrappers repassam esses argumentos ao script R via `Rscript.exe` (compatibili
 
 Para executar a cadeia completa, use `src/ETL/run-coletores.sh`. Ele:
 
-1. Invoca cada wrapper na ordem correta.
-2. Aguarda o término de cada `screen` antes de avançar.
-3. Solicita confirmação antes de sobrescrever saídas existentes (exceto na etapa de resultados).
+1. Atualiza os templates dos coletores a partir da documentação OpenAPI oficial do PNCP.
+2. Invoca cada wrapper na ordem correta.
+3. Aguarda o término de cada `screen` antes de avançar.
+4. Solicita confirmação antes de sobrescrever saídas existentes (exceto na etapa de resultados).
 
 ## utils.R
 

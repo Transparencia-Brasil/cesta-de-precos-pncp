@@ -4,13 +4,14 @@ Pipeline principal de coleta, classificação, empacotamento e carga dos dados d
 
 O orquestrador atual é [`run-coletores.sh`](run-coletores.sh). Ele executa, nesta ordem:
 
-1. coleta de contratações;
-2. coleta de itens;
-3. classificação de itens de medicamentos;
-4. coleta de resultados;
-5. empacotamento dos CSVs e logs em `coleta/data-package/`;
-6. carga opcional no banco;
-7. recoleta opcional de resultados.
+1. validação e atualização dos templates dos coletores;
+2. coleta de contratações;
+3. coleta de itens;
+4. classificação de itens de medicamentos;
+5. coleta de resultados;
+6. empacotamento dos CSVs e logs em `coleta/data-package/`;
+7. carga opcional no banco;
+8. recoleta opcional de resultados.
 
 Use o alias de coleta no formato `AAAA-MM/QUINZENA-1` ou `AAAA-MM/QUINZENA-2`, por exemplo:
 
@@ -20,6 +21,7 @@ bash src/ETL/run-coletores.sh 2025-08/QUINZENA-1 2025-08-01 2025-08-15
 
 ## Detalhes por etapa
 
+- [Templates](template/README.md): validação dos campos oficiais PNCP usados pelos coletores.
 - [Coletores](coletores/README.md): contratações, itens, resultados e recoleta.
 - [Classificador](classificador/README.md): identificação de medicamentos com CATMAT e embeddings.
 - [Loaders](loaders/README.md): carga dos dados tratados no PostgreSQL.
