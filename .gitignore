@@ -28,6 +28,10 @@ vignettes/*.pdf
 .Renviron
 project.Rproj
 
+# Python
+__pycache__/
+*.py[cod]
+
 # Arquivos específicos
 valida-rotulagem.ipynb
 catalogo-vetorizado.csv
