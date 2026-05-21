@@ -53,6 +53,15 @@ echo " - ALIAS_COLETA='$ALIAS_COLETA' - é um alias para identificar a coleta e 
 echo ""
 
 
+# VALIDA TEMPLATES --------------------------------------------------------------
+
+VALIDADOR_TEMPLATE="src/ETL/template/run-validador-template.sh"
+
+echo -e "---\n## VALIDADOR DE TEMPLATES\n"
+bash "$VALIDADOR_TEMPLATE"
+echo -e "\nValidação de templates concluída!\n"
+
+
 # CONFIRMAÇÕES DE EXECUÇÃO -----------------------------------------------------
 
 # Pergunta ao usuário se deseja executar a carga no banco (obrigando resposta válida)
