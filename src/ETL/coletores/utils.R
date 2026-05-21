@@ -100,7 +100,7 @@ salva_resultados <- function(output_dir) {
 #' @param endpoints Vetor de URLs ou identificadores dos endpoints a serem coletados.
 #' @param output_dir Caminho do diretório onde os resultados serão salvos. O padrão é `"coleta"` na raiz do projeto.
 #' @param tamanho_lote Número de requisições processadas antes de salvar os dados no disco. O padrão é 1000.
-#' @param template Dataframe template que define a estrutura dos dados a serem coletados. Cada template é gerado no script coletor em R.
+#' @param template Dataframe template que define a estrutura dos dados a serem coletados. Cada template é carregado dos CSVs versionados em `src/ETL/template/templates`.
 #'
 #' @details
 #' - A coleta é retomada de onde parou, verificando quais endpoints já foram processados.

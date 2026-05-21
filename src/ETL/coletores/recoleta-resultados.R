@@ -27,6 +27,7 @@ suppressPackageStartupMessages(library(readr))
 suppressPackageStartupMessages(library(DBI))
 
 source(here("src/ETL/coletores/utils.R"))
+source(here("src/ETL/template/utils-template.R"))
 source(here("src/ETL/loaders/utils.R"))
 source(here("src/ETL/loaders/utils-historico.R"))
 
@@ -72,68 +73,8 @@ endpoints_resultados = paste0(tb_item_licitado$url_api, "/resultados")
 # RECOLETA OS RESULTADOS -------------------------------------------------------
 
 # TEMPLATE ---------------------------------------------------------------------
-# Mapear todas as colunas que serão coletadas e garantir balanceamento do dataset
-
-# referência: https://pncp.gov.br/api/pncp/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/recuperarResultados
-template_resultados_itens <- tibble::tibble(
-  # ids
-  numeroControlePNCPCompra = character(),
-  numeroItem = character(),
-  endpoint = character(),
-  sequencialResultado = character(),
-  # Situação da compra
-  situacaoCompraItemResultadoId = character(),
-  situacaoCompraItemResultadoNome = character(),
-  # data inclusão e atualização
-  dataInclusao = character(),
-  dataAtualizacao = character(),
-  # Fornecedor
-  niFornecedor = character(),
-  nomeRazaoSocialFornecedor = character(),
-  tipoPessoa = character(),
-  porteFornecedorId = character(),
-  porteFornecedorNome = character(),
-  naturezaJuridicaId = character(),
-  naturezaJuridicaNome = character(),
-  codigoPais = character(),
-  # Quantidades e valores
-  quantidadeHomologada = character(),
-  valorUnitarioHomologado = character(),
-  valorTotalHomologado = character(),
-  percentualDesconto = character(),
-  # País de origem
-  paisOrigemProdutoServico.id = character(),
-  paisOrigemProdutoServico.nome = character(),
-  # Moeda estrangeira
-  moedaEstrangeira.id = character(),
-  moedaEstrangeira.simbolo = character(),
-  moedaEstrangeira.nome = character(),
-  timezoneCotacaoMoedaEstrangeira = character(),
-  valorNominalMoedaEstrangeira = character(),
-  dataCotacaoMoedaEstrangeira = character(),
-  # Margem preferência + amparo legal
-  aplicacaoMargemPreferencia = character(),
-  amparoLegalMargemPreferencia.id = character(),
-  amparoLegalMargemPreferencia.nome = character(),
-  amparoLegalMargemPreferencia.descricao = character(),
-  amparoLegalMargemPreferencia.statusAtivo = character(),
-  # benefício ME/EPP
-  aplicacaoBeneficioMeEpp = character(),
-  # Critério de desempate + amparo legal
-  aplicacaoCriterioDesempate = character(),
-  amparoLegalCriterioDesempate.id = character(),
-  amparoLegalCriterioDesempate.nome = character(),
-  amparoLegalCriterioDesempate.descricao = character(),
-  amparoLegalCriterioDesempate.statusAtivo = character(),
-  # subcontratação
-  indicadorSubcontratacao = character(),
-  # classificação SRP
-  ordemClassificacaoSrp = character(),
-  # resultado/cancelamento
-  dataResultado = character(),
-  dataCancelamento = character(),
-  motivoCancelamento = character()
-)
+# Template versionado e atualizado pelo validador em src/ETL/template.
+template_resultados_itens <- carrega_template_coleta("resultados_itens")
 
 # Executa a coleta com template definido
 coleta(endpoints = endpoints_resultados, output_dir = PATH_OUTPUT_DIR, template = template_resultados_itens)

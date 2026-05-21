@@ -21,6 +21,7 @@ suppressPackageStartupMessages(library(here))
 suppressPackageStartupMessages(library(readr))
 
 source(here("src/ETL/coletores/utils.R"))
+source(here("src/ETL/template/utils-template.R"))
 
 # PARAMETROS --------------------------------------------------------------
 
@@ -67,75 +68,8 @@ endpoints_itens <- paste0("https://pncp.gov.br/api/pncp/v1/orgaos/",
 
 
 # TEMPLATE ----------------------------------------------------------------
-# Mapear todas as colunas que serão coletadas e garantir balanceamento do dataset
-
-# Referência: https://pncp.gov.br/api/pncp/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/pesquisarCompraItem
-template_itens <- tibble::tibble(
-  # ids
-  numeroItem = character(),
-  endpoint = character(),
-  # descrição
-  descricao = character(),
-  # Material ou serviço
-  materialOuServico = character(),
-  materialOuServicoNome = character(),
-  # valor e quantidade
-  valorUnitarioEstimado = character(),
-  valorTotal = character(),
-  quantidade = character(),
-  unidadeMedida = character(),
-  # orçamento sigiloso
-  orcamentoSigiloso = character(),
-  # categoria de item
-  itemCategoriaId = character(),
-  itemCategoriaNome = character(),
-  # patrimônio e registro imobiliário
-  patrimonio = character(),
-  codigoRegistroImobiliario = character(),
-  # critério de julgamento
-  criterioJulgamentoId = character(),
-  criterioJulgamentoNome = character(),
-  # situação
-  situacaoCompraItem = character(),
-  situacaoCompraItemNome = character(),
-  # Benefício
-  tipoBeneficio = character(),
-  tipoBeneficioNome = character(),
-  incentivoProdutivoBasico = character(),
-  # data inclusão e atualização
-  dataInclusao = character(),
-  dataAtualizacao = character(),
-  # resultado
-  temResultado = character(),
-  # imagem
-  imagem = character(),
-  # Margem preferencial
-  aplicabilidadeMargemPreferenciaNormal = character(),
-  aplicabilidadeMargemPreferenciaAdicional = character(),
-  percentualMargemPreferenciaNormal = character(),
-  percentualMargemPreferenciaAdicional = character(),
-  # NCM-NBS
-  ncmNbsCodigo = character(),
-  ncmNbsDescricao = character(),
-  # catálogo
-  catalogo.id = character(),
-  catalogo.nome = character(),
-  catalogo.descricao = character(),
-  catalogo.dataInclusao = character(),
-  catalogo.dataAtualizacao = character(),
-  catalogo.statusAtivo = character(),
-  catalogo.url = character(),
-  # categoria item catálogo
-  categoriaItemCatalogo.id = character(),
-  categoriaItemCatalogo.nome = character(),
-  categoriaItemCatalogo.descricao = character(),
-  categoriaItemCatalogo.dataInclusao = character(),
-  categoriaItemCatalogo.dataAtualizacao = character(),
-  categoriaItemCatalogo.statusAtivo = character(),
-  # CAtálogo código item
-  catalogoCodigoItem = character(),
-  informacaoComplementar = character()
-)
+# Template versionado e atualizado pelo validador em src/ETL/template.
+template_itens <- carrega_template_coleta("itens")
 
 # COLETA ------------------------------------------------------------------
 
