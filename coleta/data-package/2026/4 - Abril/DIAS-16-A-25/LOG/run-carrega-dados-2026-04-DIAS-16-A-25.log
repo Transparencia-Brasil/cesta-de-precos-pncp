@@ -1,0 +1,12 @@
+Linhas lidas: 47515
+Linhas lidas: 5003
+Linhas lidas: 2714
+Linhas lidas (após remover NA's): 47515
+Linhas lidas (após remover NA's): 5003
+Linhas lidas (após remover NA's): 2714
+Erro ao inserir a linha 98 da tabela tabela: Failed to fetch row : ERROR:  invalid input syntax for type integer: "128.12"
+CONTEXT:  unnamed portal parameter $29 = '...'
+
+Mensagen de aviso:
+Closing open result set, cancelling previous query 
+Historico de cargas atualizado em 'C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/src/ETL/loaders/historico-cargas.csv' (5 linhas anexadas).
