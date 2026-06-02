@@ -253,20 +253,15 @@ echo -e "---\n## PACOTE DE DADOS\n"
 # coleta os resultados e copia para uma estrutura de diretórios mais coerente
 # para exportação no banco de dados:
 
-# Extrair ano, mês e dia do PRIMEIRO_DIA
+# Extrair ano e mês do PRIMEIRO_DIA
 ANO_COLETA=${PRIMEIRO_DIA:0:4}
 MES_COLETA=${PRIMEIRO_DIA:5:2}
-DIA_COLETA=${PRIMEIRO_DIA:8:2}
 
 # Preserva mês numérico para nome de arquivo de log do orquestrador
 MES_NUM=$MES_COLETA
 
-# Determinar qual quinzena
-if [ "$DIA_COLETA" = "01" ]; then
-  QUINZENA="QUINZENA-1"
-else
-  QUINZENA="QUINZENA-2"
-fi
+# Usa o último componente do alias para manter consistência com a coleta.
+PACOTE_ALIAS=${ALIAS_COLETA##*/}
 
 # Converter mês numérico para abreviação
 case $MES_COLETA in
@@ -286,7 +281,7 @@ case $MES_COLETA in
 esac
 
 # Criar diretório para o pacote de dados
-PACOTE_PATH="coleta/data-package/$ANO_COLETA/$MES_COLETA/$QUINZENA"
+PACOTE_PATH="coleta/data-package/$ANO_COLETA/$MES_COLETA/$PACOTE_ALIAS"
 
 # Criar subdiretórios DADOS e LOG
 PACOTE_PATH_DADOS="$PACOTE_PATH/DATA"
@@ -339,7 +334,7 @@ echo -e "\nArquivos csv principais copiados para ${PACOTE_PATH_DADOS}"
 echo -e "---\n## CARGA NO BANCO\n"
 
 if [ "$CARREGAR_BD" = "S" ]; then
-  LOG_CARREGA_DADOS="${PACOTE_PATH_LOG}/run-carrega-dados-${ANO_COLETA}-${MES_NUM}-${QUINZENA}.log"
+  LOG_CARREGA_DADOS="${PACOTE_PATH_LOG}/run-carrega-dados-${ANO_COLETA}-${MES_NUM}-${PACOTE_ALIAS}.log"
 
   for ARQUIVO_CARGA in "$PACOTE_CONTRATACOES_CSV" "$PACOTE_MEDICAMENTOS_CSV" "$PACOTE_RESULTADOS_CSV"; do
     if [ ! -f "$ARQUIVO_CARGA" ]; then
@@ -400,7 +395,7 @@ if [ "$RECOLETAR_RESULTADOS" = "S" ] && [ -d "$RESULTADOS_RECOLETA_PATH" ]; then
 fi
 
 # Copia o log do orquestrador (run-coletores) para o pacote de logs
-ORQUESTRADOR_LOG="src/ETL/log/run-coletores-${ANO_COLETA}-${MES_NUM}-${QUINZENA}.log"
+ORQUESTRADOR_LOG="src/ETL/log/run-coletores-${ANO_COLETA}-${MES_NUM}-${PACOTE_ALIAS}.log"
 if [ -f "$ORQUESTRADOR_LOG" ]; then
   cp "$ORQUESTRADOR_LOG" "${PACOTE_PATH_LOG}/"
 else
