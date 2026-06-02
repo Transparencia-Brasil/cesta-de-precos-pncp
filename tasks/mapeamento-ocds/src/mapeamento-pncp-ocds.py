@@ -42,7 +42,7 @@ base_dir = "C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp"
 def get_filepaths(base_dir, ano_coleta, mes_coleta):
     """
     Retorna os caminhos dos arquivos CSV de contratações, itens e resultados
-    para as duas quinzenas do mês especificado.
+    para todos os pacotes do mês especificado.
 
     Parâmetros:
         base_dir (str): Diretório base dos dados.
@@ -52,14 +52,10 @@ def get_filepaths(base_dir, ano_coleta, mes_coleta):
     Retorna:
         FilePaths: namedtuple com os caminhos dos arquivos.
     """
-    # arquivos da quinzena 1 (q1) e 2 (q2)
     FilePaths = namedtuple('FilePaths', [
-        'contratacoes_q1',
-        'contratacoes_q2',
-        'itens_q1',
-        'itens_q2',
-        'resultados_q1',
-        'resultados_q2'
+        'contratacoes',
+        'itens',
+        'resultados'
     ])
 
     # Transforma meses em pt-br
@@ -74,17 +70,23 @@ def get_filepaths(base_dir, ano_coleta, mes_coleta):
     mes_dir = f"{mes_coleta} - {MESES_PTBR[mes_coleta]}"
     coleta_dir = os.path.join(base_dir, "coleta", "data-package", ano_dir, mes_dir)
 
+    pacotes = [
+        os.path.join(coleta_dir, pacote)
+        for pacote in sorted(os.listdir(coleta_dir))
+        if os.path.isdir(os.path.join(coleta_dir, pacote))
+    ]
+
+    if not pacotes:
+        raise FileNotFoundError(f"Nenhum pacote de dados encontrado em {coleta_dir}")
+
     # define path dos arquivos
-    def path(quinzena, filename):
-        return os.path.join(coleta_dir, f"QUINZENA-{quinzena}", "DATA", filename)
+    def paths(filename):
+        return [os.path.join(pacote, "DATA", filename) for pacote in pacotes]
 
     return FilePaths(
-        contratacoes_q1=path(1, "contratacoes.csv"),
-        contratacoes_q2=path(2, "contratacoes.csv"),
-        itens_q1=path(1, "itens-medicamentos.csv"),
-        itens_q2=path(2, "itens-medicamentos.csv"),
-        resultados_q1=path(1, "itens-medicamentos-resultados.csv"),
-        resultados_q2=path(2, "itens-medicamentos-resultados.csv")
+        contratacoes=paths("contratacoes.csv"),
+        itens=paths("itens-medicamentos.csv"),
+        resultados=paths("itens-medicamentos-resultados.csv")
     )
 
 # chamando a função
@@ -93,15 +95,15 @@ paths = get_filepaths(base_dir, ano_coleta, mes_coleta)
 
 # : CARREGA DADOS --------------------------------------------------------------
 
-def carregar_e_concatenar(path1, path2):
+def carregar_e_concatenar(paths):
     return pd.concat([
-        pd.read_csv(path1, low_memory=False),
-        pd.read_csv(path2, low_memory=False)
+        pd.read_csv(path, low_memory=False)
+        for path in paths
     ], ignore_index=True)
 
-contratacoes = carregar_e_concatenar(paths.contratacoes_q1, paths.contratacoes_q2)
-itens = carregar_e_concatenar(paths.itens_q1, paths.itens_q2)
-resultados = carregar_e_concatenar(paths.resultados_q1, paths.resultados_q2)
+contratacoes = carregar_e_concatenar(paths.contratacoes)
+itens = carregar_e_concatenar(paths.itens)
+resultados = carregar_e_concatenar(paths.resultados)
 
 
 # : REMOVE COLUNAS DESNECESSÁRIAS ----------------------------------------------
