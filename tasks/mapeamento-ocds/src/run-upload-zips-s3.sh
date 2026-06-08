@@ -24,6 +24,17 @@ pwd
 
 # : FUNCOES --------------------------------------------------------------------
 
+usage() {
+  cat <<'EOF'
+Uso:
+  bash tasks/mapeamento-ocds/src/run-upload-zips-s3.sh [--overwrite]
+
+Opcoes:
+  --overwrite  Sobrescreve objetos existentes no S3 durante o upload.
+  -h, --help   Mostra esta ajuda.
+EOF
+}
+
 validate_ano() {
   local ano="${1:-}"
   if [[ -z "$ano" ]]; then
@@ -59,6 +70,30 @@ validate_mes() {
 }
 
 
+# : PARAMETROS CLI -------------------------------------------------------------
+
+OVERWRITE=false
+
+while (($#)); do
+  case "$1" in
+    --overwrite)
+      OVERWRITE=true
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Erro: opcao desconhecida: $1" >&2
+      echo "" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+
 # : PARAMETROS E VALIDACOES ----------------------------------------------------
 
 echo "Transferencia de ZIPs OCDS para AWS S3"
@@ -76,6 +111,7 @@ while true; do
 done
 
 echo "Transferindo ZIPs para ANO: $ANO e MES: $MES"
+echo "Overwrite remoto no S3: $OVERWRITE"
 
 
 # : PATHS ----------------------------------------------------------------------
@@ -118,7 +154,12 @@ if command -v wslpath >/dev/null 2>&1; then
   PYTHON_SCRIPT_TO_RUN="$(wslpath -w "${PYTHON_SCRIPT}")"
 fi
 
-"${PYTHON_BIN}" "${PYTHON_SCRIPT_TO_RUN}" --ano "${ANO}" --mes "${MES}" \
+UPLOAD_ARGS=(--ano "${ANO}" --mes "${MES}")
+if [[ "${OVERWRITE}" == true ]]; then
+  UPLOAD_ARGS+=(--overwrite)
+fi
+
+"${PYTHON_BIN}" "${PYTHON_SCRIPT_TO_RUN}" "${UPLOAD_ARGS[@]}" \
   2>&1 | tee -a "${LOG_FILE}"
 
 echo ""
