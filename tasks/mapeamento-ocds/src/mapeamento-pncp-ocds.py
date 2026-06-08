@@ -7,6 +7,8 @@ Comentários explicativos estão distribuídos ao longo do código original.
 import json
 import locale
 import os
+import ast
+import re
 import sys
 import zipfile
 from collections import namedtuple
@@ -38,6 +40,8 @@ else:
 
 # Aqui o usuário deverá setar para seu próprio diretório
 base_dir = "C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp"
+
+INPUT_DATASET_MEDICAMENTOS = "tasks/mapeamento-ocds/input/dicionario-medicamentos-ocds.csv"
 
 def get_filepaths(base_dir, ano_coleta, mes_coleta):
     """
@@ -103,6 +107,16 @@ def carregar_e_concatenar(paths):
 
 contratacoes = carregar_e_concatenar(paths.contratacoes)
 itens = carregar_e_concatenar(paths.itens)
+
+# Carregar dicionario ocds unificado
+dicionario_ocds = pd.read_csv(INPUT_DATASET_MEDICAMENTOS)
+
+# JOIN da tabela itens-medicamentos com o dataset dicionario_ocds (dataset unificado)
+itens = itens.merge(dicionario_ocds, how="left", on="codigo_br")
+
+# Teste de saída para análise do dataset resultante
+# OUTPUT_TESTE = itens.to_csv(os.path.join(base_dir, "tasks", "mapeamento-ocds", "output", str(ano_coleta), str(mes_coleta), "itens-medicamentos-com-dicionario.csv"), index=False, encoding="utf-8")
+
 resultados = carregar_e_concatenar(paths.resultados)
 
 
@@ -153,6 +167,171 @@ def duracao_em_dias(data_inicio, data_fim):
   except Exception as e:
     print(f"Erro ao calcular duração: {e} ->> {data_inicio}: {type(data_inicio)} || ->> {data_fim}: {type(data_fim)}")
     return None
+
+# Normaliza valores e campos vindos do dicionario OCDS para JSON.
+def valor_preenchido(valor):
+    if isinstance(valor, (list, tuple, dict)):
+        return True
+    return pd.notna(valor)
+
+def codigo_ocds(valor):
+    if not valor_preenchido(valor):
+        return None
+    if isinstance(valor, float) and valor.is_integer():
+        return str(int(valor))
+    return str(valor)
+
+def valor_json(valor):
+    if isinstance(valor, dict):
+        return {k: valor_json(v) for k, v in valor.items() if valor_json(v) is not None}
+    if isinstance(valor, list):
+        return [valor_json(v) for v in valor]
+    if not valor_preenchido(valor):
+        return None
+    if hasattr(valor, "item"):
+        return valor.item()
+    return valor
+
+def parse_lista(valor):
+    if not valor_preenchido(valor):
+        return []
+
+    texto = str(valor).strip()
+
+    try:
+        valor_parseado = ast.literal_eval(texto)
+    except (SyntaxError, ValueError):
+        return [texto] if texto else []
+
+    if isinstance(valor_parseado, list):
+        return [str(v).strip() for v in valor_parseado if valor_preenchido(v)]
+
+    return [str(valor_parseado).strip()] if valor_preenchido(valor_parseado) else []
+
+def primeiro_valor(valor):
+    valores = parse_lista(valor)
+    return valores[0] if valores else None
+
+def normalizar_strength_value(valor, unidade=None):
+    if not valor_preenchido(valor):
+        return None
+
+    texto = str(valor).strip()
+    eh_percentual = "%" in texto or str(unidade or "").strip().startswith("%")
+    texto_numerico = texto.replace("%", "").strip()
+    texto_normalizado = texto_numerico.replace(".", "").replace(",", ".")
+
+    try:
+        numero = float(texto_normalizado)
+    except ValueError:
+        return None
+
+    if eh_percentual:
+        numero = round(numero / 100, 12)
+
+    return int(numero) if numero.is_integer() else numero
+
+def montar_strength(valor, unidade):
+    strength = {}
+
+    valor_normalizado = normalizar_strength_value(valor, unidade)
+    if valor_normalizado is not None:
+        strength["value"] = valor_normalizado
+
+    if valor_preenchido(unidade):
+        strength["unit"] = {
+            "scheme": "UNCEFACT",
+            "id": str(unidade).strip(),
+        }
+
+    return strength
+
+def separar_nome_active_ingredient(nome):
+    if not valor_preenchido(nome):
+        return []
+
+    texto = str(nome).strip()
+
+    if re.search(r"(?i)\bassoc|(?:\bc\s*/)", texto):
+        texto = re.sub(
+            r"(?i)^\s*(?:associad[oa]s?|assoc\.?)\s*(?:com|[àa]|ao)?\s*",
+            "",
+            texto,
+        )
+        texto = re.sub(r"(?i)^\s*c\s*/\s*", "", texto)
+
+        partes = [
+            parte.strip()
+            for parte in re.split(r"\s*(?:;|\+|,|\b[Ee]\b)\s*", texto)
+            if parte.strip()
+        ]
+        if partes:
+            return partes
+
+    return [texto]
+
+def montar_active_ingredients(item):
+    nomes = []
+    for nome in parse_lista(item.get("activeIngredients.name")):
+        for parte in re.split(r"\s*;\s*", nome):
+            nomes.extend(separar_nome_active_ingredient(parte))
+
+    nome_pdm = str(item.get("nome_pdm")).strip() if valor_preenchido(item.get("nome_pdm")) else ""
+    valores_strength = parse_lista(item.get("activeIngredients.strengthValue"))
+    unidades_strength = parse_lista(item.get("activeIngredients.strengthUnit"))
+
+    if nome_pdm and (not nomes or len(valores_strength) > len(nomes)):
+        nomes = [nome_pdm, *nomes]
+
+    ingredientes = []
+    total = max(len(nomes), len(valores_strength), len(unidades_strength))
+
+    for idx in range(total):
+        ingrediente = {}
+
+        if idx < len(nomes):
+            ingrediente["name"] = nomes[idx]
+        elif nomes:
+            ingrediente["name"] = nomes[-1]
+
+        valor = valores_strength[idx] if idx < len(valores_strength) else None
+        unidade = unidades_strength[idx] if idx < len(unidades_strength) else None
+        strength = montar_strength(valor, unidade)
+
+        if strength:
+            ingrediente["strength"] = strength
+
+        if ingrediente:
+            ingredientes.append(ingrediente)
+
+    if nome_pdm and (
+        not ingredientes
+        or ingredientes[0].get("name", "").casefold() != nome_pdm.casefold()
+    ):
+        ingredientes.insert(0, {"name": nome_pdm})
+
+    return ingredientes
+
+def adicionar_attributes(item_json, item_dicionario, proximo_attribute_id):
+    """Inclui atributos auditados no item e atualiza o proximo id sequencial."""
+    nomes = parse_lista(item_dicionario.get("caracteristicaFaltante"))
+    valores = parse_lista(item_dicionario.get("attributes"))
+
+    attributes = []
+    total = min(len(nomes), len(valores))
+
+    for idx in range(total):
+        attributes.append({
+            "id": str(proximo_attribute_id),
+            "name": nomes[idx],
+            "value": valores[idx],
+        })
+        proximo_attribute_id += 1
+
+    if attributes:
+        item_json["attributes"] = attributes
+
+    return proximo_attribute_id
 
 # Extrai cnpj, ano e sequencial da coluna numeroControlePNCP
 def extrair_parametros(numero_controle):
@@ -318,6 +497,7 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
     itens_rel = itens_filtrados[itens_filtrados['data.numeroControlePNCP'] == row['data.numeroControlePNCP']]
     items = []
     items_by_id = {}
+    proximo_attribute_id = 1
     lots = []
     award_criteria = {
         "1": "priceOnly",  # Menor preço
@@ -331,109 +511,99 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
     }
 
     for _, item in itens_rel.iterrows():
+        item_id = codigo_ocds(item['numeroItem'])
         unit = {
             "value": {
-                "amount": item['valorUnitarioEstimado'],
+                "amount": valor_json(item['valorUnitarioEstimado']),
                 "currency": "BRL"
             }
         }
 
         # Só adiciona "name" se unidadeMedida não for nula
-        if pd.notna(item['unidadeMedida']):
+        if valor_preenchido(item['unidadeMedida']):
             unit["name"] = item['unidadeMedida']
 
+        active_ingredients = montar_active_ingredients(item)
         i = {
-            "id": str(item['numeroItem']),
+            "id": item_id,
             "description": item['descricao'],
+            "classification": {
+                "scheme": "CATMAT",
+                "id": codigo_ocds(item['codigo_br']),
+                "description": item['desc_item'],
+                "uri": (
+                    "https://cnbs.estaleiro.serpro.gov.br/cnbs-api/material/v1/"
+                    "recuperaDadosItemMaterialPorCodigo?codigo_item_material="
+                    + codigo_ocds(item['codigo_br'])
+                ),
+            },
+            **({"dosageForm": primeiro_valor(item['dosageForm'])} if valor_preenchido(item['dosageForm']) else {}),
+            **({"administrationRoute": primeiro_valor(item['administrationRoute'])} if valor_preenchido(item['administrationRoute']) else {}),
+            **({"activeIngredients": active_ingredients} if active_ingredients else {}),
             "quantity": int(item['quantidade']),
             "unit": unit,
-            "relatedLot": 'lot-' + str(item['numeroItem'])
+            "relatedLot": 'lot-' + item_id
         }
 
+        proximo_attribute_id = adicionar_attributes(i, item, proximo_attribute_id)
 
         items.append(i)
-        items_by_id[str(item['numeroItem'])] = i  # A fim de facilitar a rastreabilidade em awards
+        items_by_id[item_id] = i  # A fim de facilitar a rastreabilidade em awards
 
-        lots.append({
-            "id": 'lot-' + str(item['numeroItem']),
-            **({"statusDetailsId": str(item['situacaoCompraItem'])} if item['situacaoCompraItem'] else {}),
-            **({"statusDetails": item['situacaoCompraItemNome']} if pd.notna(item['situacaoCompraItemNome']) else {}),
+        criterio = award_criteria.get(codigo_ocds(item['criterioJulgamentoId']))
+        beneficio_nome = item['tipoBeneficioNome'] if valor_preenchido(item['tipoBeneficioNome']) else None
+
+        lot = {
+            "id": 'lot-' + item_id,
+            **({"statusDetailsId": codigo_ocds(item['situacaoCompraItem'])} if valor_preenchido(item['situacaoCompraItem']) else {}),
+            **({"statusDetails": item['situacaoCompraItemNome']} if valor_preenchido(item['situacaoCompraItemNome']) else {}),
             "value": {
-                "amount": item['valorTotal'],
+                "amount": valor_json(item['valorTotal']),
                 "currency": "BRL",
             },
             "lotsDetails": {
-                **({"confidentialBudget": item['orcamentoSigiloso']} if pd.notna(item['orcamentoSigiloso']) and item['orcamentoSigiloso'] != False else {}),
-                **({"asset": item['patrimonio']} if pd.notna(item['patrimonio']) else {}),
-                **({"realEstateRegistrationCode": item['codigoRegistroImobiliario']} if pd.notna(item['codigoRegistroImobiliario']) else {}),
-                **({"standardPreferenceMarginApplicability": item['aplicabilidadeMargemPreferenciaNormal']} if pd.notna(item['aplicabilidadeMargemPreferenciaNormal']) and item['aplicabilidadeMargemPreferenciaNormal'] != False else {}),
-                **({"standardPreferenceMarginPercentage": item['percentualMargemPreferenciaNormal']} if pd.notna(item['percentualMargemPreferenciaNormal']) else {}),
-                **({"additionalPreferenceMarginApplicability": item['aplicabilidadeMargemPreferenciaAdicional']} if pd.notna(item['aplicabilidadeMargemPreferenciaAdicional']) and item['aplicabilidadeMargemPreferenciaAdicional'] != False else {}),
-                **({"additionalPreferenceMarginPercentage": item['percentualMargemPreferenciaAdicional']} if pd.notna(item['percentualMargemPreferenciaAdicional']) else {}),
+                **({"confidentialBudget": valor_json(item['orcamentoSigiloso'])} if valor_preenchido(item['orcamentoSigiloso']) and item['orcamentoSigiloso'] != False else {}),
+                **({"asset": valor_json(item['patrimonio'])} if valor_preenchido(item['patrimonio']) else {}),
+                **({"realEstateRegistrationCode": valor_json(item['codigoRegistroImobiliario'])} if valor_preenchido(item['codigoRegistroImobiliario']) else {}),
+                **({"standardPreferenceMarginApplicability": valor_json(item['aplicabilidadeMargemPreferenciaNormal'])} if valor_preenchido(item['aplicabilidadeMargemPreferenciaNormal']) and item['aplicabilidadeMargemPreferenciaNormal'] != False else {}),
+                **({"standardPreferenceMarginPercentage": valor_json(item['percentualMargemPreferenciaNormal'])} if valor_preenchido(item['percentualMargemPreferenciaNormal']) else {}),
+                **({"additionalPreferenceMarginApplicability": valor_json(item['aplicabilidadeMargemPreferenciaAdicional'])} if valor_preenchido(item['aplicabilidadeMargemPreferenciaAdicional']) and item['aplicabilidadeMargemPreferenciaAdicional'] != False else {}),
+                **({"additionalPreferenceMarginPercentage": valor_json(item['percentualMargemPreferenciaAdicional'])} if valor_preenchido(item['percentualMargemPreferenciaAdicional']) else {}),
                 **({
-                    **({"benefitType": str(int(item['tipoBeneficio']))} if pd.notna(item['tipoBeneficio']) else {}),
-                    **({"benefitTypeName": item['tipoBeneficioNome']} if pd.notna(item['tipoBeneficioNome']) else {})
-                } if item['tipoBeneficioNome'] not in ["Sem benefício", "Não se aplica"] else {}),
-                **({"ncmNbsCode": item['ncmNbsCodigo']} if pd.notna(item['ncmNbsCodigo']) else {}),
-                **({"ncmNbsDescription": item['ncmNbsDescricao']} if pd.notna(item['ncmNbsDescricao']) else {}),
-                **({"catalogItemCategoryId": item['categoriaItemCatalogo.id']} if pd.notna(item['categoriaItemCatalogo.id']) else {}),
-                **({"catalogItemCategoryName": item['categoriaItemCatalogo.nome']} if pd.notna(item['categoriaItemCatalogo.nome']) else {}),
-                **({"catalogItemCategoryDescription": item['categoriaItemCatalogo.descricao']} if pd.notna(item['categoriaItemCatalogo.descricao']) else {}),
-                **({"catalogItemCode": item['catalogoCodigoItem']} if pd.notna(item['catalogoCodigoItem']) else {}),
-                **({"awardCriteria": award_criteria[str(item['criterioJulgamentoId'])]} if pd.notna(award_criteria[str(item['criterioJulgamentoId'])]) else {}),
-                **({"awardCriteriaDetails": item['criterioJulgamentoNome']} if pd.notna(item['criterioJulgamentoNome']) else {}),
+                    **({"benefitType": codigo_ocds(item['tipoBeneficio'])} if valor_preenchido(item['tipoBeneficio']) else {}),
+                    **({"benefitTypeName": beneficio_nome} if beneficio_nome else {})
+                } if beneficio_nome not in [None, "Sem benefício", "Não se aplica"] else {}),
+                **({"ncmNbsCode": valor_json(item['ncmNbsCodigo'])} if valor_preenchido(item['ncmNbsCodigo']) else {}),
+                **({"ncmNbsDescription": item['ncmNbsDescricao']} if valor_preenchido(item['ncmNbsDescricao']) else {}),
+                **({"catalogItemCategoryId": valor_json(item['categoriaItemCatalogo.id'])} if valor_preenchido(item['categoriaItemCatalogo.id']) else {}),
+                **({"catalogItemCategoryName": item['categoriaItemCatalogo.nome']} if valor_preenchido(item['categoriaItemCatalogo.nome']) else {}),
+                **({"catalogItemCategoryDescription": item['categoriaItemCatalogo.descricao']} if valor_preenchido(item['categoriaItemCatalogo.descricao']) else {}),
+                **({"catalogItemCode": valor_json(item['catalogoCodigoItem'])} if valor_preenchido(item['catalogoCodigoItem']) else {}),
+                **({"awardCriteria": criterio} if criterio else {}),
+                **({"awardCriteriaDetails": item['criterioJulgamentoNome']} if valor_preenchido(item['criterioJulgamentoNome']) else {}),
             },
-        })
+        }
 
-        if item['tipoBeneficioNome'] not in ["Sem benefício", "Não se aplica"]:
-            if item['tipoBeneficioNome'] == "Participação exclusiva para ME/EPP":
-                lots[-1]["sustainability"] = [{
-                        "goal": "social.smeInclusion",
-                        # "goal": item['incentivoProdutivoBasico'],
-                        "strategies": [
-                            "reservedParticipation"
-                        ]
-                    }
-                ]
+        if beneficio_nome == "Participação exclusiva para ME/EPP":
+            lot["sustainability"] = [{"goal": "social.smeInclusion", "strategies": ["reservedParticipation"]}]
+            lot["otherRequirements"] = {"reservedParticipation": ["sme"]}
+        elif beneficio_nome == "Subcontratação para ME/EPP":
+            lot["sustainability"] = [{"goal": "social.smeInclusion", "strategies": ["subcontracting"]}]
+            lot["subcontractingTerms"] = {"description": "Subcontratação para ME/EPP"}
+        elif beneficio_nome == "Cota reservada para ME/EPP":
+            lot["sustainability"] = [{"goal": "social.smeInclusion", "strategies": ["reservedParticipationQuota"]}]
 
-                lots[-1]["otherRequirements"] = {
-                    "reservedParticipation": [
-                        "sme"
-                    ]
-                }
-
-            elif item['tipoBeneficioNome'] == "Subcontratação para ME/EPP":
-                lots[-1]["sustainability"] = [{
-                        "goal": "social.smeInclusion",
-                        # "goal": item['incentivoProdutivoBasico'],
-                        "strategies": [
-                            "subcontracting"
-                        ]
-
-                    }
-                ]
-
-                lots[-1]["subcontractingTerms"] = {
-                    "description": "Subcontratação para ME/EPP"
-                }
-
-            elif item['tipoBeneficioNome'] == "Cota reservada para ME/EPP":
-                lots[-1]["sustainability"] = [{
-                        "goal": "social.smeInclusion",
-                        # "goal": item['incentivoProdutivoBasico'],
-                        "strategies": [
-                            "reservedParticipationQuota"
-                        ]
-
-                    }
-                ]
+        lots.append(lot)
 
 
 
 
 
     # Resultados relacionados
-    res_rel = resultados[resultados['numeroControlePNCPCompra'] == row['data.numeroControlePNCP']]
+    res_rel = resultados[
+        (resultados['numeroControlePNCPCompra'] == row['data.numeroControlePNCP'])
+        & (resultados['numeroItem'].map(codigo_ocds).isin(items_by_id.keys()))
+    ]
     awards = []
     lista_niFornecedor = []
     suppliers = []
@@ -452,15 +622,13 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
         "Não Informado": None
     }
 
-    lots_awards = []
-
-    idx = 1
-    for _, res in res_rel.iterrows():
+    for idx, (_, res) in enumerate(res_rel.iterrows(), start=1):
         # Listando fornecedores únicos para o campo "parties"
         if str(res['niFornecedor']) not in lista_niFornecedor:
             lista_niFornecedor.append(str(res['niFornecedor']))
-            suppliers.append({
-                "id": "BR-CNPJ-" + str(res['niFornecedor']),
+            fornecedor_id = "BR-CNPJ-" + str(res['niFornecedor'])
+            fornecedor = {
+                "id": fornecedor_id,
                 "name": res['nomeRazaoSocialFornecedor'],
                 "identifier": {
                     "scheme": "BR-CNPJ",
@@ -472,87 +640,64 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
                 },
                 "roles": ["supplier"],
                 "details": {
-                    **({"scale": porte_fornecedor[res['porteFornecedorNome']]} if pd.notna(porte_fornecedor[res['porteFornecedorNome']]) else {}),
+                    **({"scale": porte_fornecedor.get(res['porteFornecedorNome'])} if porte_fornecedor.get(res['porteFornecedorNome']) else {}),
                     "classifications": [
                         {
                             "scheme": "BRA-TIPO-PESSOA",
                             "id": str(res['tipoPessoa']),
-                            "description": tipoPessoa[res['tipoPessoa']],
+                            "description": tipoPessoa.get(res['tipoPessoa'], res['tipoPessoa']),
                         },
                         {
                             "scheme": "ORDEM DE CLASSIFICACAO SRP",
-                            **({"id": str(int(res['ordemClassificacaoSrp']))} if pd.notna(res['ordemClassificacaoSrp']) else {}),
+                            **({"id": codigo_ocds(res['ordemClassificacaoSrp'])} if valor_preenchido(res['ordemClassificacaoSrp']) else {}),
                         }]
                 }
-            })
+            }
 
-            if pd.notna(res['naturezaJuridicaId']):
-                suppliers[-1]['details']['classifications'].append({
+            if valor_preenchido(res['naturezaJuridicaId']):
+                fornecedor['details']['classifications'].append({
                     "scheme": "BRA-NATUREZA-JURIDICA",
-                    "id": str(int(res['naturezaJuridicaId'])),
+                    "id": codigo_ocds(res['naturezaJuridicaId']),
                     "description": str(res['naturezaJuridicaNome']),
                 })
 
+            suppliers.append(fornecedor)
+
+        fornecedor_id = "BR-CNPJ-" + str(res['niFornecedor'])
+        res_item_id = codigo_ocds(res['numeroItem'])
+        item_ref = items_by_id[res_item_id]
         awards.append({
-            "id": str(idx),  # substituindo res['sequencialResultado'], pois não possui um ID único para cada award
+            "id": str(idx),
             "title": row['data.tipoInstrumentoConvocatorioNome'] + ' - ' + str(row['data.processo']),
             "description": row['data.objetoCompra'],
             "date": to_ocds_dt(res['dataResultado'], field='dataResultado'),
-            "hasSubcontracting": res['indicadorSubcontratacao'],
+            "hasSubcontracting": valor_json(res['indicadorSubcontratacao']),
             "value": {
-            "amount": res['valorTotalHomologado'],
-            "currency": "BRL"
+                "amount": valor_json(res['valorTotalHomologado']),
+                "currency": "BRL"
             },
             "suppliers": [{
-            "id": "BR-CNPJ-" + str(res['niFornecedor']),
-            "name": res['nomeRazaoSocialFornecedor'],
+                "id": fornecedor_id,
+                "name": res['nomeRazaoSocialFornecedor'],
             }],
             "items": [{
-            "id": str(res['numeroItem']),
-            "description": items_by_id[str(res['numeroItem'])]['description'],
-            "status": res['situacaoCompraItemResultadoNome'],
-            **({"statusDetails": res['motivoCancelamento']} if pd.notna(res['motivoCancelamento']) else {}),
-            "quantity": int(res['quantidadeHomologada']),
-            "unit": {
-                **({"name": items_by_id[str(res['numeroItem'])]['unit']['name']} if "name" in items_by_id[str(res['numeroItem'])]['unit'] else {}),
-
-                "value": {
-                "amount": res['valorUnitarioHomologado'],
-                "currency": "BRL"
-                }
-            },
-            **({"deliveryLocations": [{
-                "description": str(res['paisOrigemProdutoServico.nome'])}]} if pd.notna(res['paisOrigemProdutoServico.nome']) else {}),
-            "relatedLot": 'lot-' + str(res['numeroItem']),
+                "id": res_item_id,
+                "description": item_ref['description'],
+                "status": res['situacaoCompraItemResultadoNome'],
+                **({"statusDetails": res['motivoCancelamento']} if valor_preenchido(res['motivoCancelamento']) else {}),
+                "quantity": int(res['quantidadeHomologada']),
+                "unit": {
+                    **({"name": item_ref['unit']['name']} if "name" in item_ref['unit'] else {}),
+                    "value": {
+                        "amount": valor_json(res['valorUnitarioHomologado']),
+                        "currency": "BRL"
+                    }
+                },
+                **({"deliveryLocations": [{
+                    "description": str(res['paisOrigemProdutoServico.nome'])}]} if valor_preenchido(res['paisOrigemProdutoServico.nome']) else {}),
+                "relatedLot": 'lot-' + res_item_id,
             }],
-            # "lots": {
-            #     **({"id": 'lot-' + str(res['numeroItem'])} if pd.notna(res['numeroItem']) else {}),
-            #     "lotsDetails": {
-            #         **({"preferenceMarginApplication": str(res['aplicacaoMargemPreferencia'])} if pd.notna(res['aplicacaoMargemPreferencia']) else {}),
-            #         **({"smallBusinessBenefitApplication": str(res['aplicacaoBeneficioMeEpp'])} if pd.notna(res['aplicacaoBeneficioMeEpp']) else {}),
-            #         **({"tiebreakCriterionApplication": str(res['aplicacaoCriterioDesempate'])} if pd.notna(res['aplicacaoCriterioDesempate']) else {}),
-            #         **({"updateDate": to_ocds_dt(res['dataAtualizacao'])} if pd.notna(res['dataAtualizacao']) else {}),
-            #         **({"inclusionDate": to_ocds_dt(res['dataInclusao'])} if pd.notna(res['dataInclusao']) else {}),
-            #         **({"foreignCurrencyQuoteTimezone": str(res['timezoneCotacaoMoedaEstrangeira'])} if pd.notna(res['timezoneCotacaoMoedaEstrangeira']) else {}),
-            #         **({"foreignCurrencyId": str(res['moedaEstrangeira.id'])} if pd.notna(res['moedaEstrangeira.id']) else {}),
-            #         **({"foreignCurrencySymbol": str(res['moedaEstrangeira.simbolo'])} if pd.notna(res['moedaEstrangeira.simbolo']) else {}),
-            #         **({"foreignCurrencyName": str(res['moedaEstrangeira.nome'])} if pd.notna(res['moedaEstrangeira.nome']) else {}),
-            #         **({"foreignCurrencyNominalValue": str(res['valorNominalMoedaEstrangeira'])} if pd.notna(res['valorNominalMoedaEstrangeira']) else {}),
-            #         **({"foreignCurrencyQuoteDate": to_ocds_dt(res['dataCotacaoMoedaEstrangeira'])} if pd.notna(res['dataCotacaoMoedaEstrangeira']) else {}),
-            #         **({"preferenceMarginLegalBasisId": str(res['amparoLegalMargemPreferencia.id'])} if pd.notna(res['amparoLegalMargemPreferencia.id']) else {}),
-            #         **({"preferenceMarginLegalBasisName": str(res['amparoLegalMargemPreferencia.nome'])} if pd.notna(res['amparoLegalMargemPreferencia.nome']) else {}),
-            #         **({"preferenceMarginLegalBasisDescription": str(res['amparoLegalMargemPreferencia.descricao'])} if pd.notna(res['amparoLegalMargemPreferencia.descricao']) else {}),
-            #         **({"preferenceMarginLegalBasisActiveStatus": str(res['amparoLegalMargemPreferencia.statusAtivo'])} if pd.notna(res['amparoLegalMargemPreferencia.statusAtivo']) else {}),
-            #         **({"tiebreakCriterionLegalBasisId": str(res['amparoLegalCriterioDesempate.id'])} if pd.notna(res['amparoLegalCriterioDesempate.id']) else {}),
-            #         **({"tiebreakCriterionLegalBasisName": str(res['amparoLegalCriterioDesempate.nome'])} if pd.notna(res['amparoLegalCriterioDesempate.nome']) else {}),
-            #         **({"tiebreakCriterionLegalBasisDescription": str(res['amparoLegalCriterioDesempate.descricao'])} if pd.notna(res['amparoLegalCriterioDesempate.descricao']) else {}),
-            #         **({"tiebreakCriterionLegalBasisActiveStatus": str(res['amparoLegalCriterioDesempate.statusAtivo'])} if pd.notna(res['amparoLegalCriterioDesempate.statusAtivo']) else {}),
-            #         **({"cancellationDate": to_ocds_dt(res['dataCancelamento'])} if pd.notna(res['dataCancelamento']) else {}),
-            #     }
-            # }
         })
-
-        idx += 1
 
     # "traduzindo" os IDs do PNCP
     poder_id = {
@@ -594,6 +739,11 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
         "14": None,  # Inaplicabilidade da Licitação
     }
 
+    buyer_cnpj = row['data.orgaoSubRogado.cnpj'] if valor_preenchido(row['data.orgaoSubRogado.cnpj']) else row['data.orgaoEntidade.cnpj']
+    buyer_name = row['data.orgaoSubRogado.razaoSocial'] if valor_preenchido(row['data.orgaoSubRogado.razaoSocial']) else row['data.orgaoEntidade.razaoSocial']
+    buyer_esfera = row['data.orgaoSubRogado.esferaId'] if valor_preenchido(row['data.orgaoSubRogado.esferaId']) else row['data.orgaoEntidade.esferaId']
+    buyer_poder = row['data.orgaoSubRogado.poderId'] if valor_preenchido(row['data.orgaoSubRogado.poderId']) else row['data.orgaoEntidade.poderId']
+
     # Montagem do release
     release = {
         "ocid": 'ocds-ye9ov3-' + ocid,
@@ -602,60 +752,59 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
         "tag": ["tender", "award"],
         "initiationType": "tender",
         "buyer": {
-            "id": "BR-CNPJ-" + str(row['data.orgaoSubRogado.cnpj']) if pd.notna(row['data.orgaoSubRogado.cnpj']) else "BR-CNPJ-" + str(row['data.orgaoEntidade.cnpj']),
-            "name": row['data.orgaoSubRogado.razaoSocial'] if pd.notna(row['data.orgaoSubRogado.razaoSocial']) else row['data.orgaoEntidade.razaoSocial'],
+            "id": "BR-CNPJ-" + str(buyer_cnpj),
+            "name": buyer_name,
         },
         "language": "pt",
+        "parties": [],
     }
-
-    release['parties'] = []
 
     # O órgão subrogado, quando existente, ocupa a função de buyer
     # E o órgão é adicionado como originalBuyer
     # Quando não, o próprio órgão é o buyer e originalBuyer não existe
-    release['parties'].append({
+    buyer_party = {
         # BUYER
-        "id": "BR-CNPJ-" + str(row['data.orgaoSubRogado.cnpj']) if pd.notna(row['data.orgaoSubRogado.cnpj']) else "BR-CNPJ-" + str(row['data.orgaoEntidade.cnpj']),
-        "name": row['data.orgaoSubRogado.razaoSocial'] if pd.notna(row['data.orgaoSubRogado.razaoSocial']) else row['data.orgaoEntidade.razaoSocial'],
+        "id": "BR-CNPJ-" + str(buyer_cnpj),
+        "name": buyer_name,
         "identifier": {
             "scheme": "BR-CNPJ",
-            "id": str(row['data.orgaoSubRogado.cnpj']) if pd.notna(row['data.orgaoSubRogado.cnpj']) else str(row['data.orgaoEntidade.cnpj']),
-            "legalName": row['data.orgaoSubRogado.razaoSocial'] if pd.notna(row['data.orgaoSubRogado.razaoSocial']) else row['data.orgaoEntidade.razaoSocial'],
+            "id": str(buyer_cnpj),
+            "legalName": buyer_name,
         },
         "additionalIdentifiers": [
             {
-                "id": str(row['data.unidadeSubRogada.codigoUnidade']) if pd.notna(row['data.unidadeSubRogada.codigoUnidade']) else str(row['data.unidadeOrgao.codigoUnidade']),
-                "legalName": row['data.unidadeSubRogada.nomeUnidade'] if pd.notna(row['data.unidadeSubRogada.nomeUnidade']) else row['data.unidadeOrgao.nomeUnidade'],
+                "id": str(row['data.unidadeSubRogada.codigoUnidade']) if valor_preenchido(row['data.unidadeSubRogada.codigoUnidade']) else str(row['data.unidadeOrgao.codigoUnidade']),
+                "legalName": row['data.unidadeSubRogada.nomeUnidade'] if valor_preenchido(row['data.unidadeSubRogada.nomeUnidade']) else row['data.unidadeOrgao.nomeUnidade'],
             }
         ],
         "address": {
-            "region": row['data.unidadeSubRogada.ufNome'] if pd.notna(row['data.unidadeSubRogada.ufNome']) else row['data.unidadeOrgao.ufNome'],
-            "locality": row['data.unidadeSubRogada.municipioNome'] if pd.notna(row['data.unidadeSubRogada.municipioNome']) else row['data.unidadeOrgao.municipioNome'],
+            "region": row['data.unidadeSubRogada.ufNome'] if valor_preenchido(row['data.unidadeSubRogada.ufNome']) else row['data.unidadeOrgao.ufNome'],
+            "locality": row['data.unidadeSubRogada.municipioNome'] if valor_preenchido(row['data.unidadeSubRogada.municipioNome']) else row['data.unidadeOrgao.municipioNome'],
         },
         "roles": ["buyer", "procuringEntity"],
         "details": {
             "classifications": [
                 {
                     "scheme": "BRA-ESFERA",
-                    "id": "BRA-ESFERA-" + str(row['data.orgaoSubRogado.esferaId']) if pd.notna(row['data.orgaoSubRogado.esferaId']) else "BRA-ESFERA-" + str(row['data.orgaoEntidade.esferaId']),
-                    "description": esfera_id[row['data.orgaoSubRogado.esferaId']] if pd.notna(row['data.orgaoSubRogado.esferaId']) else esfera_id[row['data.orgaoEntidade.esferaId']],
+                    "id": "BRA-ESFERA-" + str(buyer_esfera),
+                    "description": esfera_id.get(buyer_esfera, buyer_esfera),
                 }
             ]
         },
-    })
+    }
 
-    bra_poder_id = "BRA-PODER-" + str(row['data.orgaoSubRogado.poderId']) if pd.notna(row['data.orgaoSubRogado.poderId']) else "BRA-PODER-" + str(row['data.orgaoEntidade.poderId'])
-
-    if bra_poder_id != "N":
-        release["parties"][0]["details"]["classifications"].append({
+    if str(buyer_poder) != "N":
+        buyer_party["details"]["classifications"].append({
             "scheme": "BRA-PODER",
-            "id": "BRA-PODER-" + str(row['data.orgaoSubRogado.poderId']) if pd.notna(row['data.orgaoSubRogado.poderId']) else "BRA-PODER-" + str(row['data.orgaoEntidade.poderId']),
-            "description": poder_id[row['data.orgaoSubRogado.poderId']] if pd.notna(row['data.orgaoSubRogado.poderId']) else poder_id[row['data.orgaoEntidade.poderId']],
+            "id": "BRA-PODER-" + str(buyer_poder),
+            "description": poder_id.get(buyer_poder, buyer_poder),
         })
 
+    release['parties'].append(buyer_party)
+
     # Se o órgão subrogado não existir, significa que o próprio órgão já foi referenciado
-    if pd.notna(row['data.orgaoSubRogado.cnpj']):
-        release['parties'].append({
+    if valor_preenchido(row['data.orgaoSubRogado.cnpj']):
+        original_buyer = {
             # ORIGINAL BUYER
             "id": "BR-CNPJ-" + str(row['data.orgaoEntidade.cnpj']),
             "name": row['data.orgaoEntidade.razaoSocial'],
@@ -680,22 +829,25 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
                     {
                         "scheme": "BRA-ESFERA",
                         "id": "BRA-ESFERA-" + str(row['data.orgaoEntidade.esferaId']),
-                        "description": esfera_id[row['data.orgaoEntidade.esferaId']],
+                        "description": esfera_id.get(row['data.orgaoEntidade.esferaId'], row['data.orgaoEntidade.esferaId']),
                     }
                 ]
             },
-        })
+        }
 
         if str(row['data.orgaoEntidade.poderId']) != "N":
-            release["parties"][-1]["details"]["classifications"].append({
+            original_buyer["details"]["classifications"].append({
                 "scheme": "BRA-PODER",
                 "id": "BRA-PODER-" + str(row['data.orgaoEntidade.poderId']),
-                "description": poder_id[row['data.orgaoEntidade.poderId']],
+                "description": poder_id.get(row['data.orgaoEntidade.poderId'], row['data.orgaoEntidade.poderId']),
             })
 
-    # Adicionando os suppliers
-    release['parties'] = release['parties'] + [supplier for supplier in suppliers]
+        release['parties'].append(original_buyer)
 
+    # Adicionando os suppliers
+    release['parties'] = release['parties'] + suppliers
+
+    modalidade = modalidade_contratacao.get(codigo_ocds(row['data.modalidadeId']))
     release['tender'] = {
             "id": str(row['data.processo']),
             "title": row['data.tipoInstrumentoConvocatorioNome'] + ' - ' + str(row['data.processo']),
@@ -705,10 +857,10 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
                 "id": "BR-CNPJ-" + str(row['data.orgaoEntidade.cnpj']),
             },
             "value": {
-                "amount": row['data.valorTotalEstimado'],
+                "amount": valor_json(row['data.valorTotalEstimado']),
                 "currency": "BRL"
             },
-            "procurementMethod": tipo_instrumento_convocatorio[str(row['data.tipoInstrumentoConvocatorioCodigo'])],
+            "procurementMethod": tipo_instrumento_convocatorio.get(codigo_ocds(row['data.tipoInstrumentoConvocatorioCodigo'])),
             "procurementMethodDetails": (
                 'tipoInstrumentoConvocatorioCodigo: ' + str(row['data.tipoInstrumentoConvocatorioCodigo'])
                 + '; tipoInstrumentoConvocatorioNome: ' + row['data.tipoInstrumentoConvocatorioNome']
@@ -724,19 +876,19 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
                 + '; amparoLegalDescricao: ' + str(row['data.amparoLegal.descricao'])
             ),
             "mainProcurementCategory": "goods",
-            **({"submissionMethod": [modalidade_contratacao[str(row['data.modalidadeId'])]]} if pd.notna(modalidade_contratacao[str(row['data.modalidadeId'])]) else {}),
+            **({"submissionMethod": [modalidade]} if modalidade else {}),
             "submissionMethodDetails": str(row['data.modalidadeNome']),
             **({"tenderPeriod": {
-                **({"startDate": to_ocds_dt(row['data.dataAberturaProposta'], field='data.dataAberturaProposta')} if pd.notna(row['data.dataAberturaProposta']) else {}),
-                **({"endDate": to_ocds_dt(row['data.dataEncerramentoProposta'], field='data.dataEncerramentoProposta')} if pd.notna(row['data.dataEncerramentoProposta']) else {}),
-                **({"maxExtentDate": to_ocds_dt(row['data.dataEncerramentoProposta'], field='data.dataEncerramentoProposta')} if pd.notna(row['data.dataEncerramentoProposta']) else {}),
-                **({"durationInDays": duracao_em_dias(row['data.dataAberturaProposta'], row['data.dataEncerramentoProposta'])} if pd.notna(row['data.dataAberturaProposta']) and pd.notna(row['data.dataEncerramentoProposta']) else {}),
-            }} if pd.notna(row['data.dataAberturaProposta']) or pd.notna(row['data.dataEncerramentoProposta']) else {}),
+                **({"startDate": to_ocds_dt(row['data.dataAberturaProposta'], field='data.dataAberturaProposta')} if valor_preenchido(row['data.dataAberturaProposta']) else {}),
+                **({"endDate": to_ocds_dt(row['data.dataEncerramentoProposta'], field='data.dataEncerramentoProposta')} if valor_preenchido(row['data.dataEncerramentoProposta']) else {}),
+                **({"maxExtentDate": to_ocds_dt(row['data.dataEncerramentoProposta'], field='data.dataEncerramentoProposta')} if valor_preenchido(row['data.dataEncerramentoProposta']) else {}),
+                **({"durationInDays": duracao_em_dias(row['data.dataAberturaProposta'], row['data.dataEncerramentoProposta'])} if valor_preenchido(row['data.dataAberturaProposta']) and valor_preenchido(row['data.dataEncerramentoProposta']) else {}),
+            }} if valor_preenchido(row['data.dataAberturaProposta']) or valor_preenchido(row['data.dataEncerramentoProposta']) else {}),
             "items": items,
             "lots": lots,
         }
 
-    if awards != []:
+    if awards:
         release['awards'] = awards
 
     estados = {
@@ -769,12 +921,18 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
         "Tocantins": "to"
     }
 
+    estado = (
+        str(row['data.unidadeOrgao.ufSigla']).lower()
+        if 'data.unidadeOrgao.ufSigla' in row and valor_preenchido(row['data.unidadeOrgao.ufSigla'])
+        else estados[row['data.unidadeOrgao.ufNome']]
+    )
+
     # Caso a chave não exista, criamos
-    if estados[row['data.unidadeOrgao.ufNome']] not in releases:
-        releases[estados[row['data.unidadeOrgao.ufNome']]] = []
+    if estado not in releases:
+        releases[estado] = []
 
     # Adicionamos a release recém-criada ao seu respectivo estado
-    releases[estados[row['data.unidadeOrgao.ufNome']]].append(release)
+    releases[estado].append(valor_json(release))
 
 
 # : CRIA JSON E ZIP ------------------------------------------------------------
@@ -792,7 +950,7 @@ for estado in releases:
         id = f'{estado}-{mes_coleta}-{ano_coleta}'
 
         # Montagem do objeto OCDS
-        ocds = {
+        ocds = valor_json({
             "uri": f"https://medicamentos-transparentes-dados-abertos.s3.sa-east-1.amazonaws.com/{id}-json.zip",  # link no qual o OCDS poderá ser acessado, alterar após definir a URL correta
             "publishedDate": to_ocds_dt(datetime.now().isoformat(), field='publisherDate'),
             "publisher": {
@@ -809,9 +967,11 @@ for estado in releases:
                 "https://raw.githubusercontent.com/open-contracting-extensions/ocds_organizationClassification_extension/master/extension.json",
                 "https://raw.githubusercontent.com/open-contracting-extensions/ocds_sustainability_extension/master/extension.json",
                 "https://gitlab.com/dncp-opendata/ocds_statusdetails_extension/-/raw/master/extension.json",
+                "https://extensions.open-contracting.org/en/extensions/medicine/master/",
+                "https://extensions.open-contracting.org/en/extensions/itemAttributes/master/",
             ],
             "releases": lote
-        }
+        })
 
         # Exportar para JSON
         json_file = f'{id}-{i // lote_tamanho + 1}.json' if total_lotes > 1 else f'{id}.json'
