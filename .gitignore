@@ -262,3 +262,7 @@ tasks/mapeamento-ocds/output/2026/**/**/*.csv
 tasks/indicadores-MEL/inputs/*
 drive-datapackage-upload.json
 tasks/indicadores-MEL/tmp/*
+tasks/api-compras/tmp/*
+tasks/api-compras/inputs/contratacoes.rds
+tasks/api-compras/inputs/item-homologado-compras.rds
+tasks/api-compras/inputs/item-homologado.rds
