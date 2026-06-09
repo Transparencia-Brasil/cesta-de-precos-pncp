@@ -36,8 +36,13 @@ make_id <- \(endpoint) {
 
 make_anomes_coleta <- function(path) {
   path |>
-    str_remove("^.+itens\\/") |>
-    str_remove("\\/medicamentos\\.csv$") |>
-    str_remove("[\\/\\-]Q(UINZENA)?-?[12]$") |>
+    str_extract("202[56]\\/\\d{1,2}") |>
     ym()
+}
+
+get_colnames <- function(path) {
+  cat("\rRead: ", path, "\r")
+  path |>
+    read_csv(col_types = cols(.default = "c")) |>
+    colnames()
 }

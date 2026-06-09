@@ -1,4 +1,31 @@
-# Mapeamento das colunas dos arquivos de itens
+#' @title Mapeamento das colunas dos arquivos de itens
+#' ---
+#'
+#' @description Este script realiza o mapeamento das colunas dos arquivos de itens
+#' relacionados à cesta de preços do PNCP (Programa Nacional de Compras Públicas).
+#' Ele define os nomes das colunas para facilitar a unificação e análise dos dados.
+#'
+#' O mapeamento é realizado para os itens das contratações, considerando as diferentes coletas realizadas.
+#' Este script é para ser carregado no ambiente para ser utilizado nos scripts de unificação dos dados.
+#'
+#' @return carrega no ambiente os objetos:
+#'
+#' - VETOR COM SCHEMA DE COLUNAS:
+#'   - `mapeamento_colunas_contratacoes`: Um vetor de mapeamento para as colunas dos arquivos de contratações.
+#'
+#' - FUNÇÕES DE MAPEAMENTO:
+#'   - `mapeamento_colunas_itens_coleta1`: Uma função que realiza o mapeamento das colunas para os itens da coleta I.
+#'   - `mapeamento_colunas_itens_coleta2`: Uma função que realiza o mapeamento das colunas para os itens da coleta II.
+#'   - `mapeamento_colunas_itens_coleta3`: Uma função que realiza o mapeamento das colunas para os itens da coleta III.
+#'   - `mapeamento_colunas_resultado_coleta2`: Uma função que realiza o mapeamento das colunas para os resultados dos itens da coleta II.
+#'   - `mapeamento_colunas_resultado_coleta3`: Uma função que realiza o mapeamento das colunas para os resultados dos itens da coleta III.
+#'   - `mapeamento_colunas_resultado_coleta_remanescente`: Uma função que realiza o mapeamento das colunas para os resultados dos itens da coleta remanescente.
+#'
+#' - HELPERS:
+#'  - `comparar_colunas`: Uma função auxiliar para comparar as colunas de um dataframe com um template, identificando colunas faltantes, extras e comuns.
+#'  - `make_id`: Uma função auxiliar para criar um identificador único a partir de uma coluna de endpoint.
+#'
+
 
 # :: CONTRATAÇÕES --------------------------------------------------------------
 
@@ -57,6 +84,7 @@ mapeamento_colunas_contratacoes <- c(
   "endpoint" = "pncp_endpoint"
 )
 
+
 # :: ITENS ---------------------------------------------------------------------
 
 #' Mapeamento de colunas para itens de coleta I
@@ -67,7 +95,7 @@ mapeamento_colunas_contratacoes <- c(
 #' @param itens_coleta1 Um data frame contendo os dados dos itens de coleta I.
 #' @return Um data frame (itens_coleta1) com as colunas mapeadas e novas colunas adicionadas.
 mapeamento_colunas_itens_coleta1 <- function(itens_coleta1) {
-  itens_coleta1 %>%
+  itens_coleta1 |>
     select(
       # colunas que existiam na coleta I
       numeroItem = numeroItem,
@@ -95,7 +123,7 @@ mapeamento_colunas_itens_coleta1 <- function(itens_coleta1) {
       temResultado = temResultado,
       imagem = imagem,
       endpoint = pncp_endpoint
-    ) %>%
+    ) |>
     # colunas que foram criadas depois da coleta I
     mutate(
       aplicabilidadeMargemPreferenciaNormal = NA_character_,
@@ -119,7 +147,7 @@ mapeamento_colunas_itens_coleta1 <- function(itens_coleta1) {
 #' @param itens_coleta2 Um data frame contendo os dados dos itens de coleta II.
 #' @return Um data frame (itens_coleta2) com as colunas mapeadas e novas colunas adicionadas.
 mapeamento_colunas_itens_coleta2 <- function(itens_coleta2) {
-  itens_coleta2 %>%
+  itens_coleta2 |>
     select(
       # colunas que existiam na coleta II
       numeroItem = numeroItem,
@@ -154,7 +182,7 @@ mapeamento_colunas_itens_coleta2 <- function(itens_coleta2) {
       ncmNbsDescricao = ncmNbsDescricao,
       endpoint = endpoint
       # codigo_pdm = codigo_pdm
-    ) %>%
+    ) |>
     mutate(
       # colunas que foram criadas depois da coleta II
       catalogo = NA_character_,
@@ -171,7 +199,7 @@ mapeamento_colunas_itens_coleta2 <- function(itens_coleta2) {
 #' @param itens_coleta3 Um data frame contendo os dados dos itens de coleta III.
 #' @return Um data frame (itens_coleta3) com as colunas mapeadas.
 mapeamento_colunas_itens_coleta3 <- function(itens_coleta3) {
-  itens_coleta3 %>%
+  itens_coleta3 |>
     select(
       # colunas que existiam na coleta III
       numeroItem = numeroItem,
@@ -213,6 +241,7 @@ mapeamento_colunas_itens_coleta3 <- function(itens_coleta3) {
     )
 }
 
+
 # :: RESULTADOS DOS ITENS ------------------------------------------------------
 
 #' Mapeamento de colunas para itens de resultados de coleta II
@@ -222,7 +251,7 @@ mapeamento_colunas_itens_coleta3 <- function(itens_coleta3) {
 #' @param resultado_coleta2 Um data frame contendo os dados de resultados de coleta II.
 #' @return Um data frame (resultado_coleta2) com as colunas mapeadas e novas colunas adicionadas.
 mapeamento_colunas_resultado_coleta2 <- function(resultado_coleta2) {
-  resultado_coleta2 %>%
+  resultado_coleta2 |>
     select(
       # colunas que existiam na coleta II
       situacaoCompraItemResultadoNome = situacaoCompraItemResultadoNome,
@@ -260,7 +289,7 @@ mapeamento_colunas_resultado_coleta2 <- function(resultado_coleta2) {
       naturezaJuridicaId = naturezaJuridicaId,
       endpoint = endpoint,
       numeroControlePNCPCompra = numeroControlePNCPCompra,
-    ) %>%
+    ) |>
     mutate(
       # colunas que foram criadas depois da coleta II
       amparoLegalCriterioDesempate.statusAtivo = NA_character_,
@@ -278,7 +307,7 @@ mapeamento_colunas_resultado_coleta2 <- function(resultado_coleta2) {
 #' @param resultado_coleta3 Um data frame contendo os dados de resultados de coleta III.
 #' @return Um data frame (resultado_coleta3) com as colunas mapeadas.
 mapeamento_colunas_resultado_coleta3 <- function(resultado_coleta3) {
-  resultado_coleta3 %>%
+  resultado_coleta3 |>
     select(
       # colunas que existiam na coleta II
       situacaoCompraItemResultadoNome = situacaoCompraItemResultadoNome,
@@ -319,7 +348,7 @@ mapeamento_colunas_resultado_coleta3 <- function(resultado_coleta3) {
       amparoLegalCriterioDesempate.nome = amparoLegalCriterioDesempate.nome,
       amparoLegalCriterioDesempate.descricao = amparoLegalCriterioDesempate.descricao,
       amparoLegalCriterioDesempate.statusAtivo = amparoLegalCriterioDesempate.statusAtivo
-    ) %>%
+    ) |>
     # Essa coluna desagregou em id, nome, descricao, statusAtivo. Porém está no template.
     mutate(amparoLegalCriterioDesempate = if_else(!is.na(amparoLegalCriterioDesempate.id), TRUE, NA))
 }
@@ -331,7 +360,7 @@ mapeamento_colunas_resultado_coleta3 <- function(resultado_coleta3) {
 #' @param resultado_novos Um data frame contendo os dados de resultados de coleta.
 #' @return Um data frame (resultado_coleta3) com as colunas mapeadas.
 mapeamento_colunas_resultado_coleta_remanescente <- function(resultado_coleta3) {
-  resultado_coleta3 %>%
+  resultado_coleta3 |>
     select(
       # colunas que existiam na coleta
       situacaoCompraItemResultadoNome = situacaoCompraItemResultadoNome,
@@ -369,7 +398,7 @@ mapeamento_colunas_resultado_coleta_remanescente <- function(resultado_coleta3) 
       endpoint = endpoint,
       numeroControlePNCPCompra = numeroControlePNCPCompra,
       amparoLegalCriterioDesempate = amparoLegalCriterioDesempate
-    ) %>%
+    ) |>
     mutate(
       # colunas que foram criadas depois da coleta II
       amparoLegalCriterioDesempate.statusAtivo = NA_character_,
@@ -379,6 +408,7 @@ mapeamento_colunas_resultado_coleta_remanescente <- function(resultado_coleta3) 
       amparoLegalCriterioDesempate.statusAtivo = NA_character_
     )
 }
+
 
 # :: HELPERS -------------------------------------------------------------------
 
@@ -437,17 +467,17 @@ comparar_colunas <- function(df, template) {
 #' make_id("https://api.exemplo.com/orgaos/12345/compras/2023/6789/itens")
 #' # Retorna: "12345-1-006789/2023"
 make_id <- \(endpoint) {
-  cnpj <- endpoint %>%
-    str_remove("^.+orgaos\\/") %>%
+  cnpj <- endpoint |>
+    str_remove("^.+orgaos\\/") |>
     str_remove("\\/compras.+")
 
-  ano <- endpoint %>%
-    str_remove("^.+compras\\/") %>%
+  ano <- endpoint |>
+    str_remove("^.+compras\\/") |>
     str_extract("^\\d+")
 
-  sequencial <- endpoint %>%
-    str_remove(str_glue("^.+compras\\/{ano}\\/")) %>%
-    str_remove(str_glue("\\/itens")) %>%
+  sequencial <- endpoint |>
+    str_remove(str_glue("^.+compras\\/{ano}\\/")) |>
+    str_remove(str_glue("\\/itens")) |>
     str_pad(width = 6, pad = "0")
 
   numeroControlePNCP <- str_glue("{cnpj}-1-{sequencial}/{ano}")

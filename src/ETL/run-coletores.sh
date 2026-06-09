@@ -53,6 +53,42 @@ echo " - ALIAS_COLETA='$ALIAS_COLETA' - é um alias para identificar a coleta e 
 echo ""
 
 
+# VALIDA TEMPLATES --------------------------------------------------------------
+
+VALIDADOR_TEMPLATE="src/ETL/template/run-validador-template.sh"
+
+echo -e "---\n## VALIDADOR DE TEMPLATES\n"
+bash "$VALIDADOR_TEMPLATE"
+echo -e "\nValidação de templates concluída!\n"
+
+
+# CONFIRMAÇÕES DE EXECUÇÃO -----------------------------------------------------
+
+# Pergunta ao usuário se deseja executar a carga no banco (obrigando resposta válida)
+while true; do
+  read -r -p "Deseja executar a CARGA NO BANCO após empacotar os dados? (S/N): " CARREGAR_BD
+  case "$CARREGAR_BD" in
+    [Ss]) CARREGAR_BD="S"; break ;;
+    [Nn]) CARREGAR_BD="N"; break ;;
+    *) echo "Resposta inválida. Digite 'S' para Sim ou 'N' para Não." ;;
+  esac
+done
+
+echo -e "Resposta: $CARREGAR_BD\n"
+
+# Pergunta ao usuário se deseja executar a recoleta (obrigando resposta válida)
+while true; do
+  read -r -p "Deseja executar a RECOLETA DE ITENS NÃO HOMOLOGADOS (recoleta de resultados)? (S/N): " RECOLETAR_RESULTADOS
+  case "$RECOLETAR_RESULTADOS" in
+    [Ss]) RECOLETAR_RESULTADOS="S"; break ;;
+    [Nn]) RECOLETAR_RESULTADOS="N"; break ;;
+    *) echo "Resposta inválida. Digite 'S' para Sim ou 'N' para Não." ;;
+  esac
+done
+
+echo -e "Resposta: $RECOLETAR_RESULTADOS\n"
+
+
 # SCREENS ----------------------------------------------------------------------
 # cada etapa deve gerar uma screen
 
@@ -71,6 +107,7 @@ COLETOR_ITENS="src/ETL/coletores/coletor-itens.sh"
 CLASSIFICADOR="src/ETL/classificador/filtra-medicamentos.sh"
 COLETOR_RESULTADOS="src/ETL/coletores/coletor-resultados.sh"
 RECOLETOR_RESULTADOS="src/ETL/coletores/recoletor-resultados.sh"
+CARREGADOR_DADOS="src/ETL/loaders/carrega-dados.R"
 
 
 # FILEPATHS --------------------------------------------------------------------
@@ -155,23 +192,6 @@ executar_coletor() {
 }
 
 
-# CONFIRMAÇÃO (RECOLETA RESULTADOS) --------------------------------------------
-
-echo "Deseja executar a RECOLETA DE ITENS NÃO HOMOLOGADOS (recoleta de resultados)? (S/N): "
-
-# Pergunta ao usuário se deseja executar a recoleta (obrigando resposta válida)
-while true; do
-  read -r -p "Deseja executar a RECOLETA DE ITENS NÃO HOMOLOGADOS (recoleta de resultados)? (S/N): " RECOLETAR_RESULTADOS
-  case "$RECOLETAR_RESULTADOS" in
-    [Ss]) RECOLETAR_RESULTADOS="S"; break ;;
-    [Nn]) RECOLETAR_RESULTADOS="N"; break ;;
-    *) echo "Resposta inválida. Digite 'S' para Sim ou 'N' para Não." ;;
-  esac
-done
-
-echo -e "Resposta: $RECOLETAR_RESULTADOS\n"
-
-
 # ------------------------------------------------------------------------------
 # EXECUÇÃO ---------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -224,30 +244,6 @@ executar_coletor "$MEDICAMENTOS_PATH" "$BASH_RESULTADOS" "$SCREEN_RESULTADOS"
 echo -e "\nColeta de RESULTADOS de MEDICAMENTOS concluída!\n"
 
 
-# :: RECOLETA DE RESULTADOS ---
-
-echo -e "---\n## RECOLETA DE RESULTADOS\n"
-
-# A recoleta de resultados é opcional, dependendo da escolha do usuário. Ela só
-# será executada se o usuário tiver respondido "S" na confirmação anterior.
-if [ "$RECOLETAR_RESULTADOS" = "S" ]; then
-  executar_coletor "$RESULTADOS_RECOLETA_DIR/dados.csv" "$BASH_RECOLETA_RESULTADOS" "$SCREEN_RECOLETA_RESULTADOS"
-  echo -e "\nRecoleta de RESULTADOS concluída!\n"
-else
-  echo -e "\nRecoleta de RESULTADOS ignorada (usuário optou por não executar).\n"
-fi
-
-
-# ------------------------------------------------------------------------------
-# FIM DA EXECUÇÃO --------------------------------------------------------------
-# ------------------------------------------------------------------------------
-
-# FINALIZA COLETA --------------------------------------------------------------
-
-AGORA=$(date +"%d-%b-%Y %H:%M:%S")
-echo -e "\nCOLETA ENCERRADA ÀS '$AGORA'!"
-
-
 # ------------------------------------------------------------------------------
 # EMPACOTADOR ------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -257,20 +253,15 @@ echo -e "---\n## PACOTE DE DADOS\n"
 # coleta os resultados e copia para uma estrutura de diretórios mais coerente
 # para exportação no banco de dados:
 
-# Extrair ano, mês e dia do PRIMEIRO_DIA
+# Extrair ano e mês do PRIMEIRO_DIA
 ANO_COLETA=${PRIMEIRO_DIA:0:4}
 MES_COLETA=${PRIMEIRO_DIA:5:2}
-DIA_COLETA=${PRIMEIRO_DIA:8:2}
 
 # Preserva mês numérico para nome de arquivo de log do orquestrador
 MES_NUM=$MES_COLETA
 
-# Determinar qual quinzena
-if [ "$DIA_COLETA" = "01" ]; then
-  QUINZENA="QUINZENA-1"
-else
-  QUINZENA="QUINZENA-2"
-fi
+# Usa o último componente do alias para manter consistência com a coleta.
+PACOTE_ALIAS=${ALIAS_COLETA##*/}
 
 # Converter mês numérico para abreviação
 case $MES_COLETA in
@@ -290,7 +281,7 @@ case $MES_COLETA in
 esac
 
 # Criar diretório para o pacote de dados
-PACOTE_PATH="coleta/data-package/$ANO_COLETA/$MES_COLETA/$QUINZENA"
+PACOTE_PATH="coleta/data-package/$ANO_COLETA/$MES_COLETA/$PACOTE_ALIAS"
 
 # Criar subdiretórios DADOS e LOG
 PACOTE_PATH_DADOS="$PACOTE_PATH/DATA"
@@ -312,8 +303,12 @@ ITENS_PATH="coleta/itens/${ALIAS_COLETA}"
 RESULTADOS_PATH="coleta/resultados/${ALIAS_COLETA}"
 RESULTADOS_RECOLETA_PATH="${RESULTADOS_PATH}/recoleta"
 
+PACOTE_CONTRATACOES_CSV="${PACOTE_PATH_DADOS}/contratacoes.csv"
+PACOTE_MEDICAMENTOS_CSV="${PACOTE_PATH_DADOS}/itens-medicamentos.csv"
+PACOTE_RESULTADOS_CSV="${PACOTE_PATH_DADOS}/itens-medicamentos-resultados.csv"
+
 # Copiar arquivos de contratações
-cp "${CONTRATACOES_PATH}/dados.csv" "${PACOTE_PATH_DADOS}/contratacoes.csv"
+cp "${CONTRATACOES_PATH}/dados.csv" "$PACOTE_CONTRATACOES_CSV"
 cp "${CONTRATACOES_PATH}/erros.csv" "${PACOTE_PATH_DADOS}/contratacoes-erros.csv"
 cp "${CONTRATACOES_PATH}/monitoramento.csv" "${PACOTE_PATH_DADOS}/contratacoes-monitoramento.csv"
 
@@ -321,43 +316,86 @@ cp "${CONTRATACOES_PATH}/monitoramento.csv" "${PACOTE_PATH_DADOS}/contratacoes-m
 cp "${ITENS_PATH}/dados.csv" "${PACOTE_PATH_DADOS}/itens.csv"
 cp "${ITENS_PATH}/erros.csv" "${PACOTE_PATH_DADOS}/itens-erros.csv"
 cp "${ITENS_PATH}/monitoramento.csv" "${PACOTE_PATH_DADOS}/itens-monitoramento.csv"
-cp "${ITENS_PATH}/medicamentos.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos.csv"
+cp "${ITENS_PATH}/medicamentos.csv" "$PACOTE_MEDICAMENTOS_CSV"
 
 # Copiar arquivos de resultados
-cp "${RESULTADOS_PATH}/dados.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos-resultados.csv"
+cp "${RESULTADOS_PATH}/dados.csv" "$PACOTE_RESULTADOS_CSV"
 cp "${RESULTADOS_PATH}/erros.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos-resultados-erros.csv"
 cp "${RESULTADOS_PATH}/monitoramento.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos-resultados-monitoramento.csv"
 
-# Copiar arquivos de recoleta (se existirem)
-if [ -d "$RESULTADOS_RECOLETA_PATH" ]; then
+# Confirmar cópia dos csv's principais
+echo -e "\nArquivos csv principais copiados para ${PACOTE_PATH_DADOS}"
+
+
+# ------------------------------------------------------------------------------
+# CARGA NO BANCO ----------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
+echo -e "---\n## CARGA NO BANCO\n"
+
+if [ "$CARREGAR_BD" = "S" ]; then
+  LOG_CARREGA_DADOS="${PACOTE_PATH_LOG}/run-carrega-dados-${ANO_COLETA}-${MES_NUM}-${PACOTE_ALIAS}.log"
+
+  for ARQUIVO_CARGA in "$PACOTE_CONTRATACOES_CSV" "$PACOTE_MEDICAMENTOS_CSV" "$PACOTE_RESULTADOS_CSV"; do
+    if [ ! -f "$ARQUIVO_CARGA" ]; then
+      echo "Erro: arquivo obrigatório para carga não encontrado: '$ARQUIVO_CARGA'."
+      exit 1
+    fi
+  done
+
+  echo "Executando carga no banco com:"
+  echo " - CONTRATAÇÕES: '$PACOTE_CONTRATACOES_CSV'"
+  echo " - MEDICAMENTOS: '$PACOTE_MEDICAMENTOS_CSV'"
+  echo " - RESULTADOS: '$PACOTE_RESULTADOS_CSV'"
+  echo " - LOG: '$LOG_CARREGA_DADOS'"
+  echo ""
+
+  if Rscript.exe "$CARREGADOR_DADOS" "$PACOTE_CONTRATACOES_CSV" "$PACOTE_MEDICAMENTOS_CSV" "$PACOTE_RESULTADOS_CSV" > "$LOG_CARREGA_DADOS" 2>&1; then
+    echo -e "Carga no banco concluída!\n"
+  else
+    STATUS_CARGA=$?
+    echo -e "Erro: carga no banco falhou com status $STATUS_CARGA."
+    echo -e "Consulte o log em '$LOG_CARREGA_DADOS'."
+    exit "$STATUS_CARGA"
+  fi
+else
+  echo -e "Carga no banco ignorada (usuário optou por não executar).\n"
+fi
+
+
+# :: RECOLETA DE RESULTADOS ---
+
+echo -e "---\n## RECOLETA DE RESULTADOS\n"
+
+# A recoleta de resultados é opcional, dependendo da escolha do usuário. Ela só
+# será executada se o usuário tiver respondido "S" na confirmação inicial.
+if [ "$RECOLETAR_RESULTADOS" = "S" ]; then
+  executar_coletor "$RESULTADOS_RECOLETA_DIR/dados.csv" "$BASH_RECOLETA_RESULTADOS" "$SCREEN_RECOLETA_RESULTADOS"
+  echo -e "\nRecoleta de RESULTADOS concluída!\n"
+else
+  echo -e "\nRecoleta de RESULTADOS ignorada (usuário optou por não executar).\n"
+fi
+
+# Copiar arquivos de recoleta após a execução (se existirem)
+if [ "$RECOLETAR_RESULTADOS" = "S" ] && [ -d "$RESULTADOS_RECOLETA_PATH" ]; then
   cp "${RESULTADOS_RECOLETA_PATH}/dados.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos-resultados-recoleta.csv" 2>/dev/null || true
   cp "${RESULTADOS_RECOLETA_PATH}/erros.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos-resultados-recoleta-erros.csv" 2>/dev/null || true
   cp "${RESULTADOS_RECOLETA_PATH}/monitoramento.csv" "${PACOTE_PATH_DADOS}/itens-medicamentos-resultados-recoleta-monitoramento.csv" 2>/dev/null || true
 fi
 
 # Confirmar cópia dos csv's
-echo -e "\nArquivos csv copiados para ${PACOTE_PATH_DADOS}"
+echo -e "\nArquivos csv disponíveis em ${PACOTE_PATH_DADOS}"
 
 # Copiar todos os arquivos de log
 cp "${CONTRATACOES_PATH}"/*.log "${PACOTE_PATH_LOG}/" 2>/dev/null || true
 cp "${ITENS_PATH}"/*.log "${PACOTE_PATH_LOG}/" 2>/dev/null || true
 cp "${RESULTADOS_PATH}"/*.log "${PACOTE_PATH_LOG}/" 2>/dev/null || true
-if [ -d "$RESULTADOS_RECOLETA_PATH" ]; then
+if [ "$RECOLETAR_RESULTADOS" = "S" ] && [ -d "$RESULTADOS_RECOLETA_PATH" ]; then
   cp "${RESULTADOS_RECOLETA_PATH}"/*.log "${PACOTE_PATH_LOG}/" 2>/dev/null || true
 fi
 
-# Exibe a árvore de diretórios do pacote
-echo -e "\nEstrutura do pacote de dados:\n"
-if command -v tree &> /dev/null; then
-  tree -h -- "${PACOTE_PATH}"
-else
-    echo "Comando 'tree' não encontrado. Instalando..."
-    sudo apt-get update && sudo apt-get install tree -y
-    tree -h -- "${PACOTE_PATH}"
-fi
-
 # Copia o log do orquestrador (run-coletores) para o pacote de logs
-ORQUESTRADOR_LOG="src/ETL/log/run-coletores-${ANO_COLETA}-${MES_NUM}-${QUINZENA}.log"
+ORQUESTRADOR_LOG="src/ETL/log/run-coletores-${ANO_COLETA}-${MES_NUM}-${PACOTE_ALIAS}.log"
 if [ -f "$ORQUESTRADOR_LOG" ]; then
   cp "$ORQUESTRADOR_LOG" "${PACOTE_PATH_LOG}/"
 else
@@ -370,4 +408,17 @@ fi
 
 # Confirmar cópia dos logs
 echo -e "\nArquivos de log copiados para ${PACOTE_PATH_LOG}"
+
+# Exibe a árvore de diretórios do pacote
+echo -e "\nEstrutura do pacote de dados:\n"
+if command -v tree &> /dev/null; then
+  tree -h -- "${PACOTE_PATH}"
+else
+    echo "Comando 'tree' não encontrado. Instalando..."
+    sudo apt-get update && sudo apt-get install tree -y
+    tree -h -- "${PACOTE_PATH}"
+fi
+
+AGORA=$(date +"%d-%b-%Y %H:%M:%S")
+echo -e "\nCOLETA ENCERRADA ÀS '$AGORA'!"
 echo -e "\nFim! =)"

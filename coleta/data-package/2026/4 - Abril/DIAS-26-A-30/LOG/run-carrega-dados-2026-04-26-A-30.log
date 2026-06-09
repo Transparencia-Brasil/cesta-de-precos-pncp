@@ -1,0 +1,12 @@
+Linhas lidas: 49909
+Linhas lidas: 4237
+Linhas lidas: 2170
+Linhas lidas (após remover NA's): 49909
+Linhas lidas (após remover NA's): 4237
+Linhas lidas (após remover NA's): 2170
+Erro ao inserir a linha 1793 da tabela tabela: Failed to fetch row : ERROR:  invalid input syntax for type integer: "0.23000000000000001"
+CONTEXT:  unnamed portal parameter $29 = '...'
+
+Mensagen de aviso:
+Closing open result set, cancelling previous query 
+Historico de cargas atualizado em 'C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/src/ETL/loaders/historico-cargas.csv' (5 linhas anexadas).

@@ -1,3 +1,14 @@
+#' @title Identificar itens a recoletar
+#' ---
+#'
+#' @description Este script identifica os itens que precisam ser recoletados devido a inconsistências no campo `endpoint` do arquivo `itens3.rds`.
+#' O problema ocorre porque o campo `endpoint` está vazio e seu conteúdo foi armazenado
+#' na coluna `status_code`. Este script compara os itens coletados com os medicamentos classificados para identificar quais itens precisam ser recoletados.
+#'
+#' @return Um arquivo CSV contendo os itens que precisam ser recoletados,
+#'   salvo em "coleta/itens/medicamentos.csv".
+#'
+
 library(tidyverse)
 library(here)
 

@@ -21,6 +21,8 @@ Use esta skill quando o usuario quiser evitar repetir instrucoes operacionais do
 
 Executar o fluxo de colaboracao de forma padronizada e segura, priorizando o uso de MCP do GitHub e ferramentas Git disponiveis no ambiente.
 
+Antes de executar o fluxo, leia `AGENTS.md` na raiz do repositorio. Ele e a fonte canonica para convencoes de Git, cuidados com artefatos gerados, dados sensiveis, idioma e escopo seguro neste projeto.
+
 ## Ordem recomendada do fluxo
 
 A ordem abaixo e a mais robusta para evitar PR sem commit, branch incorreta ou atribuicoes incompletas:
@@ -47,6 +49,7 @@ Se faltarem campos obrigatorios, solicitar apenas o minimo necessario antes de e
 
 ## Convencoes deste repositorio
 
+- fonte canonica: `AGENTS.md` na raiz do repositorio
 - branch base padrao: `coleta-orquestrada`
 - prefira nomes de branch com prefixo: `feat/`, `fix/`, `docs/`, `chore/`
 - commits em PT-BR no formato: `feat: ...`, `fix: ...`, `docs: ...`, `refactor: ...`, `chore: ...`

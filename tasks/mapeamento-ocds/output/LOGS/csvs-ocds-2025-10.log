@@ -1,0 +1,89 @@
+==== Inicio: Geracao de CSVs/ZIPs OCDS 2026-06-08T19:25:03-03:00 ====
+30 JSONs em 27 grupos
+
+[grupo 1/27] ac-10-2025 (1 arquivo(s))
+  flatten: ac-10-2025
+  zip: ac-10-2025-csv.zip
+[grupo 2/27] al-10-2025 (1 arquivo(s))
+  flatten: al-10-2025
+  zip: al-10-2025-csv.zip
+[grupo 3/27] am-10-2025 (1 arquivo(s))
+  flatten: am-10-2025
+  zip: am-10-2025-csv.zip
+[grupo 4/27] ap-10-2025 (1 arquivo(s))
+  flatten: ap-10-2025
+  zip: ap-10-2025-csv.zip
+[grupo 5/27] ba-10-2025 (1 arquivo(s))
+  flatten: ba-10-2025
+  zip: ba-10-2025-csv.zip
+[grupo 6/27] ce-10-2025 (1 arquivo(s))
+  flatten: ce-10-2025
+  zip: ce-10-2025-csv.zip
+[grupo 7/27] df-10-2025 (1 arquivo(s))
+  flatten: df-10-2025
+  zip: df-10-2025-csv.zip
+[grupo 8/27] es-10-2025 (1 arquivo(s))
+  flatten: es-10-2025
+  zip: es-10-2025-csv.zip
+[grupo 9/27] go-10-2025 (1 arquivo(s))
+  flatten: go-10-2025
+  zip: go-10-2025-csv.zip
+[grupo 10/27] ma-10-2025 (1 arquivo(s))
+  flatten: ma-10-2025
+  zip: ma-10-2025-csv.zip
+[grupo 11/27] mg-10-2025 (1 arquivo(s))
+  flatten: mg-10-2025
+  zip: mg-10-2025-csv.zip
+[grupo 12/27] ms-10-2025 (1 arquivo(s))
+  flatten: ms-10-2025
+  zip: ms-10-2025-csv.zip
+[grupo 13/27] mt-10-2025 (1 arquivo(s))
+  flatten: mt-10-2025
+  zip: mt-10-2025-csv.zip
+[grupo 14/27] pa-10-2025 (1 arquivo(s))
+  flatten: pa-10-2025
+  zip: pa-10-2025-csv.zip
+[grupo 15/27] pb-10-2025 (1 arquivo(s))
+  flatten: pb-10-2025
+  zip: pb-10-2025-csv.zip
+[grupo 16/27] pe-10-2025 (1 arquivo(s))
+  flatten: pe-10-2025
+  zip: pe-10-2025-csv.zip
+[grupo 17/27] pi-10-2025 (1 arquivo(s))
+  flatten: pi-10-2025
+  zip: pi-10-2025-csv.zip
+[grupo 18/27] pr-10-2025 (1 arquivo(s))
+  flatten: pr-10-2025
+  zip: pr-10-2025-csv.zip
+[grupo 19/27] rj-10-2025 (1 arquivo(s))
+  flatten: rj-10-2025
+  zip: rj-10-2025-csv.zip
+[grupo 20/27] rn-10-2025 (1 arquivo(s))
+  flatten: rn-10-2025
+  zip: rn-10-2025-csv.zip
+[grupo 21/27] ro-10-2025 (1 arquivo(s))
+  flatten: ro-10-2025
+  zip: ro-10-2025-csv.zip
+[grupo 22/27] rr-10-2025 (1 arquivo(s))
+  flatten: rr-10-2025
+  zip: rr-10-2025-csv.zip
+[grupo 23/27] rs-10-2025 (1 arquivo(s))
+  flatten: rs-10-2025
+  zip: rs-10-2025-csv.zip
+[grupo 24/27] sc-10-2025 (1 arquivo(s))
+  flatten: sc-10-2025
+  zip: sc-10-2025-csv.zip
+[grupo 25/27] se-10-2025 (1 arquivo(s))
+  flatten: se-10-2025
+  zip: se-10-2025-csv.zip
+[grupo 26/27] sp-10-2025 (4 arquivo(s))
+  flatten: sp-10-2025-1
+  flatten: sp-10-2025-2
+  flatten: sp-10-2025-3
+  flatten: sp-10-2025-4
+  zip: sp-10-2025-csv.zip
+[grupo 27/27] to-10-2025 (1 arquivo(s))
+  flatten: to-10-2025
+  zip: to-10-2025-csv.zip
+==== Fim: Geracao de CSVs/ZIPs OCDS 2026-06-08T19:25:16-03:00 ====
+

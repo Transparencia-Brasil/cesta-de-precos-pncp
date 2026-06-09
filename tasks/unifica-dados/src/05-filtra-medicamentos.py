@@ -22,6 +22,13 @@ O valor 0.5 foi definido experimentalmente como sendo o limite que rende os melh
 Por fim, os medicamentos idntificados são salvos em um arquivo chamado 'medicamentos.csv', junto com o código BR do item
 mais similar do catálogo. Os embeddings do catálogo são salvos em um arquivo (catalogo-vetorizado.csv) para evitar calculá-los a
 cada execução do script.
+
+Saídas:
+1. catalogo-vetorizado.csv - arquivo contendo o catálogo de medicamentos com os embeddings calculados.
+    Se esse arquivo já existir, ele será carregado ao invés de ser criado novamente.
+2. medicamentos.csv - arquivo contendo os itens classificados como medicamentos, junto com o código BR do
+    item do catálogo mais similar e a similaridade entre eles.
+
 """
 
 import argparse  # Conversor para opções de linha de comando

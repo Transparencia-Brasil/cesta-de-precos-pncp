@@ -27,7 +27,9 @@ suppressPackageStartupMessages(library(readr))
 suppressPackageStartupMessages(library(DBI))
 
 source(here("src/ETL/coletores/utils.R"))
+source(here("src/ETL/template/utils-template.R"))
 source(here("src/ETL/loaders/utils.R"))
+source(here("src/ETL/loaders/utils-historico.R"))
 
 
 # PARÂMETROS DE ENTRADAS -------------------------------------------------------
@@ -71,68 +73,8 @@ endpoints_resultados = paste0(tb_item_licitado$url_api, "/resultados")
 # RECOLETA OS RESULTADOS -------------------------------------------------------
 
 # TEMPLATE ---------------------------------------------------------------------
-# Mapear todas as colunas que serão coletadas e garantir balanceamento do dataset
-
-# referência: https://pncp.gov.br/api/pncp/swagger-ui/index.html#/Contrata%C3%A7%C3%A3o/recuperarResultados
-template_resultados_itens <- tibble::tibble(
-  # ids
-  numeroControlePNCPCompra = character(),
-  numeroItem = character(),
-  endpoint = character(),
-  sequencialResultado = character(),
-  # Situação da compra
-  situacaoCompraItemResultadoId = character(),
-  situacaoCompraItemResultadoNome = character(),
-  # data inclusão e atualização
-  dataInclusao = character(),
-  dataAtualizacao = character(),
-  # Fornecedor
-  niFornecedor = character(),
-  nomeRazaoSocialFornecedor = character(),
-  tipoPessoa = character(),
-  porteFornecedorId = character(),
-  porteFornecedorNome = character(),
-  naturezaJuridicaId = character(),
-  naturezaJuridicaNome = character(),
-  codigoPais = character(),
-  # Quantidades e valores
-  quantidadeHomologada = character(),
-  valorUnitarioHomologado = character(),
-  valorTotalHomologado = character(),
-  percentualDesconto = character(),
-  # País de origem
-  paisOrigemProdutoServico.id = character(),
-  paisOrigemProdutoServico.nome = character(),
-  # Moeda estrangeira
-  moedaEstrangeira.id = character(),
-  moedaEstrangeira.simbolo = character(),
-  moedaEstrangeira.nome = character(),
-  timezoneCotacaoMoedaEstrangeira = character(),
-  valorNominalMoedaEstrangeira = character(),
-  dataCotacaoMoedaEstrangeira = character(),
-  # Margem preferência + amparo legal
-  aplicacaoMargemPreferencia = character(),
-  amparoLegalMargemPreferencia.id = character(),
-  amparoLegalMargemPreferencia.nome = character(),
-  amparoLegalMargemPreferencia.descricao = character(),
-  amparoLegalMargemPreferencia.statusAtivo = character(),
-  # benefício ME/EPP
-  aplicacaoBeneficioMeEpp = character(),
-  # Critério de desempate + amparo legal
-  aplicacaoCriterioDesempate = character(),
-  amparoLegalCriterioDesempate.id = character(),
-  amparoLegalCriterioDesempate.nome = character(),
-  amparoLegalCriterioDesempate.descricao = character(),
-  amparoLegalCriterioDesempate.statusAtivo = character(),
-  # subcontratação
-  indicadorSubcontratacao = character(),
-  # classificação SRP
-  ordemClassificacaoSrp = character(),
-  # resultado/cancelamento
-  dataResultado = character(),
-  dataCancelamento = character(),
-  motivoCancelamento = character()
-)
+# Template versionado e atualizado pelo validador em src/ETL/template.
+template_resultados_itens <- carrega_template_coleta("resultados_itens")
 
 # Executa a coleta com template definido
 coleta(endpoints = endpoints_resultados, output_dir = PATH_OUTPUT_DIR, template = template_resultados_itens)
@@ -246,8 +188,11 @@ safe_count <- function(qry) {
 }
 
 # Contagens antes da inserção
-n_fornecedores_antes <- safe_count("select count(*) from fornecedor;")
-n_itens_homologados_antes <- safe_count("select count(*) from item_homologado;")
+tabelas_historico_recoleta <- c("fornecedor", "item_homologado", "item_licitado")
+contagens_historico_antes <- contar_tabelas_historico(con, tabelas_historico_recoleta)
+n_fornecedores_antes <- contagens_historico_antes[["fornecedor"]]
+n_itens_homologados_antes <- contagens_historico_antes[["item_homologado"]]
+n_itens_licitado_antes <- contagens_historico_antes[["item_licitado"]]
 
 
 # Insere os fornecedores =======================================================
@@ -344,7 +289,6 @@ if (nrow(ids_itens_homologados) == 0) {
     get_query("select * from temp_ids;")
 
     message("Removendo itens homologados da tabela item_licitado...")
-    n_itens_licitado_antes <- safe_count("select count(*) from item_licitado")
 
     # Executa o DELETE usando JOIN
     dbExecute(
@@ -379,6 +323,17 @@ if (nrow(ids_itens_homologados) == 0) {
   # Exibe as contagens antes e depois
   message("\r\nAntes:", n_itens_licitado_antes, "\r\nDepois:", n_itens_licitado_depois)
 }
+
+contagens_historico_depois <- contar_tabelas_historico(con, tabelas_historico_recoleta)
+
+linhas_historico <- montar_linhas_historico(
+  rotina = "recoleta_resultados",
+  contagens_antes = contagens_historico_antes,
+  contagens_depois = contagens_historico_depois,
+  caminhos_origem = PATH_OUTPUT_DIR
+)
+
+registrar_historico_cargas(linhas_historico)
 
 
 # Fecha a conexão com o BD

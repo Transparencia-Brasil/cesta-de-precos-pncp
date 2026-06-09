@@ -1,10 +1,26 @@
-#' Download de Dados
+#' @title Download de Dados do google drive
 #' ---
 #'
-#' Este script realiza o download de dados necessários para a unificação de informações
+#' @description Este script realiza o download de dados necessários para a unificação de informações
 #' relacionadas à cesta de preços do PNCP (Programa Nacional de Compras Públicas).
 #' Ele utiliza bibliotecas para manipulação de arquivos, integração com o Google Drive,
 #' e processamento de dados em R.
+#'
+#' @return ENTREGA FINAL DO SCRIPT
+#'
+#' - Contratações:
+#'   - input/contratacoes2.rds
+#'   - input/contratacoes3.rds ->> input/contratacoes3.rds
+#'
+#' - Itens das contratações:
+#'   - input/itens1.rds
+#'   - input/itens2.rds
+#'   - input/itens3.rds
+#'
+#' - Resultados dos itens das contratações:
+#'   - input/itens1-resultados.rds
+#'   - input/itens2-resultados.rds
+#'   - input/itens3-resultados.rds
 #'
 
 # libs
@@ -19,14 +35,12 @@ library(readr)
 INPUT_DIR <- here("tasks/unifica-dados/input")
 
 # Cria o diretório INPUT_DIR, caso não exista
-if (!dir.exists(INPUT_DIR)) { 
-  dir.create(INPUT_DIR, recursive = TRUE) 
-}
-  
+if (!dir.exists(INPUT_DIR)) dir.create(INPUT_DIR, recursive = TRUE)
+
 #' Baixa arquivos do Google Drive
 #'
-#' @description Função para baixar arquivos de uma pasta no Google Drive para um diretório local. 
-#' Esta função utiliza a API do Google Drive para listar e baixar arquivos de uma pasta específica. 
+#' @description Função para baixar arquivos de uma pasta no Google Drive para um diretório local.
+#' Esta função utiliza a API do Google Drive para listar e baixar arquivos de uma pasta específica.
 #' Os arquivos são filtrados com base no padrão fornecido e salvos no diretório local especificado.
 #'
 #' @param drive_url URL da pasta no Google Drive de onde os arquivos serão baixados.
@@ -37,14 +51,12 @@ if (!dir.exists(INPUT_DIR)) {
 #' @return Um data frame contendo informações sobre os arquivos baixados, incluindo seus IDs e caminhos locais.
 #'
 download_from_googledrive <- function(drive_url, pattern, input_dir, local_files) {
-  files <- drive_ls(drive_url, pattern = pattern, recursive = TRUE) %>%
-    transmute(
-      file = id,
-      path = here(input_dir, local_files[name])
-    ) %>%
+  files <- drive_ls(drive_url, pattern = pattern, recursive = TRUE) |>
+    transmute(file = id, path = here(input_dir, local_files[name])) |>
     pmap_df(drive_download, overwrite = TRUE)
   return(files)
 }
+
 
 # COLETA I ---------------------------------------------------------------------
 
@@ -62,6 +74,7 @@ coleta1_pattern <- paste0(names(coleta1_files), collapse = "|")
 # Realiza o download dos arquivos do Google Drive para o diretório local
 coleta1_dir <- download_from_googledrive(coleta1_url, coleta1_pattern, INPUT_DIR, coleta1_files)
 
+
 # COLETA II --------------------------------------------------------------------
 
 # URL da pasta no Google Drive para a coleta II
@@ -76,11 +89,12 @@ coleta2_files <- c(
 )
 
 # Criação de um padrão regex para filtrar os arquivos no Google Drive
-coleta2_pattern <- paste0(names(coleta2_files), collapse = "|") %>%
+coleta2_pattern <- paste0(names(coleta2_files), collapse = "|") |>
   str_replace_all("\\(|\\)", ".")
 
 # Realiza o download dos arquivos do Google Drive para o diretório local
 coleta2_dir <- download_from_googledrive(coleta2_url, coleta2_pattern, INPUT_DIR, coleta2_files)
+
 
 # COLETA III -------------------------------------------------------------------
 
@@ -101,6 +115,6 @@ coleta3_pattern <- paste0(names(coleta3_files), collapse = "|")
 coleta3_dir <- download_from_googledrive(coleta3_url, coleta3_pattern, INPUT_DIR, coleta3_files)
 
 # Lê o arquivo CSV baixado, converte todas as colunas para o tipo caractere e salva como RDS
-here(INPUT_DIR, "contratacoes3.csv") %>%
-  read_csv(col_types = cols(.default = col_character())) %>%
+here(INPUT_DIR, "contratacoes3.csv") |>
+  read_csv(col_types = cols(.default = col_character())) |>
   saveRDS(here(INPUT_DIR, "contratacoes3.rds"))

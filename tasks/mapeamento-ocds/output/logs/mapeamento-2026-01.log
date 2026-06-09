@@ -1,23 +1,0 @@
-Nenhuma contratação sem data encontrada.
-Erro ao converter data: campo='dataResultado' valor='1858-11-17' tipo=<class 'str'> erro=[Errno 22] Invalid argument
-Erro ao converter data: campo='dataResultado' valor='1858-11-17' tipo=<class 'str'> erro=[Errno 22] Invalid argument
-Erro ao converter data: campo='dataResultado' valor='1858-11-17' tipo=<class 'str'> erro=[Errno 22] Invalid argument
-Erro ao converter data: campo='dataResultado' valor='1858-11-17' tipo=<class 'str'> erro=[Errno 22] Invalid argument
-Erro ao converter data: campo='dataResultado' valor='1858-11-17' tipo=<class 'str'> erro=[Errno 22] Invalid argument
-Erro ao converter data: campo='dataResultado' valor='1858-11-17' tipo=<class 'str'> erro=[Errno 22] Invalid argument
-Erro ao converter data: campo='dataResultado' valor='1858-11-17' tipo=<class 'str'> erro=[Errno 22] Invalid argument
-Erro ao converter data: campo='dataResultado' valor='1858-11-17' tipo=<class 'str'> erro=[Errno 22] Invalid argument
-Erro ao converter data: campo='dataResultado' valor='1858-11-17' tipo=<class 'str'> erro=[Errno 22] Invalid argument
-Erro ao converter data: campo='dataResultado' valor='1900-01-01' tipo=<class 'str'> erro=[Errno 22] Invalid argument
-Erro ao converter data: campo='dataResultado' valor='1900-01-01' tipo=<class 'str'> erro=[Errno 22] Invalid argument
-Erro ao converter data: campo='dataResultado' valor='1900-01-01' tipo=<class 'str'> erro=[Errno 22] Invalid argument
-Erro ao converter data: campo='dataResultado' valor='0001-01-01' tipo=<class 'str'> erro=[Errno 22] Invalid argument
-Erro ao converter data: campo='dataResultado' valor='0001-01-01' tipo=<class 'str'> erro=[Errno 22] Invalid argument
-Erro ao converter data: campo='dataResultado' valor='0001-01-01' tipo=<class 'str'> erro=[Errno 22] Invalid argument
-Erro ao converter data: campo='dataResultado' valor='0001-01-01' tipo=<class 'str'> erro=[Errno 22] Invalid argument
-
-16 foram encontrados e salvos em C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp\tasks\mapeamento-ocds\output\2026\1\errors\sem-data-resultado\errors-resultados-1-2026.csv.
- -> Essas contratações NÃO foram processadas!
-
-PROCESSANDO CONTRATAÇÕES...
-  0%|          | 0/2532 [00:00<?, ?it/s]  2%|2         | 51/2532 [00:00<00:04, 504.69it/s]  4%|4         | 105/2532 [00:00<00:04, 523.80it/s]  6%|6         | 159/2532 [00:00<00:04, 529.59it/s]  8%|8         | 213/2532 [00:00<00:04, 530.65it/s] 11%|#         | 269/2532 [00:00<00:04, 539.29it/s] 13%|#2        | 326/2532 [00:00<00:04, 547.99it/s] 15%|#5        | 381/2532 [00:00<00:03, 546.56it/s] 17%|#7        | 441/2532 [00:00<00:03, 561.20it/s] 20%|#9        | 498/2532 [00:00<00:03, 542.48it/s] 22%|##1       | 553/2532 [00:01<00:03, 532.57it/s] 24%|##3       | 607/2532 [00:01<00:03, 509.45it/s] 26%|##6       | 659/2532 [00:01<00:03, 495.05it/s] 28%|##8       | 709/2532 [00:01<00:03, 492.52it/s] 30%|###       | 764/2532 [00:01<00:03, 508.65it/s] 32%|###2      | 820/2532 [00:01<00:03, 520.57it/s] 34%|###4      | 873/2532 [00:01<00:03, 516.74it/s] 37%|###6      | 930/2532 [00:01<00:03, 531.11it/s] 39%|###8      | 984/2532 [00:01<00:02, 530.11it/s] 41%|####1     | 1047/2532 [00:01<00:02, 559.47it/s] 44%|####3     | 1112/2532 [00:02<00:02, 584.82it/s] 47%|####6     | 1180/2532 [00:02<00:02, 611.16it/s] 49%|####9     | 1246/2532 [00:02<00:02, 624.99it/s] 52%|#####1    | 1309/2532 [00:02<00:02, 593.06it/s] 54%|#####4    | 1369/2532 [00:02<00:01, 587.01it/s] 56%|#####6    | 1429/2532 [00:02<00:01, 588.78it/s] 59%|#####8    | 1489/2532 [00:02<00:01, 572.09it/s] 61%|######1   | 1549/2532 [00:02<00:01, 579.32it/s] 64%|######3   | 1608/2532 [00:02<00:01, 581.00it/s] 66%|######5   | 1667/2532 [00:03<00:01, 569.46it/s] 68%|######8   | 1725/2532 [00:03<00:01, 570.08it/s] 70%|#######   | 1783/2532 [00:03<00:01, 562.05it/s] 73%|#######2  | 1844/2532 [00:03<00:01, 573.97it/s] 75%|#######5  | 1902/2532 [00:03<00:01, 568.61it/s] 77%|#######7  | 1959/2532 [00:03<00:01, 563.80it/s] 80%|#######9  | 2016/2532 [00:03<00:01, 515.02it/s] 82%|########1 | 2073/2532 [00:03<00:00, 528.68it/s] 84%|########4 | 2133/2532 [00:03<00:00, 548.50it/s] 86%|########6 | 2189/2532 [00:03<00:00, 532.08it/s] 89%|########8 | 2245/2532 [00:04<00:00, 539.48it/s] 91%|######### | 2300/2532 [00:04<00:00, 535.78it/s] 93%|#########3| 2358/2532 [00:04<00:00, 548.37it/s] 95%|#########5| 2417/2532 [00:04<00:00, 560.28it/s] 98%|#########7| 2476/2532 [00:04<00:00, 566.62it/s]100%|##########| 2532/2532 [00:04<00:00, 551.98it/s]

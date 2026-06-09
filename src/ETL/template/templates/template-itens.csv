@@ -1,0 +1,50 @@
+endpoint_alias,campo,coluna_template,fonte,schema_api,tipo_api,formato_api,descricao,data_inicio_coleta,data_atualizacao_template,presente_na_api,usar_no_template,status_template,ordem_template,ordem_api
+itens,numeroItem,numeroItem,api,RecuperarCompraItemSigiloDTO,integer,int32,Número sequencial do item dentro da contratação,2026-05-20,2026-05-21,TRUE,TRUE,ativo,1,1
+itens,endpoint,endpoint,coletor,,,,URL consultada pelo coletor.,2026-05-20,2026-05-20,FALSE,TRUE,operacional,2,
+itens,descricao,descricao,api,RecuperarCompraItemSigiloDTO,string,,Descrição detalhada do material ou serviço correspondente ao item,2026-05-20,2026-05-21,TRUE,TRUE,ativo,3,2
+itens,materialOuServico,materialOuServico,api,RecuperarCompraItemSigiloDTO,string,,"Indica se o item refere‑se a um material (""M"") ou a um serviço (""S"")",2026-05-20,2026-05-21,TRUE,TRUE,ativo,4,3
+itens,materialOuServicoNome,materialOuServicoNome,api,RecuperarCompraItemSigiloDTO,string,,Nome do material ou serviço associado ao item,2026-05-20,2026-05-21,TRUE,TRUE,ativo,5,4
+itens,valorUnitarioEstimado,valorUnitarioEstimado,api,RecuperarCompraItemSigiloDTO,number,,Valor unitário estimado do item conforme informado na contratação,2026-05-20,2026-05-21,TRUE,TRUE,ativo,6,5
+itens,valorTotal,valorTotal,api,RecuperarCompraItemSigiloDTO,number,,Valor total estimado do item (quantidade × valor unitário),2026-05-20,2026-05-21,TRUE,TRUE,ativo,7,6
+itens,quantidade,quantidade,api,RecuperarCompraItemSigiloDTO,number,,Quantidade do item a ser contratada,2026-05-20,2026-05-21,TRUE,TRUE,ativo,8,7
+itens,unidadeMedida,unidadeMedida,api,RecuperarCompraItemSigiloDTO,string,,Unidade de medida utilizada para quantificar o item,2026-05-20,2026-05-21,TRUE,TRUE,ativo,9,8
+itens,orcamentoSigiloso,orcamentoSigiloso,api,RecuperarCompraItemSigiloDTO,boolean,,Indicador se o orçamento do item é sigiloso (True/False),2026-05-20,2026-05-21,TRUE,TRUE,ativo,10,9
+itens,itemCategoriaId,itemCategoriaId,api,RecuperarCompraItemSigiloDTO,integer,int64,Identificador da categoria do item no PNCP,2026-05-20,2026-05-21,TRUE,TRUE,ativo,11,10
+itens,itemCategoriaNome,itemCategoriaNome,api,RecuperarCompraItemSigiloDTO,string,,Nome da categoria do item,2026-05-20,2026-05-21,TRUE,TRUE,ativo,12,11
+itens,patrimonio,patrimonio,api,RecuperarCompraItemSigiloDTO,string,,Indica se o item se refere a um bem patrimonial (True/False),2026-05-20,2026-05-21,TRUE,TRUE,ativo,13,12
+itens,codigoRegistroImobiliario,codigoRegistroImobiliario,api,RecuperarCompraItemSigiloDTO,string,,"Código de registro imobiliário, aplicável quando o item é um bem imóvel",2026-05-20,2026-05-21,TRUE,TRUE,ativo,14,13
+itens,criterioJulgamentoId,criterioJulgamentoId,api,RecuperarCompraItemSigiloDTO,integer,int64,Identificador do critério de julgamento associado ao item,2026-05-20,2026-05-21,TRUE,TRUE,ativo,15,14
+itens,criterioJulgamentoNome,criterioJulgamentoNome,api,RecuperarCompraItemSigiloDTO,string,,Nome do critério de julgamento associado ao item,2026-05-20,2026-05-21,TRUE,TRUE,ativo,16,15
+itens,situacaoCompraItem,situacaoCompraItem,api,RecuperarCompraItemSigiloDTO,string,,"Código da situação do item da compra (1 – Em andamento, 2 – Homologado, 3 – Anulado/Revogado/Cancelado, 4 – Deserto, 5 – Fracassado)",2026-05-20,2026-05-21,TRUE,TRUE,ativo,17,16
+itens,situacaoCompraItemNome,situacaoCompraItemNome,api,RecuperarCompraItemSigiloDTO,string,,Descrição da situação do item da compra,2026-05-20,2026-05-21,TRUE,TRUE,ativo,18,17
+itens,tipoBeneficio,tipoBeneficio,api,RecuperarCompraItemSigiloDTO,string,,Código do tipo de benefício aplicado ao item (domínio definido pelo PNCP),2026-05-20,2026-05-21,TRUE,TRUE,ativo,19,18
+itens,tipoBeneficioNome,tipoBeneficioNome,api,RecuperarCompraItemSigiloDTO,string,,Nome do tipo de benefício aplicado ao item,2026-05-20,2026-05-21,TRUE,TRUE,ativo,20,19
+itens,incentivoProdutivoBasico,incentivoProdutivoBasico,api,RecuperarCompraItemSigiloDTO,boolean,,Indicador de incentivo produtivo básico associado ao item (True/False),2026-05-20,2026-05-21,TRUE,TRUE,ativo,21,20
+itens,dataInclusao,dataInclusao,api,RecuperarCompraItemSigiloDTO,string,date-time,Data em que o item foi incluído no PNCP,2026-05-20,2026-05-21,TRUE,TRUE,ativo,22,21
+itens,dataAtualizacao,dataAtualizacao,api,RecuperarCompraItemSigiloDTO,string,date-time,Data da última atualização do item no PNCP,2026-05-20,2026-05-21,TRUE,TRUE,ativo,23,22
+itens,temResultado,temResultado,api,RecuperarCompraItemSigiloDTO,boolean,,Indicador se existe resultado associado ao item (True/False),2026-05-20,2026-05-21,TRUE,TRUE,ativo,24,23
+itens,imagem,imagem,api,RecuperarCompraItemSigiloDTO,integer,int32,URL ou referência a uma imagem ilustrativa do item,2026-05-20,2026-05-21,TRUE,TRUE,ativo,25,24
+itens,aplicabilidadeMargemPreferenciaNormal,aplicabilidadeMargemPreferenciaNormal,api,RecuperarCompraItemSigiloDTO,boolean,,Indica se se aplica margem de preferência normal ao item (True/False),2026-05-20,2026-05-21,TRUE,TRUE,ativo,26,25
+itens,aplicabilidadeMargemPreferenciaAdicional,aplicabilidadeMargemPreferenciaAdicional,api,RecuperarCompraItemSigiloDTO,boolean,,Indica se se aplica margem de preferência adicional ao item (True/False),2026-05-20,2026-05-21,TRUE,TRUE,ativo,27,26
+itens,percentualMargemPreferenciaNormal,percentualMargemPreferenciaNormal,api,RecuperarCompraItemSigiloDTO,number,,Percentual de margem de preferência normal aplicado ao item,2026-05-20,2026-05-21,TRUE,TRUE,ativo,28,27
+itens,percentualMargemPreferenciaAdicional,percentualMargemPreferenciaAdicional,api,RecuperarCompraItemSigiloDTO,number,,Percentual de margem de preferência adicional aplicado ao item,2026-05-20,2026-05-21,TRUE,TRUE,ativo,29,28
+itens,ncmNbsCodigo,ncmNbsCodigo,api,RecuperarCompraItemSigiloDTO,string,,Código NCM ou NBS (Nomenclatura Comum do Mercosul/Nomenclatura Brasileira de Serviços) do item,2026-05-20,2026-05-21,TRUE,TRUE,ativo,30,29
+itens,ncmNbsDescricao,ncmNbsDescricao,api,RecuperarCompraItemSigiloDTO,string,,Descrição da Nomenclatura Comum do Mercosul ou NBS do item,2026-05-20,2026-05-21,TRUE,TRUE,ativo,31,30
+itens,catalogo.id,catalogo.id,api,CatalogoDTO,integer,int64,Identificador do item no catálogo de bens ou serviços,2026-05-20,2026-05-21,TRUE,TRUE,ativo,32,31
+itens,catalogo.nome,catalogo.nome,api,CatalogoDTO,string,,Nome do item conforme cadastrado no catálogo,2026-05-20,2026-05-21,TRUE,TRUE,ativo,33,32
+itens,catalogo.descricao,catalogo.descricao,api,CatalogoDTO,string,,Descrição do item conforme o catálogo,2026-05-20,2026-05-21,TRUE,TRUE,ativo,34,33
+itens,catalogo.dataInclusao,catalogo.dataInclusao,api,CatalogoDTO,string,date-time,Data de inclusão do item no catálogo,2026-05-20,2026-05-21,TRUE,TRUE,ativo,35,34
+itens,catalogo.dataAtualizacao,catalogo.dataAtualizacao,api,CatalogoDTO,string,date-time,Data de última atualização do item no catálogo,2026-05-20,2026-05-21,TRUE,TRUE,ativo,36,35
+itens,catalogo.statusAtivo,catalogo.statusAtivo,api,CatalogoDTO,boolean,,Indica se o item do catálogo está ativo (True/False),2026-05-20,2026-05-21,TRUE,TRUE,ativo,37,36
+itens,catalogo.url,catalogo.url,api,CatalogoDTO,string,,URL de referência para o item no catálogo oficial,2026-05-20,2026-05-21,TRUE,TRUE,ativo,38,37
+itens,categoriaItemCatalogo.id,categoriaItemCatalogo.id,api,DominioGenericoDTO,integer,int64,Identificador da categoria do item no catálogo,2026-05-20,2026-05-21,TRUE,TRUE,ativo,39,38
+itens,categoriaItemCatalogo.nome,categoriaItemCatalogo.nome,api,DominioGenericoDTO,string,,Nome da categoria do item no catálogo,2026-05-20,2026-05-21,TRUE,TRUE,ativo,40,39
+itens,categoriaItemCatalogo.descricao,categoriaItemCatalogo.descricao,api,DominioGenericoDTO,string,,Descrição da categoria do item no catálogo,2026-05-20,2026-05-21,TRUE,TRUE,ativo,41,40
+itens,categoriaItemCatalogo.dataInclusao,categoriaItemCatalogo.dataInclusao,api,DominioGenericoDTO,string,date-time,Data de inclusão da categoria no catálogo,2026-05-20,2026-05-21,TRUE,TRUE,ativo,42,41
+itens,categoriaItemCatalogo.dataAtualizacao,categoriaItemCatalogo.dataAtualizacao,api,DominioGenericoDTO,string,date-time,Data de atualização da categoria no catálogo,2026-05-20,2026-05-21,TRUE,TRUE,ativo,43,42
+itens,categoriaItemCatalogo.statusAtivo,categoriaItemCatalogo.statusAtivo,api,DominioGenericoDTO,boolean,,Indica se a categoria do catálogo está ativa (True/False),2026-05-20,2026-05-21,TRUE,TRUE,ativo,44,43
+itens,catalogoCodigoItem,catalogoCodigoItem,api,RecuperarCompraItemSigiloDTO,string,,Código do item no catálogo utilizado pela contratação,2026-05-20,2026-05-21,TRUE,TRUE,ativo,45,44
+itens,informacaoComplementar,informacaoComplementar,api,RecuperarCompraItemSigiloDTO,string,,Informações complementares sobre o item da contratação,2026-05-20,2026-05-21,TRUE,TRUE,ativo,46,45
+itens,tipoMargemPreferencia.codigo,tipoMargemPreferencia.codigo,api,TipoMargemPreferenciaDTO,integer,int64,INCLUIR DESCRIÇÃO EM dicionario-dados.py,2026-05-21,2026-05-21,TRUE,TRUE,ativo,47,46
+itens,tipoMargemPreferencia.nome,tipoMargemPreferencia.nome,api,TipoMargemPreferenciaDTO,string,,INCLUIR DESCRIÇÃO EM dicionario-dados.py,2026-05-21,2026-05-21,TRUE,TRUE,ativo,48,47
+itens,exigenciaConteudoNacional,exigenciaConteudoNacional,api,RecuperarCompraItemSigiloDTO,boolean,,INCLUIR DESCRIÇÃO EM dicionario-dados.py,2026-05-21,2026-05-21,TRUE,TRUE,ativo,49,48
