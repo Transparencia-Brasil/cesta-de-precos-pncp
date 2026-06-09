@@ -170,11 +170,22 @@ def duracao_em_dias(data_inicio, data_fim):
 
 # Normaliza valores e campos vindos do dicionario OCDS para JSON.
 def valor_preenchido(valor):
+    """Indica se um valor deve ser considerado preenchido no mapeamento OCDS.
+
+    Colecoes sao preservadas como preenchidas mesmo quando vazias, pois podem
+    representar estruturas JSON validas. Para escalares, delega a verificacao
+    para pandas, cobrindo NaN, NA e None.
+    """
     if isinstance(valor, (list, tuple, dict)):
         return True
     return pd.notna(valor)
 
 def codigo_ocds(valor):
+    """Converte codigos para string no formato esperado pelo OCDS.
+
+    Valores ausentes retornam None. Numeros float que representam inteiros
+    perdem a casa decimal para evitar identificadores como "1.0".
+    """
     if not valor_preenchido(valor):
         return None
     if isinstance(valor, float) and valor.is_integer():
@@ -182,6 +193,12 @@ def codigo_ocds(valor):
     return str(valor)
 
 def valor_json(valor):
+    """Normaliza valores para tipos serializaveis em JSON.
+
+    Remove campos de dicionarios cujo valor normalizado seja None, percorre
+    listas recursivamente, converte escalares numpy/pandas via item() e preserva
+    valores ja serializaveis.
+    """
     if isinstance(valor, dict):
         return {k: valor_json(v) for k, v in valor.items() if valor_json(v) is not None}
     if isinstance(valor, list):
@@ -193,6 +210,12 @@ def valor_json(valor):
     return valor
 
 def parse_lista(valor):
+    """Interpreta um campo que pode conter lista literal ou valor unico.
+
+    Campos do dicionario OCDS chegam frequentemente como texto contendo uma
+    lista Python. Quando o parse falha, trata o conteudo como um unico valor.
+    Retorna sempre uma lista de strings sem espacos nas pontas.
+    """
     if not valor_preenchido(valor):
         return []
 
@@ -209,10 +232,17 @@ def parse_lista(valor):
     return [str(valor_parseado).strip()] if valor_preenchido(valor_parseado) else []
 
 def primeiro_valor(valor):
+    """Retorna o primeiro item parseado de um campo lista, quando existir."""
     valores = parse_lista(valor)
     return valores[0] if valores else None
 
 def normalizar_strength_value(valor, unidade=None):
+    """Normaliza o valor numerico de concentracao de um principio ativo.
+
+    Aceita numeros em formato brasileiro, remove separadores de milhar e troca
+    virgula decimal por ponto. Quando o valor ou a unidade indicam percentual,
+    converte para fracao decimal conforme a representacao esperada no OCDS.
+    """
     if not valor_preenchido(valor):
         return None
 
@@ -232,6 +262,11 @@ def normalizar_strength_value(valor, unidade=None):
     return int(numero) if numero.is_integer() else numero
 
 def montar_strength(valor, unidade):
+    """Monta o objeto strength de activeIngredients.
+
+    Inclui value quando a concentracao pode ser convertida para numero e inclui
+    unit quando ha unidade informada, usando o esquema UNCEFACT.
+    """
     strength = {}
 
     valor_normalizado = normalizar_strength_value(valor, unidade)
@@ -247,6 +282,12 @@ def montar_strength(valor, unidade):
     return strength
 
 def separar_nome_active_ingredient(nome):
+    """Separa nomes de principios ativos quando o campo indica associacao.
+
+    Remove prefixos comuns como "associado com" e "c/" e divide o texto por
+    separadores usados no dicionario, como ponto e virgula, soma, virgula e "e".
+    Quando nao ha indicio de associacao, retorna o nome original em lista.
+    """
     if not valor_preenchido(nome):
         return []
 
@@ -271,6 +312,12 @@ def separar_nome_active_ingredient(nome):
     return [texto]
 
 def montar_active_ingredients(item):
+    """Monta a lista OCDS activeIngredients para um item de medicamento.
+
+    Combina nomes, valores de concentracao e unidades vindos do dicionario,
+    complementando o primeiro ingrediente com nome_pdm quando necessario para
+    manter rastreabilidade ao PDM classificado.
+    """
     nomes = []
     for nome in parse_lista(item.get("activeIngredients.name")):
         for parte in re.split(r"\s*;\s*", nome):
@@ -313,7 +360,12 @@ def montar_active_ingredients(item):
     return ingredientes
 
 def adicionar_attributes(item_json, item_dicionario, proximo_attribute_id):
-    """Inclui atributos auditados no item e atualiza o proximo id sequencial."""
+    """Inclui atributos auditados no item e atualiza o proximo id sequencial.
+
+    Relaciona caracteristicaFaltante e attributes por posicao, cria ids
+    sequenciais em string para cada atributo e grava a lista em item_json apenas
+    quando houver pares validos.
+    """
     nomes = parse_lista(item_dicionario.get("caracteristicaFaltante"))
     valores = parse_lista(item_dicionario.get("attributes"))
 
