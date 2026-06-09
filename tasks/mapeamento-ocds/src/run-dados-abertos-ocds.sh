@@ -15,16 +15,20 @@ set -euo pipefail
 usage() {
   cat <<'EOF'
 Uso:
-  bash tasks/mapeamento-ocds/src/run-dados-abertos-ocds.sh [--ano ANO] [--mes MES]
+  bash tasks/mapeamento-ocds/src/run-dados-abertos-ocds.sh [--ano ANO] [--mes MES] [--overwrite] [--smoke-test]
 
 Exemplos:
   bash tasks/mapeamento-ocds/src/run-dados-abertos-ocds.sh
   bash tasks/mapeamento-ocds/src/run-dados-abertos-ocds.sh --ano 2026 --mes 3
+  bash tasks/mapeamento-ocds/src/run-dados-abertos-ocds.sh --ano 2026 --mes 3 --overwrite
+  bash tasks/mapeamento-ocds/src/run-dados-abertos-ocds.sh --ano 2026 --mes 3 --smoke-test
 
 Opcoes:
-  --ano ANO   Ano dos dados a processar (inteiro >= 2022).
-  --mes MES   Mes dos dados a processar (inteiro entre 1 e 12).
-  -h, --help  Mostra esta ajuda.
+  --ano ANO      Ano dos dados a processar (inteiro >= 2022).
+  --mes MES      Mes dos dados a processar (inteiro entre 1 e 12).
+  --overwrite    Sobrescreve objetos existentes no S3 durante o upload.
+  --smoke-test   Executa apenas mapeamento e CSVs/ZIPs locais, sem upload para S3.
+  -h, --help     Mostra esta ajuda.
 EOF
 }
 
@@ -98,6 +102,8 @@ ANO=""
 MES=""
 ANO_PROVIDED=false
 MES_PROVIDED=false
+OVERWRITE=false
+SMOKE_TEST=false
 
 while (($#)); do
   case "$1" in
@@ -123,6 +129,14 @@ while (($#)); do
       MES_PROVIDED=true
       shift
       ;;
+    --overwrite)
+      OVERWRITE=true
+      shift
+      ;;
+    --smoke-test)
+      SMOKE_TEST=true
+      shift
+      ;;
     -h|--help)
       usage
       exit 0
@@ -135,6 +149,12 @@ while (($#)); do
       ;;
   esac
 done
+
+if [[ "${OVERWRITE}" == true && "${SMOKE_TEST}" == true ]]; then
+  echo "Erro: --overwrite e --smoke-test nao podem ser usados juntos." >&2
+  echo "--smoke-test nao executa upload remoto para S3." >&2
+  exit 2
+fi
 
 
 # : SET DIR --------------------------------------------------------------------
@@ -193,7 +213,15 @@ echo ""
 echo "Logs da execucao:"
 echo " - '${MAPEAMENTO_LOG_FILE}'"
 echo " - '${CSVS_LOG_FILE}'"
-echo " - '${UPLOAD_LOG_FILE}'"
+if [[ "${SMOKE_TEST}" == true ]]; then
+  echo " - upload S3: pulado pelo modo smoke test"
+else
+  echo " - '${UPLOAD_LOG_FILE}'"
+fi
+echo ""
+echo "Opcoes ativas:"
+echo " - overwrite remoto: ${OVERWRITE}"
+echo " - smoke test: ${SMOKE_TEST}"
 
 
 # : COMPATIBILIDADE WSL --------------------------------------------------------
@@ -218,8 +246,25 @@ run_logged "Mapeamento PNCP -> JSON OCDS" "${MAPEAMENTO_LOG_FILE}" \
 run_logged "Geracao de CSVs/ZIPs OCDS" "${CSVS_LOG_FILE}" \
   "${PYTHON_BIN}" "${CSVS_PYTHON_SCRIPT_TO_RUN}" --ano "${ANO}" --mes "${MES}"
 
+if [[ "${SMOKE_TEST}" == true ]]; then
+  echo ""
+  echo "Smoke test finalizado: etapas 1 e 2 executadas; nenhum upload para S3 foi realizado."
+  echo "Pacotes de dados locais prontos para inspecao:"
+  echo " - ${OUTPUT_PATH}/${ANO}/${MES}/JSON"
+  echo " - ${OUTPUT_PATH}/${ANO}/${MES}/CSV"
+  echo " - ${OUTPUT_PATH}/${ANO}/${MES}/ZIP"
+  echo ""
+  echo "Pipeline smoke test finalizado com sucesso para ANO: ${ANO} e MES: ${MES}."
+  exit 0
+fi
+
+UPLOAD_ARGS=(--ano "${ANO}" --mes "${MES}")
+if [[ "${OVERWRITE}" == true ]]; then
+  UPLOAD_ARGS+=(--overwrite)
+fi
+
 run_logged "Upload dos ZIPs OCDS para S3" "${UPLOAD_LOG_FILE}" \
-  "${PYTHON_BIN}" "${UPLOAD_PYTHON_SCRIPT_TO_RUN}" --ano "${ANO}" --mes "${MES}"
+  "${PYTHON_BIN}" "${UPLOAD_PYTHON_SCRIPT_TO_RUN}" "${UPLOAD_ARGS[@]}"
 
 echo ""
 echo "Pipeline finalizado com sucesso para ANO: ${ANO} e MES: ${MES}."
