@@ -2,7 +2,7 @@
 Valida e envia ZIPs OCDS locais para um bucket AWS S3.
 
 Uso:
-    python upload-zips-s3.py --ano <ANO> [--mes <MES>]
+    python upload-zips-s3.py --ano <ANO> [--mes <MES>] [--overwrite]
 
 O script busca arquivos em:
     tasks/mapeamento-ocds/output/<ANO>/<MES>/ZIP/CSV/*.zip
@@ -12,7 +12,8 @@ Os ZIPs devem seguir o padrao:
     {uf}-{mes}-{ano}-{formato}.zip
 
 Uploads sao feitos sem prefixo/pasta no S3, usando apenas o nome do arquivo
-como key do objeto.
+como key do objeto. Por padrao, objetos existentes no S3 sao pulados. Use
+--overwrite para substituir objetos existentes.
 """
 
 from __future__ import annotations
@@ -49,6 +50,7 @@ class ZipCandidate:
 class TransferSummary:
     found: int = 0
     uploaded: int = 0
+    overwritten: int = 0
     skipped: int = 0
     invalid: int = 0
     failed: int = 0
@@ -190,19 +192,24 @@ def _object_exists(s3_client, bucket: str, key: str) -> bool:
         raise
 
 
-def _upload_zips(s3_client, bucket: str, candidates: list[ZipCandidate]) -> TransferSummary:
+def _upload_zips(s3_client, bucket: str, candidates: list[ZipCandidate], overwrite: bool = False) -> TransferSummary:
     summary = TransferSummary(found=len(candidates))
 
     for candidate in candidates:
         try:
-            if _object_exists(s3_client, bucket, candidate.key):
+            object_exists = _object_exists(s3_client, bucket, candidate.key)
+            if object_exists and not overwrite:
                 summary.skipped += 1
                 logging.warning("SKIP objeto ja existe: s3://%s/%s", bucket, candidate.key)
                 continue
 
             s3_client.upload_file(str(candidate.path), bucket, candidate.key)
-            summary.uploaded += 1
-            logging.info("UPLOAD OK: %s -> s3://%s/%s", candidate.path, bucket, candidate.key)
+            if object_exists:
+                summary.overwritten += 1
+                logging.warning("OVERWRITE OK: %s -> s3://%s/%s", candidate.path, bucket, candidate.key)
+            else:
+                summary.uploaded += 1
+                logging.info("UPLOAD OK: %s -> s3://%s/%s", candidate.path, bucket, candidate.key)
         except Exception as exc:
             summary.failed += 1
             logging.error("UPLOAD ERRO: %s -> s3://%s/%s (%r)", candidate.path, bucket, candidate.key, exc)
@@ -231,6 +238,11 @@ def _parse_args() -> argparse.Namespace:
         default=None,
         help="Arquivo .env a carregar antes de criar o cliente AWS. Default: <base-dir>/.env.",
     )
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Sobrescreve objetos existentes no bucket S3. Por padrao, objetos existentes sao pulados.",
+    )
     return parser.parse_args()
 
 
@@ -258,6 +270,7 @@ def main() -> int:
 
     logging.info("Raiz de output: %s", output_root)
     logging.info("Bucket S3: %s", bucket)
+    logging.info("Overwrite remoto: %s", "ativado" if args.overwrite else "desativado")
 
     candidates, invalid = _discover_zips(output_root, args.ano, args.mes)
     if invalid:
@@ -273,11 +286,12 @@ def main() -> int:
         logging.error("Erro ao criar cliente S3: %r", exc)
         return 1
 
-    summary = _upload_zips(s3_client, bucket, candidates)
+    summary = _upload_zips(s3_client, bucket, candidates, overwrite=args.overwrite)
     logging.info(
-        "Resumo: encontrados=%s enviados=%s pulados=%s invalidos=%s falhas=%s",
+        "Resumo: encontrados=%s enviados=%s sobrescritos=%s pulados=%s invalidos=%s falhas=%s",
         summary.found,
         summary.uploaded,
+        summary.overwritten,
         summary.skipped,
         invalid,
         summary.failed,
