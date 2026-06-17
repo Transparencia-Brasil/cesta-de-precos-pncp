@@ -1,3 +1,4 @@
+options(width = 150)
 library(tidyverse)
 library(here)
 library(httr2)
@@ -11,7 +12,6 @@ ENDPOINT <- "1_consultarMaterial"
 MODULO <- "modulo-pesquisa-preco"
 
 PATH_TMP <- here("tasks/api-compras/tmp/", ENDPOINT)
-
 
 dir.create(PATH_TMP, recursive = TRUE, showWarnings = FALSE)
 
@@ -36,12 +36,8 @@ contratacoes_compras <- arrow::open_dataset(CONTRATACOES_COMPRAS) |>
   ) |>
   collect()
 
+item_homologado_compras_com_ids <- contratacoes_compras |>
+  inner_join(item_homologado_compras) |>
+  distinct()
 
-
-contratacoes_compras |>
-  glimpse()
-
-
-
-
-"https://dadosabertos.compras.gov.br/modulo-pesquisa-preco/1_consultarMaterial?pagina=1&tamanhoPagina=10&codigoItemCatalogo=436169&dataResultado=true&idCompra=98683505900092026"
+saveRDS(item_homologado_compras_com_ids, here("tasks/api-compras/inputs/item-homologado-compras-com-ids.rds"))
