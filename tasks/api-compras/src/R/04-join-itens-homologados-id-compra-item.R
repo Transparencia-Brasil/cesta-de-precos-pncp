@@ -5,16 +5,11 @@ library(httr2)
 
 
 source(here("tasks/api-compras/src/R/utils.R"))
+
 PATH_ITEM_HOMOLOGADO_COMPRAS <- here("tasks/api-compras/inputs/item-homologado-compras.rds")
-
-ENDPOINT <- "1_consultarMaterial"
-
-MODULO <- "modulo-pesquisa-preco"
-
-PATH_TMP <- here("tasks/api-compras/tmp/", ENDPOINT)
+PATH_ITEM_HOMOLOGADO_COMPRAS_COM_IDS <- here("tasks/api-compras/inputs/item-homologado-compras-com-ids.rds")
 
 dir.create(PATH_TMP, recursive = TRUE, showWarnings = FALSE)
-
 CONTRATACOES_COMPRAS <- here("tasks/api-compras/tmp/2.1_consultarItensContratacoes_PNCP_124133_Id")
 
 item_homologado_compras <- readRDS(PATH_ITEM_HOMOLOGADO_COMPRAS) |>
@@ -32,12 +27,16 @@ contratacoes_compras <- arrow::open_dataset(CONTRATACOES_COMPRAS) |>
     idCompraItem,
     numeroItemPncp,
     numeroItemCompra,
-    codItemCatalogo
+    codItemCatalogo,
+    descricaoResumida,
+    descricaodetalhada,
+    unidadeMedida
   ) |>
-  collect()
+  collect() |>
+  mutate(across(where(is.character), \(x) str_squish(x)))
 
 item_homologado_compras_com_ids <- contratacoes_compras |>
   inner_join(item_homologado_compras) |>
   distinct()
 
-saveRDS(item_homologado_compras_com_ids, here("tasks/api-compras/inputs/item-homologado-compras-com-ids.rds"))
+saveRDS(item_homologado_compras_com_ids, PATH_ITEM_HOMOLOGADO_COMPRAS_COM_IDS)
