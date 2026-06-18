@@ -79,13 +79,49 @@ psql -d medicamentos-transparentes \
   -f tasks/catalogo-caracteristicas-ocds/alter-catalogo-caracteristicas-ocds.sql
 ```
 
-Depois, rodar o `UPDATE` com o CSV:
+## Como executar o UPDATE via Bash/WSL
+
+O comando abaixo deve ser executado a partir da raiz do repositório, em um
+terminal Bash/WSL com o cliente `psql` disponível. Ele:
+
+- carrega as variáveis de conexão de `.env`, removendo caracteres `CR` de
+  arquivos salvos no formato de fim de linha do Windows;
+- converte as variáveis `DB_*` usadas pelo projeto para as variáveis `PG*`
+  reconhecidas pelo `psql`;
+- usa o caminho absoluto do CSV;
+- substitui a referência `:'dataset_csv'` no comando `\copy`, que não expande
+  essa variável da mesma forma que comandos SQL comuns.
 
 ```bash
-psql -d medicamentos-transparentes \
-  -v dataset_csv='tasks/catalogo-caracteristicas-ocds/input/tabela-mapeamento-ocds.csv' \
-  -f tasks/catalogo-caracteristicas-ocds/update-catalogo-caracteristicas-ocds.sql
+(
+  set -a
+  source <(sed 's/\r$//' .env)
+  set +a
+
+  export PGHOST="$DB_HOST"
+  export PGPORT="$DB_PORT"
+  export PGUSER="$DB_USER"
+  export PGPASSWORD="$DB_PASS"
+  export PGDATABASE="medicamentos_transparentes"
+
+  dataset_csv="$PWD/tasks/catalogo-caracteristicas-ocds/input/tabela-mapeamento-ocds.csv"
+
+  psql -f <(
+    sed "s|FROM :'dataset_csv'|FROM '$dataset_csv'|" \
+      tasks/catalogo-caracteristicas-ocds/update-catalogo-caracteristicas-ocds.sql
+  )
+)
 ```
+
+O subshell delimitado por `(` e `)` evita que as credenciais exportadas
+permaneçam no ambiente do terminal após a execução. O arquivo `.env` deve
+conter `DB_HOST`, `DB_PORT`, `DB_USER` e `DB_PASS`; não imprima nem copie os
+valores dessas variáveis para logs, documentação ou commits.
+
+Antes do `UPDATE`, confirme que
+`alter-catalogo-caracteristicas-ocds.sql` foi aplicado ao mesmo banco. Ao
+final, o script mostra as contagens de registros com e sem
+`caracteristicas_ocds` e os tipos JSONB encontrados.
 
 Os scripts reais:
 
