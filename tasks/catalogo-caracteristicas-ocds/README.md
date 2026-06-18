@@ -4,14 +4,16 @@
 
 Esta task prepara a inclusão e a população da coluna `catalogo.caracteristicas_ocds`, que armazenará os atributos técnicos dos medicamentos mapeados para o padrão OCDS.
 
-A decisão atual é manter essa mudança fora de `src/ETL/BD/cria-esquema.sql` até o fluxo estar consolidado. Primeiro, validamos a alteração em uma task separada, usando o dataset gerado pelo notebook `src/ETL/loaders/docs/tabela-caracteristicas-ocds.ipynb`.
+A decisão atual é manter essa mudança fora de `src/ETL/BD/cria-esquema.sql` até o fluxo estar consolidado. Primeiro, validamos a alteração em uma task separada, usando o dataset gerado pelo notebook `tasks/catalogo-caracteristicas-ocds/docs/tabela-caracteristicas-ocds.ipynb`.
 
 ## Arquivos da task
 
-- `input/tabela-mapeamento-ocds.csv`: dataset com os valores OCDS a serem aplicados ao catálogo.
-- `test-populacao-sqltools.sql`: simulação segura para rodar no SQLTools.
-- `alter-catalogo-caracteristicas-ocds.sql`: script operacional para adicionar a coluna no banco real via `psql`.
-- `update-catalogo-caracteristicas-ocds.sql`: script operacional para popular a coluna no banco real via `psql`.
+- `docs/tabela-caracteristicas-ocds.ipynb`: notebook que gera o mapeamento de características OCDS.
+- `docs/outputs/tabela-mapeamento-ocds.csv`: saída gerada pelo notebook para conferência.
+- `input/tabela-mapeamento-ocds.csv`: dataset validado usado na atualização do catálogo.
+- `src/sql/test-populacao-sqltools.sql`: simulação segura para rodar no SQLTools.
+- `src/sql/alter-catalogo-caracteristicas-ocds.sql`: script operacional para adicionar a coluna no banco real via `psql`.
+- `src/sql/update-catalogo-caracteristicas-ocds.sql`: script operacional para popular a coluna no banco real via `psql`.
 
 ## O que foi testado
 
@@ -49,7 +51,7 @@ O teste termina com `ROLLBACK`, então não altera nenhuma tabela real.
 ## Como testar no SQLTools
 
 1. Conecte o SQLTools a qualquer banco PostgreSQL local ou de teste.
-2. Abra `tasks/catalogo-caracteristicas-ocds/test-populacao-sqltools.sql`.
+2. Abra `tasks/catalogo-caracteristicas-ocds/src/sql/test-populacao-sqltools.sql`.
 3. Execute o arquivo inteiro com `Run on active connection`.
 4. Confira os blocos de resultado:
 
@@ -76,7 +78,7 @@ Para aplicar no banco real, rodar primeiro o `ALTER TABLE`:
 
 ```bash
 psql -d medicamentos-transparentes \
-  -f tasks/catalogo-caracteristicas-ocds/alter-catalogo-caracteristicas-ocds.sql
+  -f tasks/catalogo-caracteristicas-ocds/src/sql/alter-catalogo-caracteristicas-ocds.sql
 ```
 
 ## Como executar o UPDATE via Bash/WSL
@@ -108,7 +110,7 @@ terminal Bash/WSL com o cliente `psql` disponível. Ele:
 
   psql -f <(
     sed "s|FROM :'dataset_csv'|FROM '$dataset_csv'|" \
-      tasks/catalogo-caracteristicas-ocds/update-catalogo-caracteristicas-ocds.sql
+      tasks/catalogo-caracteristicas-ocds/src/sql/update-catalogo-caracteristicas-ocds.sql
   )
 )
 ```
@@ -119,7 +121,7 @@ conter `DB_HOST`, `DB_PORT`, `DB_USER` e `DB_PASS`; não imprima nem copie os
 valores dessas variáveis para logs, documentação ou commits.
 
 Antes do `UPDATE`, confirme que
-`alter-catalogo-caracteristicas-ocds.sql` foi aplicado ao mesmo banco. Ao
+`src/sql/alter-catalogo-caracteristicas-ocds.sql` foi aplicado ao mesmo banco. Ao
 final, o script mostra as contagens de registros com e sem
 `caracteristicas_ocds` e os tipos JSONB encontrados.
 
