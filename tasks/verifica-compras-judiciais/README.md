@@ -112,7 +112,7 @@ temporárias e termina com `ROLLBACK`, nenhuma tabela real é alterada.
 Execute primeiro o script que adiciona a coluna:
 
 ```bash
-psql -d nome-do-database \
+psql -d medicamentos_transparentes \
   -f tasks/verifica-compras-judiciais/src/sql/alter-contratacao-compra-judicial.sql
 ```
 
@@ -129,7 +129,7 @@ Bash/WSL com o cliente `psql` disponível:
   export PGPORT="$DB_PORT"
   export PGUSER="$DB_USER"
   export PGPASSWORD="$DB_PASS"
-  export PGDATABASE="nome-do-database"
+  export PGDATABASE="medicamentos_transparentes"
 
   dataset_csv="$PWD/tasks/verifica-compras-judiciais/outputs/compras-judiciais-completo.csv"
 
