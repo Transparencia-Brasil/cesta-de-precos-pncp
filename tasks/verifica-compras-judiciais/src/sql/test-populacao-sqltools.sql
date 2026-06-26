@@ -6,7 +6,7 @@
 
 BEGIN;
 
-CREATE TEMP TABLE contratacao (
+CREATE TEMP TABLE tmp_contratacao (
   numero_controle_pncp VARCHAR(30) PRIMARY KEY,
   ano_compra SMALLINT NOT NULL,
   sequencial_compra INTEGER NOT NULL,
@@ -27,7 +27,7 @@ CREATE TEMP TABLE contratacao (
   data_insercao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ON COMMIT DROP;
 
-INSERT INTO contratacao (
+INSERT INTO tmp_contratacao (
   numero_controle_pncp,
   ano_compra,
   sequencial_compra,
@@ -81,10 +81,10 @@ SELECT
   srp,
   codigo_modalidade,
   nome_modalidade
-FROM contratacao
+FROM tmp_contratacao
 ORDER BY numero_controle_pncp;
 
-ALTER TABLE contratacao
+ALTER TABLE tmp_contratacao
 ADD COLUMN IF NOT EXISTS compra_judicial BOOLEAN;
 
 SELECT
@@ -92,7 +92,7 @@ SELECT
   numero_controle_pncp,
   objeto_compra,
   compra_judicial
-FROM contratacao
+FROM tmp_contratacao
 ORDER BY numero_controle_pncp;
 
 CREATE TEMP TABLE tmp_contratacao_compra_judicial (
@@ -137,7 +137,7 @@ SELECT
 FROM tmp_contratacao_compra_judicial
 ORDER BY numero_controle_pncp;
 
-UPDATE contratacao AS c
+UPDATE tmp_contratacao AS c
 SET compra_judicial = lower(btrim(t.compra_judicial))::boolean
 FROM tmp_contratacao_compra_judicial AS t
 WHERE c.numero_controle_pncp = t.numero_controle_pncp;
@@ -147,7 +147,7 @@ SELECT
   numero_controle_pncp,
   objeto_compra,
   compra_judicial
-FROM contratacao
+FROM tmp_contratacao
 ORDER BY numero_controle_pncp;
 
 SELECT
@@ -155,6 +155,6 @@ SELECT
   COUNT(*) FILTER (WHERE compra_judicial IS NULL) AS sem_classificacao,
   COUNT(*) FILTER (WHERE compra_judicial IS TRUE) AS compras_judiciais,
   COUNT(*) FILTER (WHERE compra_judicial IS FALSE) AS compras_nao_judiciais
-FROM contratacao;
+FROM tmp_contratacao;
 
 ROLLBACK;
