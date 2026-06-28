@@ -143,11 +143,14 @@ join_medio <- de_para |>
   distinct()
 
 # Bind rows dos três joins anteriores
+
 joins <- bind_rows(
   join_forte,
   join_nao_tao_forte,
   join_medio
 )
+
+# Tabela marcas final, com todas as colunas necessárias
 
 tabela_marcas <- joins |>
   select(
@@ -171,3 +174,4 @@ tabela_marcas <- joins |>
 
 saveRDS(tabela_marcas, PATH_TABELA_MARCAS)
 write_csv(tabela_marcas, here("tasks/api-compras/outputs/tabela-marcas.csv"))
+readRDS(PATH_TABELA_MARCAS)
