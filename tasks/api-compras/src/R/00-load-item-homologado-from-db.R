@@ -22,6 +22,7 @@ item_homologado <- get_query("
   ni_fornecedor,
   valor_unitario_homologado,
   quantidade_homologada,
+  data_resultado
   from item_homologado
 ") |>
   rename(
