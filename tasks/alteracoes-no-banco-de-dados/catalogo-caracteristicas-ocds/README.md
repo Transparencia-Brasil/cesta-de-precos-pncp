@@ -4,7 +4,7 @@
 
 Esta task prepara a inclusão e a população da coluna `catalogo.caracteristicas_ocds`, que armazenará os atributos técnicos dos medicamentos mapeados para o padrão OCDS.
 
-A decisão atual é manter essa mudança fora de `src/ETL/BD/cria-esquema.sql` até o fluxo estar consolidado. Primeiro, validamos a alteração em uma task separada, usando o dataset gerado pelo notebook `tasks/catalogo-caracteristicas-ocds/docs/tabela-caracteristicas-ocds.ipynb`.
+A decisão atual é manter essa mudança fora de `src/ETL/BD/cria-esquema.sql` até o fluxo estar consolidado. Primeiro, validamos a alteração em uma task separada, usando o dataset gerado pelo notebook `tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/docs/tabela-caracteristicas-ocds.ipynb`.
 
 ## Arquivos da task
 
@@ -51,7 +51,7 @@ O teste termina com `ROLLBACK`, então não altera nenhuma tabela real.
 ## Como testar no SQLTools
 
 1. Conecte o SQLTools a qualquer banco PostgreSQL local ou de teste.
-2. Abra `tasks/catalogo-caracteristicas-ocds/src/sql/test-populacao-sqltools.sql`.
+2. Abra `tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/src/sql/test-populacao-sqltools.sql`.
 3. Execute o arquivo inteiro com `Run on active connection`.
 4. Confira os blocos de resultado:
 
@@ -78,7 +78,7 @@ Para aplicar no banco real, rodar primeiro o `ALTER TABLE`:
 
 ```bash
 psql -d medicamentos-transparentes \
-  -f tasks/catalogo-caracteristicas-ocds/src/sql/alter-catalogo-caracteristicas-ocds.sql
+  -f tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/src/sql/alter-catalogo-caracteristicas-ocds.sql
 ```
 
 ## Como executar o UPDATE via Bash/WSL
@@ -106,11 +106,11 @@ terminal Bash/WSL com o cliente `psql` disponível. Ele:
   export PGPASSWORD="$DB_PASS"
   export PGDATABASE="medicamentos_transparentes"
 
-  dataset_csv="$PWD/tasks/catalogo-caracteristicas-ocds/input/tabela-mapeamento-ocds.csv"
+  dataset_csv="$PWD/tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/input/tabela-mapeamento-ocds.csv"
 
   psql -f <(
     sed "s|FROM :'dataset_csv'|FROM '$dataset_csv'|" \
-      tasks/catalogo-caracteristicas-ocds/src/sql/update-catalogo-caracteristicas-ocds.sql
+      tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/src/sql/update-catalogo-caracteristicas-ocds.sql
   )
 )
 ```

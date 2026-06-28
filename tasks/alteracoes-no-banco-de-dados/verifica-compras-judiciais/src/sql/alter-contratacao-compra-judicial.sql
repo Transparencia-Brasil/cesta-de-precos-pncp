@@ -2,7 +2,7 @@
 --
 -- Uso esperado:
 -- psql -d medicamentos_transparentes \
---   -f tasks/verifica-compras-judiciais/src/sql/alter-contratacao-compra-judicial.sql
+--   -f tasks/alteracoes-no-banco-de-dados/verifica-compras-judiciais/src/sql/alter-contratacao-compra-judicial.sql
 
 \set ON_ERROR_STOP on
 
