@@ -259,7 +259,6 @@ tasks/mapeamento-ocds/output/2025/**/*.csv
 tasks/contratacoes-inexigibilidade/outputs/contratacoes.csv
 tasks/contratacoes-inexigibilidade/outputs/itens.csv
 tasks/mapeamento-ocds/output/2026/**/**/*.csv
-tasks/indicadores-MEL/inputs/*
 drive-datapackage-upload.json
 tasks/indicadores-MEL/tmp/*
 tasks/api-compras/tmp/*

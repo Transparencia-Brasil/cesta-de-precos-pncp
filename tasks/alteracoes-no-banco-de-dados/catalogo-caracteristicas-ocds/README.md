@@ -1,0 +1,142 @@
+# Task: `catalogo-caracteristicas-ocds`
+
+## Resumo
+
+Esta task prepara a inclusão e a população da coluna `catalogo.caracteristicas_ocds`, que armazenará os atributos técnicos dos medicamentos mapeados para o padrão OCDS.
+
+A decisão atual é manter essa mudança fora de `src/ETL/BD/cria-esquema.sql` até o fluxo estar consolidado. Primeiro, validamos a alteração em uma task separada, usando o dataset gerado pelo notebook `tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/docs/tabela-caracteristicas-ocds.ipynb`.
+
+## Arquivos da task
+
+- `docs/tabela-caracteristicas-ocds.ipynb`: notebook que gera o mapeamento de características OCDS.
+- `docs/outputs/tabela-mapeamento-ocds.csv`: saída gerada pelo notebook para conferência.
+- `input/tabela-mapeamento-ocds.csv`: dataset validado usado na atualização do catálogo.
+- `src/sql/test-populacao-sqltools.sql`: simulação segura para rodar no SQLTools.
+- `src/sql/alter-catalogo-caracteristicas-ocds.sql`: script operacional para adicionar a coluna no banco real via `psql`.
+- `src/sql/update-catalogo-caracteristicas-ocds.sql`: script operacional para popular a coluna no banco real via `psql`.
+
+## O que foi testado
+
+Foi criado um teste no SQLTools simulando a tabela `catalogo` com o mesmo schema usado hoje no banco:
+
+```sql
+CREATE TEMP TABLE catalogo (
+  codigo_classe SMALLINT NOT NULL,
+  nome_classe VARCHAR(100) NOT NULL,
+  codigo_pdm INTEGER NOT NULL,
+  nome_pdm VARCHAR(100) NOT NULL,
+  codigo_item INTEGER PRIMARY KEY,
+  nome_item VARCHAR(1000) NOT NULL,
+  item_suspenso BOOLEAN,
+  item_ativo BOOLEAN,
+  item_sustentavel BOOLEAN,
+  características JSONB NOT NULL,
+  unidades_fornecimento JSONB NOT NULL,
+  data_insercao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+Depois, o teste:
+
+- insere amostras baseadas em `src/ETL/loaders/catmat.csv`;
+- mostra o catálogo antes da alteração;
+- executa `ALTER TABLE catalogo ADD COLUMN IF NOT EXISTS caracteristicas_ocds JSONB`;
+- mostra o catálogo após o `ALTER TABLE`, ainda com `caracteristicas_ocds = NULL`;
+- simula o dataset `input/tabela-mapeamento-ocds.csv`;
+- executa o `UPDATE` por `codigo_item`;
+- mostra o catálogo depois do preenchimento da coluna.
+
+O teste termina com `ROLLBACK`, então não altera nenhuma tabela real.
+
+## Como testar no SQLTools
+
+1. Conecte o SQLTools a qualquer banco PostgreSQL local ou de teste.
+2. Abra `tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/src/sql/test-populacao-sqltools.sql`.
+3. Execute o arquivo inteiro com `Run on active connection`.
+4. Confira os blocos de resultado:
+
+- `01 CATALOGO ANTES DO ALTER TABLE`: catálogo sem a coluna `caracteristicas_ocds`.
+- `02 CATALOGO APOS ALTER TABLE, ANTES DO UPDATE`: coluna criada, ainda vazia.
+- `03 DATASET DE MAPEAMENTO OCDS`: dados que serão usados para popular a coluna.
+- `04 CATALOGO DEPOIS DO UPDATE`: `caracteristicas_ocds` preenchida para os itens mapeados.
+
+Resultado observado no teste: a coluna foi adicionada, o `UPDATE` populou os registros esperados por `codigo_item`, e os valores foram aceitos como `JSONB`.
+
+## Dataset validado
+
+O arquivo `input/tabela-mapeamento-ocds.csv` foi validado localmente com:
+
+- `5771` linhas;
+- `0` `codigo_item` duplicado;
+- `5771` linhas com `caracteristicas_ocds` preenchida.
+
+Esse formato é compatível com o script operacional, que usa `codigo_item` como chave de atualização e converte `caracteristicas_ocds` para `JSONB`.
+
+## Perspectiva para produção
+
+Para aplicar no banco real, rodar primeiro o `ALTER TABLE`:
+
+```bash
+psql -d medicamentos-transparentes \
+  -f tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/src/sql/alter-catalogo-caracteristicas-ocds.sql
+```
+
+## Como executar o UPDATE via Bash/WSL
+
+O comando abaixo deve ser executado a partir da raiz do repositório, em um
+terminal Bash/WSL com o cliente `psql` disponível. Ele:
+
+- carrega as variáveis de conexão de `.env`, removendo caracteres `CR` de
+  arquivos salvos no formato de fim de linha do Windows;
+- converte as variáveis `DB_*` usadas pelo projeto para as variáveis `PG*`
+  reconhecidas pelo `psql`;
+- usa o caminho absoluto do CSV;
+- substitui a referência `:'dataset_csv'` no comando `\copy`, que não expande
+  essa variável da mesma forma que comandos SQL comuns.
+
+```bash
+(
+  set -a
+  source <(sed 's/\r$//' .env)
+  set +a
+
+  export PGHOST="$DB_HOST"
+  export PGPORT="$DB_PORT"
+  export PGUSER="$DB_USER"
+  export PGPASSWORD="$DB_PASS"
+  export PGDATABASE="medicamentos_transparentes"
+
+  dataset_csv="$PWD/tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/input/tabela-mapeamento-ocds.csv"
+
+  psql -f <(
+    sed "s|FROM :'dataset_csv'|FROM '$dataset_csv'|" \
+      tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/src/sql/update-catalogo-caracteristicas-ocds.sql
+  )
+)
+```
+
+O subshell delimitado por `(` e `)` evita que as credenciais exportadas
+permaneçam no ambiente do terminal após a execução. O arquivo `.env` deve
+conter `DB_HOST`, `DB_PORT`, `DB_USER` e `DB_PASS`; não imprima nem copie os
+valores dessas variáveis para logs, documentação ou commits.
+
+Antes do `UPDATE`, confirme que
+`src/sql/alter-catalogo-caracteristicas-ocds.sql` foi aplicado ao mesmo banco. Ao
+final, o script mostra as contagens de registros com e sem
+`caracteristicas_ocds` e os tipos JSONB encontrados.
+
+Os scripts reais:
+
+- adicionam `catalogo.caracteristicas_ocds JSONB` com `ADD COLUMN IF NOT EXISTS`;
+- mantém a coluna nullable, sem `DEFAULT`;
+- carrega o CSV em tabela temporária;
+- atualiza apenas `catalogo.caracteristicas_ocds`;
+- preserva `catalogo.características`, `unidades_fornecimento`, chaves e relacionamentos;
+- executa dentro de transação;
+- mostra contagens finais e tipos `JSONB` preenchidos.
+
+Se algum valor de `caracteristicas_ocds` estiver com JSON inválido, a transação deve falhar antes de deixar uma atualização parcial.
+
+## Pontos de atenção
+
+- Quando o fluxo estiver consolidado, atualizar `src/ETL/BD/cria-esquema.sql` de forma organizada.
