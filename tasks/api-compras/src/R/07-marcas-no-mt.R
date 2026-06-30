@@ -172,6 +172,11 @@ tabela_marcas <- joins |>
     nome_unidade_medida = nomeUnidadeMedida,
   )
 
+tabela_marcas <- tabela_marcas |>
+  filter(!(numero_controle_pncp == "76282656000106-1-000463/2024" & numero_item == 10 & marca == "AMPOLA")) |>
+  filter(!(numero_controle_pncp == "87252045000131-1-000015/2024" & numero_item == 1 & marca == "CX C/50")) |>
+  filter(!(numero_controle_pncp == "46137410000180-1-001233/2024" & numero_item == 2 & marca == "FR"))
+
 saveRDS(tabela_marcas, PATH_TABELA_MARCAS)
 write_csv(tabela_marcas, here("tasks/api-compras/outputs/tabela-marcas.csv"))
 readRDS(PATH_TABELA_MARCAS)
