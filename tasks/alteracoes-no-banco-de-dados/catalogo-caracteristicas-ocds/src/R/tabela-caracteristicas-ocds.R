@@ -38,7 +38,7 @@ caracteristicas_ocds <- ocds |>
   mutate(
     across(
       c(dosageForm, administrationRoute, immediateContainer, activeIngredients, strength),
-      \(x) replace_na(x, "")
+      function(x) replace_na(x, "")
     ),
     caracteristicas_ocds = pmap(
       list(dosageForm, administrationRoute, immediateContainer, activeIngredients, strength),
