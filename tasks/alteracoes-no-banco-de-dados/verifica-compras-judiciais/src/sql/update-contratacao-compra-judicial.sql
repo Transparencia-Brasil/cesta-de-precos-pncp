@@ -1,14 +1,14 @@
 -- Popula contratacao.compra_judicial a partir do CSV gerado pelo notebook
--- tasks/verifica-compras-judiciais/docs/contagem-compras-judiciais.ipynb.
+-- tasks/alteracoes-no-banco-de-dados/verifica-compras-judiciais/docs/contagem-compras-judiciais.ipynb.
 --
 -- Pre-requisito:
 -- executar antes:
--- tasks/verifica-compras-judiciais/src/sql/alter-contratacao-compra-judicial.sql.
+-- tasks/alteracoes-no-banco-de-dados/verifica-compras-judiciais/src/sql/alter-contratacao-compra-judicial.sql.
 --
 -- Uso esperado:
 -- psql -d medicamentos_transparentes \
---   -v dataset_csv='tasks/verifica-compras-judiciais/outputs/compras-judiciais-completo.csv' \
---   -f tasks/verifica-compras-judiciais/src/sql/update-contratacao-compra-judicial.sql
+--   -v dataset_csv='tasks/alteracoes-no-banco-de-dados/verifica-compras-judiciais/outputs/compras-judiciais-completo.csv' \
+--   -f tasks/alteracoes-no-banco-de-dados/verifica-compras-judiciais/src/sql/update-contratacao-compra-judicial.sql
 
 \set ON_ERROR_STOP on
 

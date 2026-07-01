@@ -7,7 +7,7 @@ O trabalho é exploratório e parte de uma regra textual simples, transparente e
 ## Estrutura
 
 ```text
-tasks/verifica-compras-judiciais/
+tasks/alteracoes-no-banco-de-dados/verifica-compras-judiciais/
 ├── docs/
 │   └── contagem-compras-judiciais.ipynb
 ├── inputs/
@@ -64,7 +64,7 @@ O notebook utiliza:
 - pandas;
 - módulo `re(regular expressions)` da biblioteca padrão.
 
-O caminho `base_dir` está definido diretamente no notebook e deve apontar para a raiz local do repositório.
+O notebook localiza automaticamente a raiz do repositório e monta os caminhos de entrada e saída a partir dela.
 
 ## Validação dos dados
 
@@ -113,7 +113,7 @@ Execute primeiro o script que adiciona a coluna:
 
 ```bash
 psql -d medicamentos_transparentes \
-  -f tasks/verifica-compras-judiciais/src/sql/alter-contratacao-compra-judicial.sql
+  -f tasks/alteracoes-no-banco-de-dados/verifica-compras-judiciais/src/sql/alter-contratacao-compra-judicial.sql
 ```
 
 Depois, a partir da raiz do repositório, execute o backfill em um terminal
@@ -131,11 +131,11 @@ Bash/WSL com o cliente `psql` disponível:
   export PGPASSWORD="$DB_PASS"
   export PGDATABASE="medicamentos_transparentes"
 
-  dataset_csv="$PWD/tasks/verifica-compras-judiciais/outputs/compras-judiciais-completo.csv"
+  dataset_csv="$PWD/tasks/alteracoes-no-banco-de-dados/verifica-compras-judiciais/outputs/compras-judiciais-completo.csv"
 
   psql -f <(
     sed "s|FROM :'dataset_csv'|FROM '$dataset_csv'|" \
-      tasks/verifica-compras-judiciais/src/sql/update-contratacao-compra-judicial.sql
+      tasks/alteracoes-no-banco-de-dados/verifica-compras-judiciais/src/sql/update-contratacao-compra-judicial.sql
   )
 )
 ```
