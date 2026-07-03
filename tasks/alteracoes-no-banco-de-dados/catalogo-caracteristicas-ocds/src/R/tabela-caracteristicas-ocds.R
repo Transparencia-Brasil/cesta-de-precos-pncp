@@ -2,6 +2,7 @@ library(tidyverse)
 library(here)
 library(jsonlite)
 library(dotenv)
+library(httr2)
 load_dot_env()
 
 
@@ -11,18 +12,32 @@ GITHUB_TOKEN <- Sys.getenv("GITHUB_TOKEN")
 
 REMOTE_DOCUMENT_JSON_URL <- "https://raw.githubusercontent.com/Transparencia-Brasil/medicine-extension-ocds/refs/heads/main/tasks/documento-ocds/outputs/documento-ocds.json?token="
 
-INPUT_PATH <- paste0(REMOTE_DOCUMENT_JSON_URL, GITHUB_TOKEN)
-
 OUTPUT_PATH <- here("tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/outputs/tabela-mapeamento-ocds.csv")
 
 UTILS_PATH <- here("tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/src/R/utils.R")
+
+INPUT_PATH <- paste0(
+  "https://api.github.com/repos/",
+  "Transparencia-Brasil/medicine-extension-ocds/",
+  "contents/tasks/documento-ocds/outputs/documento-ocds.json",
+  "?ref=main"
+)
+
 
 # :: MAIN ----------------------------------------------------------------------
 
 source(UTILS_PATH)
 
 # Parse the OCDS JSON data
-ocds_json <- fromJSON(INPUT_PATH)
+ocds_json <- request(INPUT_PATH) |>
+  req_headers(
+    Authorization = paste("Bearer", GITHUB_TOKEN),
+    Accept = "application/vnd.github.raw+json",
+    `X-GitHub-Api-Version` = "2022-11-28"
+  ) |>
+  req_perform() |>
+  resp_body_string() |>
+  fromJSON()
 
 # Tidy the OCDS JSON data and extract relevant information
 ocds <- tidy_ocds_json(ocds_json) |>
@@ -48,7 +63,7 @@ caracteristicas_ocds <- ocds |>
           list(nomeCaracteristica = "administrationRoute", nomeValorCaracteristica = administrationRoute),
           list(nomeCaracteristica = "immediateContainer", nomeValorCaracteristica = immediateContainer),
           list(nomeCaracteristica = "activeIngredients", nomeValorCaracteristica = activeIngredients),
-          list(nomeCaracteristica = "strength", nomeValorCaracteristica = strength)
+          list(nomeCaracteristica = "strengthValue", nomeValorCaracteristica = strength)
         )
       }
     )
@@ -58,7 +73,7 @@ caracteristicas_ocds <- ocds |>
 caracteristicas_ocds <- caracteristicas_ocds |>
   mutate(
     caracteristicas_ocds = map(caracteristicas_ocds, discard, ~ .x$nomeValorCaracteristica == ""),
-    caracteristicas_ocds = map(caracteristicas_ocds, toJSON)
+    caracteristicas_ocds = map(caracteristicas_ocds, toJSON, auto_unbox = TRUE)
   )
 
 # Write the final data frame to a CSV file

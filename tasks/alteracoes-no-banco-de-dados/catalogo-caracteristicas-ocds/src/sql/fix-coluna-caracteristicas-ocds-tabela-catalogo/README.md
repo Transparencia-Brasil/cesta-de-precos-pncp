@@ -55,9 +55,24 @@ O script operacional espera receber o caminho do CSV corrigido via variável
 Exemplo:
 
 ```bash
-psql -d medicamentos-transparentes \
-  -v dataset_csv='tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/outputs/tabela-mapeamento-ocds.csv' \
-  -f tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/src/sql/fix-coluna-caracteristicas-ocds-tabela-catalogo/update-catalogo-caracteristicas-ocds.sql
+(
+  set -a
+  source <(sed 's/\r$//' .env)
+  set +a
+
+  export PGHOST="$DB_HOST"
+  export PGPORT="$DB_PORT"
+  export PGUSER="$DB_USER"
+  export PGPASSWORD="$DB_PASS"
+  export PGDATABASE="medicamentos_transparentes"
+
+  dataset_csv="$PWD/tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/outputs/tabela-mapeamento-ocds.csv"
+
+  psql -f <(
+    sed "s|FROM :'dataset_csv'|FROM '$dataset_csv'|" \
+      tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/src/sql/fix-coluna-caracteristicas-ocds-tabela-catalogo/update-catalogo-caracteristicas-ocds.sql
+  )
+)
 ```
 
 O CSV esperado deve conter as colunas:
