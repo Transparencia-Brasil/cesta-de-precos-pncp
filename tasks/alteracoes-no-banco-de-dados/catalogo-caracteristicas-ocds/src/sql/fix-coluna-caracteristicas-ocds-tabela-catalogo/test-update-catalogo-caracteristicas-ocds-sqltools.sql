@@ -50,7 +50,7 @@ VALUES
   (
     267087,
     'Genfibrozila, Dosagem:900 MG',
-    $$[{"nomeCaracteristica": "activeIngredients", "nomeValorCaracteristica": "Genfibrozila"}, {"nomeCaracteristica": "strengthValue", "nomeValorCaracteristica": "900"}, {"nomeCaracteristica": "strengthUnit", "nomeValorCaracteristica": "MG"}]$$
+    $$[{"nomeCaracteristica":["activeIngredients"],"nomeValorCaracteristica":["Genfibrozila"]},{"nomeCaracteristica":["strength"],"nomeValorCaracteristica":["900 MG"]}]$$
   );
 
 INSERT INTO catalogo (
@@ -110,6 +110,7 @@ SELECT
 FROM tmp_catalogo_caracteristicas_ocds_corrigidas
 ORDER BY codigo_item;
 
+CREATE TEMP TABLE tmp_catalogo_itens_atualizados AS
 WITH mapeamento AS (
   SELECT
     codigo_item,
@@ -122,13 +123,16 @@ atualizados AS (
   SET caracteristicas_ocds = m.caracteristicas_ocds
   FROM mapeamento AS m
   WHERE c.codigo_item = m.codigo_item
-    AND c.caracteristicas_ocds IS DISTINCT FROM m.caracteristicas_ocds
   RETURNING c.codigo_item
 )
 SELECT
+  codigo_item
+FROM atualizados;
+
+SELECT
   '03 LINHAS ATUALIZADAS' AS etapa,
   COUNT(*) AS total_linhas_atualizadas
-FROM atualizados;
+FROM tmp_catalogo_itens_atualizados;
 
 SELECT
   '04 CATALOGO DEPOIS DO UPDATE' AS etapa,
@@ -141,10 +145,17 @@ ORDER BY codigo_item;
 SELECT
   '05 CONFERENCIA COM DATASET CORRIGIDO' AS etapa,
   c.codigo_item,
+  u.codigo_item IS NOT NULL AS foi_atualizado,
+  CASE
+    WHEN u.codigo_item IS NOT NULL THEN 'repopulado a partir do dataset corrigido'
+    ELSE 'nao atualizado: item nao encontrado no dataset corrigido'
+  END AS status_update,
   c.caracteristicas_ocds = t.caracteristicas_ocds::jsonb AS atualizado_com_valor_esperado
 FROM catalogo AS c
 JOIN tmp_catalogo_caracteristicas_ocds_corrigidas AS t
   ON t.codigo_item = c.codigo_item
+LEFT JOIN tmp_catalogo_itens_atualizados AS u
+  ON u.codigo_item = c.codigo_item
 ORDER BY c.codigo_item;
 
 SELECT

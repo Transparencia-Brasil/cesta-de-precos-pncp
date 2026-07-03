@@ -83,7 +83,6 @@ atualizados AS (
   SET caracteristicas_ocds = m.caracteristicas_ocds
   FROM mapeamento AS m
   WHERE c.codigo_item = m.codigo_item
-    AND c.caracteristicas_ocds IS DISTINCT FROM m.caracteristicas_ocds
   RETURNING c.codigo_item
 )
 ```
@@ -110,33 +109,48 @@ Em outras palavras: ela pega apenas os mapeamentos novos válidos e transforma
 Ela:
 
 - encontra o item da `catalogo` pelo mesmo `codigo_item` do CSV;
-- compara o valor atual de `catalogo.caracteristicas_ocds` com o valor novo;
-- atualiza apenas quando os valores são diferentes;
+- repopula `catalogo.caracteristicas_ocds` com o valor corrigido do dataset novo;
 - retorna os `codigo_item` que foram atualizados.
 
-A comparação acontece nesta linha:
+O `WHERE` faz apenas o pareamento pela chave do catálogo:
 
 ```sql
-AND c.caracteristicas_ocds IS DISTINCT FROM m.caracteristicas_ocds
+WHERE c.codigo_item = m.codigo_item
 ```
 
-`IS DISTINCT FROM` é usado porque compara valores considerando `NULL` de forma
-segura. Assim, o script detecta diferenças como:
+Essa decisão foi tomada porque a correção do mapeamento OCDS mudou praticamente
+todo o dataset, principalmente pela unificação de `strengthValue` e
+`strengthUnit` em uma única característica `strength`.
 
-- `NULL` no banco e JSON preenchido no dataset;
-- JSON preenchido no banco e outro JSON no dataset;
-- campos, valores ou elementos diferentes;
-- arrays com elementos em ordem diferente.
+Exemplo do formato antigo:
 
-Como a coluna é `jsonb`, o PostgreSQL normaliza objetos JSON. Por isso, diferenças
-puramente textuais, como espaços ou ordem das chaves dentro de objetos, não são
-tratadas como mudança se o conteúdo JSON for equivalente.
+```json
+[
+  {"nomeCaracteristica": "activeIngredients", "nomeValorCaracteristica": "Genfibrozila"},
+  {"nomeCaracteristica": "strengthValue", "nomeValorCaracteristica": "900"},
+  {"nomeCaracteristica": "strengthUnit", "nomeValorCaracteristica": "MG"}
+]
+```
+
+Exemplo do formato corrigido:
+
+```json
+[
+  {"nomeCaracteristica": ["activeIngredients"], "nomeValorCaracteristica": ["Genfibrozila"]},
+  {"nomeCaracteristica": ["strength"], "nomeValorCaracteristica": ["900 MG"]}
+]
+```
+
+Como o CSV corrigido passa a ser a fonte de verdade, o script atualiza todos os
+itens encontrados no dataset novo. Isso deixa a operação mais direta: a coluna
+`catalogo.caracteristicas_ocds` passa a refletir integralmente o mapeamento OCDS
+corrigido.
 
 ## Resultado esperado
 
 Ao final do script operacional, o banco deve exibir:
 
-- total de linhas efetivamente atualizadas a partir do dataset corrigido;
+- total de linhas repopuladas a partir do dataset corrigido;
 - quantidade de itens da `catalogo` com e sem `caracteristicas_ocds`;
 - tipos JSONB presentes na coluna preenchida.
 

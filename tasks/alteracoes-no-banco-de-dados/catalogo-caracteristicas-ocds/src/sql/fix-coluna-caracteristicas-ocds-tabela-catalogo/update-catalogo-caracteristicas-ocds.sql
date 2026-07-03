@@ -34,7 +34,6 @@ atualizados AS (
   SET caracteristicas_ocds = m.caracteristicas_ocds
   FROM mapeamento AS m
   WHERE c.codigo_item = m.codigo_item
-    AND c.caracteristicas_ocds IS DISTINCT FROM m.caracteristicas_ocds
   RETURNING c.codigo_item
 )
 SELECT
