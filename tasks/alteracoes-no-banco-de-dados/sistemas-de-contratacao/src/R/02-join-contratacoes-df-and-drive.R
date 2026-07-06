@@ -2,6 +2,9 @@
 library(here)
 library(tidyverse)
 
+# ' Esse script realiza o join entre os dados de contratações do banco de dados e do Google Drive.
+PLAN_GSHEETS <- "https://docs.google.com/spreadsheets/d/1Mj_HUHC2wwWCaxhcSn5cZIQXXajkfY5sI2oTODhXTvM"
+
 #' Esse script aproveita o resultado do código legado a seguir:
 #' defina LOAD_SOURCE como TRUE para rodar o código legado e gerar o arquivo de saída
 LOAD_SOURCE <- FALSE
@@ -27,12 +30,16 @@ contratacoes_db <- readRDS(PATH_CONTRATACOES_DB)
 
 contratacoes <- inner_join(contratacoes_db, contratacoes_drive, by = "numero_controle_pncp")
 
+count_contratacoes <- contratacoes |>
+  count(usuario_nome, sort = TRUE, name = "qtde_contratacoes_no_pncp")
+
+count_contratacoes |>
+  googlesheets4::sheet_write(ss = PLAN_GSHEETS, sheet = "[JUL-2026] ATUALIZADO - COUNT")
+
+top_10 <- count_contratacoes |>
+  slice(2:10)
+
 contratacoes |>
-  count(usuario_nome, sort = TRUE, name = "qtde_contratacoes_no_pncp") |>
-
-
-contratacoes_drive |>
-  filter(numero_controle_pncp == "00000368000150-1-000044/2024")
-
-
-get_query("select * from contratacao where numero_controle_pncp = '00000368000150-1-000065/2024'") |> glimpse()
+  filter(usuario_nome %in% top_10$usuario_nome) |>
+  arrange(usuario_nome) |>
+  googlesheets4::sheet_write(ss = PLAN_GSHEETS, sheet = "[JUL-2026] ATUALIZADO - DETALHES")
