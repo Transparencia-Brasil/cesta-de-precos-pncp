@@ -268,3 +268,5 @@ tasks/mapeamento-ocds/output/202*/*
 tasks/api-compras/inputs/item-homologado-compras.rds
 tasks/api-compras/inputs/item-homologado.rds
 tasks/api-compras/inputs/contratacoes.rds
+tasks/alteracoes-no-banco-de-dados/sistemas-de-contratacao/inputs/contratacoes-drive.rds
+tasks/alteracoes-no-banco-de-dados/sistemas-de-contratacao/inputs/contratacoes-db.rds
