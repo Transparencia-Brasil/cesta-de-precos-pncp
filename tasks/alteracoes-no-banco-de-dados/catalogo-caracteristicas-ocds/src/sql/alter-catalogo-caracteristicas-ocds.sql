@@ -2,7 +2,7 @@
 --
 -- Uso esperado:
 -- psql -d medicamentos-transparentes \
---   -f tasks/catalogo-caracteristicas-ocds/src/sql/alter-catalogo-caracteristicas-ocds.sql
+--   -f tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/src/sql/alter-catalogo-caracteristicas-ocds.sql
 
 \set ON_ERROR_STOP on
 

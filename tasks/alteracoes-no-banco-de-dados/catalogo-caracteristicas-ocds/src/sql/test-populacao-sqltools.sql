@@ -3,7 +3,7 @@
 -- Este script nao usa \copy, nao altera tabelas reais e termina com ROLLBACK.
 -- Ele reproduz a tabela catalogo a partir do schema real, insere amostras do
 -- catmat.csv e aplica o backfill com amostras do dataset
--- tasks/catalogo-caracteristicas-ocds/input/tabela-mapeamento-ocds.csv.
+-- tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/input/tabela-mapeamento-ocds.csv.
 --
 -- Observacao: PostgreSQL nao permite escolher a posicao fisica de uma coluna
 -- nova com ALTER TABLE. A coluna caracteristicas_ocds e adicionada ao fim da

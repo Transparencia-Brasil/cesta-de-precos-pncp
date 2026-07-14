@@ -1,19 +1,19 @@
 -- Popula catalogo.caracteristicas_ocds a partir do CSV gerado pelo notebook
--- tasks/catalogo-caracteristicas-ocds/docs/tabela-caracteristicas-ocds.ipynb.
+-- tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/docs/tabela-caracteristicas-ocds.ipynb.
 --
 -- Pre-requisito:
 -- executar antes:
--- tasks/catalogo-caracteristicas-ocds/src/sql/alter-catalogo-caracteristicas-ocds.sql.
+-- tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/src/sql/alter-catalogo-caracteristicas-ocds.sql.
 --
 -- Uso esperado:
 -- psql -d medicamentos-transparentes \
---   -v dataset_csv='tasks/catalogo-caracteristicas-ocds/input/tabela-mapeamento-ocds.csv' \
---   -f tasks/catalogo-caracteristicas-ocds/src/sql/update-catalogo-caracteristicas-ocds.sql
+--   -v dataset_csv='tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/input/tabela-mapeamento-ocds.csv' \
+--   -f tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/src/sql/update-catalogo-caracteristicas-ocds.sql
 --
 -- O CSV operacional fica em:
--- tasks/catalogo-caracteristicas-ocds/input/tabela-mapeamento-ocds.csv
+-- tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/input/tabela-mapeamento-ocds.csv
 -- e deve seguir o formato da saida gerada em:
--- tasks/catalogo-caracteristicas-ocds/docs/outputs/tabela-mapeamento-ocds.csv
+-- tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/docs/outputs/tabela-mapeamento-ocds.csv
 
 \set ON_ERROR_STOP on
 
