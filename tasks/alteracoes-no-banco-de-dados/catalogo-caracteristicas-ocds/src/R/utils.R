@@ -100,27 +100,3 @@ extrai_activeIngredients <- function(active_ingredients) {
 
   str_replace(active_ingredients_name, "; $", "")
 }
-
-#' Extrai o recipiente imediato a partir do data frame de recipiente imediato
-#'
-#' @param immediate_container Um data frame contendo o recipiente imediato do medicamento
-#' @return Uma string contendo o recipiente imediato, ou NA se não houver nome
-#'
-extrai_immediateContainer <- function(immediate_container) {
-  if (is.null(immediate_container)) {
-    return(NA_character_)
-  }
-  if (!"name" %in% names(immediate_container)) {
-    return(NA_character_)
-  }
-
-  immediate_container_name <- immediate_container |>
-    filter(!is.na(name)) |>
-    pull(name)
-
-  if (length(immediate_container_name) == 0) {
-    return(NA_character_)
-  }
-
-  paste(immediate_container_name, collapse = ", ")
-}
