@@ -137,69 +137,23 @@ incorreta.
 
 ### Itens homologados (medicamentos)
 
-A análise comparou os nomes recebidos do PNCP com as colunas atuais de
-`DF_ITEM_HOMOLOGADO` e com o schema da tabela `item_homologado`. Alguns campos
-possuem nomes diferentes entre a resposta da API e o banco de dados.
-
 | Coluna de origem | Situação no banco |
 |---|---|
-| `tipoBeneficioNome` | **Já existe no banco** como `nome_tipo_beneficio` |
+| `tipoBeneficioNome` | **Já existe no banco** |
 | `aplicabilidadeMargemPreferenciaNormal` | Deve ser adicionada |
 | `percentualMargemPreferenciaNormal` | Deve ser adicionada |
 | `aplicabilidadeMargemPreferenciaAdicional` | Deve ser adicionada |
 | `percentualMargemPreferenciaAdicional` | Deve ser adicionada |
 | `tipoMargemPreferencia.codigo` | Deve ser adicionada |
-| `criterioJulgamentoNome` | **Já existe no banco** como `nome_criterio_julgamento` |
+| `criterioJulgamentoNome` | **Já existe no banco** |
 | `tipoMargemPreferencia.nome` | Deve ser adicionada |
 | `tipoMargemPreferencia` | Deve ser adicionada |
 | `exigenciaConteudoNacional` | Deve ser adicionada |
 
-Os campos marcados como existentes não devem gerar novas colunas duplicadas no
-schema. O ETL deve mapear `tipoBeneficioNome` para `nome_tipo_beneficio` e
-`criterioJulgamentoNome` para `nome_criterio_julgamento`, preservando as
-convenções atuais do banco.
+### Contratações 
 
-### Contratações (medicamentos)
-
-| Coluna de origem | Situação no banco e destino pretendido |
+| Coluna de origem | Situação no banco|
 |---|---|
-| `srp` | **Já existe no banco** na tabela `contratacao`; sua integração ao dataset de itens homologados foi implementada no notebook |
+| `srp` | **Já existe no banco** na tabela `contratacao`; 
 
-Embora `srp` não seja atualmente uma coluna de `DF_ITEM_HOMOLOGADO`, ela já faz
-parte do schema de `contratacao`.
-
-### Integração de `srp` aos itens homologados
-
-O notebook associa a coluna `srp` de `DF_CONTRATACOES_COM_LEGADOS` a
-`DF_ITEM_HOMOLOGADO_COM_LEGADOS` por `numero_controle_pncp`. Foi utilizado um
-`left merge`, e não uma concatenação, porque uma contratação pode estar
-relacionada a vários itens.
-
-A relação é validada como `many_to_one`: várias linhas de itens podem apontar
-para uma única contratação. Uma asserção também garante que a integração não
-altere a quantidade de itens homologados.
-
-| Medida | Quantidade |
-|---|---:|
-| Itens antes da integração de `srp` | 200.205 |
-| Itens depois da integração de `srp` | 200.205 |
-| Itens associados a uma contratação | 200.205 |
-| Itens sem contratação correspondente | 0 |
-| Itens com valor `srp` não nulo | 200.205 |
-| Diferença de cardinalidade | 0 |
-
-O resultado permanece em `DF_ITEM_HOMOLOGADO_COM_LEGADOS`, agora com as colunas
-`srp` e `_merge_srp`. A coluna `_merge_srp` registra se cada item encontrou uma
-contratação correspondente e mantém a operação auditável.
-
-## Observações para uso no ETL
-
-- A ausência de correspondência não é um erro: não é possível obter cobertura
-  de 100% quando a chave atual não existe nos dados legados.
-- Colunas que contenham listas representam conflitos reais ou diferentes valores
-  registrados para a mesma chave no legado.
-- Antes de carregar esses valores em um banco relacional, deve-se definir se as
-  listas serão armazenadas como arrays/JSON, normalizadas em outra tabela ou
-  resolvidas por uma regra de negócio documentada.
-- Não se deve substituir listas por um valor arbitrário sem registrar a regra,
-  pois isso causaria perda de informação e reduziria a rastreabilidade.
+- Não foi observada nenhum coluna referente à descontos que fosse necessário adicionar na tabela do Banco.
