@@ -21,14 +21,14 @@ INSERT INTO item_homologado VALUES
 SELECT '01 ANTES DO ALTER' AS etapa, * FROM item_homologado ORDER BY numero_controle_pncp, numero_item;
 
 ALTER TABLE item_homologado
-  ADD COLUMN "aplicabilidadeMargemPreferenciaNormal" TEXT,
-  ADD COLUMN "percentualMargemPreferenciaNormal" TEXT,
-  ADD COLUMN "aplicabilidadeMargemPreferenciaAdicional" TEXT,
-  ADD COLUMN "percentualMargemPreferenciaAdicional" TEXT,
-  ADD COLUMN "tipoMargemPreferencia.codigo" TEXT,
-  ADD COLUMN "tipoMargemPreferencia.nome" TEXT,
-  ADD COLUMN "tipoMargemPreferencia" TEXT,
-  ADD COLUMN "exigenciaConteudoNacional" TEXT;
+  ADD COLUMN aplicabilidade_margem_preferencia_normal TEXT,
+  ADD COLUMN percentual_margem_preferencia_normal TEXT,
+  ADD COLUMN aplicabilidade_margem_preferencia_adicional TEXT,
+  ADD COLUMN percentual_margem_preferencia_adicional TEXT,
+  ADD COLUMN tipo_margem_preferencia_codigo TEXT,
+  ADD COLUMN tipo_margem_preferencia_nome TEXT,
+  ADD COLUMN tipo_margem_preferencia TEXT,
+  ADD COLUMN exigencia_conteudo_nacional TEXT;
 
 CREATE TEMP TABLE tmp_item_homologado_margens_csv (
   numero_controle_pncp TEXT,
@@ -52,14 +52,14 @@ INSERT INTO tmp_item_homologado_margens_csv VALUES
   ('00394452000103-1-014637/2025', 3, 'True', '5.0', 'True', '10.0', '2.0', 'Resolução CICS', NULL, 'False');
 
 UPDATE item_homologado AS i
-SET "aplicabilidadeMargemPreferenciaNormal" = t.aplicabilidade_normal,
-    "percentualMargemPreferenciaNormal" = t.percentual_normal,
-    "aplicabilidadeMargemPreferenciaAdicional" = t.aplicabilidade_adicional,
-    "percentualMargemPreferenciaAdicional" = t.percentual_adicional,
-    "tipoMargemPreferencia.codigo" = t.codigo_tipo,
-    "tipoMargemPreferencia.nome" = t.nome_tipo,
-    "tipoMargemPreferencia" = t.tipo_margem,
-    "exigenciaConteudoNacional" = t.exigencia_conteudo
+SET aplicabilidade_margem_preferencia_normal = t.aplicabilidade_normal,
+    percentual_margem_preferencia_normal = t.percentual_normal,
+    aplicabilidade_margem_preferencia_adicional = t.aplicabilidade_adicional,
+    percentual_margem_preferencia_adicional = t.percentual_adicional,
+    tipo_margem_preferencia_codigo = t.codigo_tipo,
+    tipo_margem_preferencia_nome = t.nome_tipo,
+    tipo_margem_preferencia = t.tipo_margem,
+    exigencia_conteudo_nacional = t.exigencia_conteudo
 FROM tmp_item_homologado_margens_csv AS t
 WHERE i.numero_controle_pncp = t.numero_controle_pncp
   AND i.numero_item = t.numero_item;
@@ -71,7 +71,7 @@ BEGIN
   IF (SELECT COUNT(*) FROM item_homologado) <> 5 THEN
     RAISE EXCEPTION 'O teste alterou a cardinalidade de item_homologado.';
   END IF;
-  IF (SELECT COUNT(*) FROM item_homologado WHERE "percentualMargemPreferenciaNormal" = '5.0') <> 5 THEN
+  IF (SELECT COUNT(*) FROM item_homologado WHERE percentual_margem_preferencia_normal = '5.0') <> 5 THEN
     RAISE EXCEPTION 'O UPDATE nao preencheu os cinco registros.';
   END IF;
 END;

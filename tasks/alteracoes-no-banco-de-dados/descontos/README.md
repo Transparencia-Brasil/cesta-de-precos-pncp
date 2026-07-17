@@ -10,20 +10,20 @@ Esta alteração acrescenta à tabela `item_homologado` os campos de margem de p
 
 ## Mapeamento de colunas
 
-Os identificadores no banco preservam exatamente os nomes recebidos da API e presentes no CSV, sem conversão para `snake_case`.
+As colunas de destino usam `snake_case`, seguindo o padrão do schema do banco. A tabela temporária de importação preserva os cabeçalhos originais do CSV para explicitar o mapeamento da origem.
 
 | CSV/API | `item_homologado` |
 |---|---|
-| `aplicabilidadeMargemPreferenciaNormal` | `"aplicabilidadeMargemPreferenciaNormal"` |
-| `percentualMargemPreferenciaNormal` | `"percentualMargemPreferenciaNormal"` |
-| `aplicabilidadeMargemPreferenciaAdicional` | `"aplicabilidadeMargemPreferenciaAdicional"` |
-| `percentualMargemPreferenciaAdicional` | `"percentualMargemPreferenciaAdicional"` |
-| `tipoMargemPreferencia.codigo` | `"tipoMargemPreferencia.codigo"` |
-| `tipoMargemPreferencia.nome` | `"tipoMargemPreferencia.nome"` |
-| `tipoMargemPreferencia` | `"tipoMargemPreferencia"` |
-| `exigenciaConteudoNacional` | `"exigenciaConteudoNacional"` |
+| `aplicabilidadeMargemPreferenciaNormal` | `aplicabilidade_margem_preferencia_normal` |
+| `percentualMargemPreferenciaNormal` | `percentual_margem_preferencia_normal` |
+| `aplicabilidadeMargemPreferenciaAdicional` | `aplicabilidade_margem_preferencia_adicional` |
+| `percentualMargemPreferenciaAdicional` | `percentual_margem_preferencia_adicional` |
+| `tipoMargemPreferencia.codigo` | `tipo_margem_preferencia_codigo` |
+| `tipoMargemPreferencia.nome` | `tipo_margem_preferencia_nome` |
+| `tipoMargemPreferencia` | `tipo_margem_preferencia` |
+| `exigenciaConteudoNacional` | `exigencia_conteudo_nacional` |
 
-Como o PostgreSQL converte identificadores sem aspas para letras minúsculas e interpreta o ponto como separador, esses nomes devem ser usados entre aspas duplas em todas as consultas SQL. Exemplo: `item_homologado."exigenciaConteudoNacional"`.
+Esses identificadores não exigem aspas duplas nas consultas SQL. Exemplo: `item_homologado.exigencia_conteudo_nacional`.
 
 As colunas são `TEXT` de forma intencional. O arquivo enriquecido reúne dados atuais e legados e contém, além de escalares como `True`, `False` e `5.0`, valores legados divergentes preservados como listas textuais. Converter diretamente para `BOOLEAN` ou `NUMERIC` descartaria informação ou faria a carga falhar.
 

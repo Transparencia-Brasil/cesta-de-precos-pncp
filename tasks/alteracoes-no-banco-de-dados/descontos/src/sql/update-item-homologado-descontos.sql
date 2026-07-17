@@ -60,14 +60,14 @@ LEFT JOIN item_homologado AS i
 
 UPDATE item_homologado AS i
 SET
-  "aplicabilidadeMargemPreferenciaNormal" = t."aplicabilidadeMargemPreferenciaNormal",
-  "percentualMargemPreferenciaNormal" = t."percentualMargemPreferenciaNormal",
-  "aplicabilidadeMargemPreferenciaAdicional" = t."aplicabilidadeMargemPreferenciaAdicional",
-  "percentualMargemPreferenciaAdicional" = t."percentualMargemPreferenciaAdicional",
-  "tipoMargemPreferencia.codigo" = t."tipoMargemPreferencia.codigo",
-  "tipoMargemPreferencia.nome" = t."tipoMargemPreferencia.nome",
-  "tipoMargemPreferencia" = t."tipoMargemPreferencia",
-  "exigenciaConteudoNacional" = t."exigenciaConteudoNacional"
+  aplicabilidade_margem_preferencia_normal = t."aplicabilidadeMargemPreferenciaNormal",
+  percentual_margem_preferencia_normal = t."percentualMargemPreferenciaNormal",
+  aplicabilidade_margem_preferencia_adicional = t."aplicabilidadeMargemPreferenciaAdicional",
+  percentual_margem_preferencia_adicional = t."percentualMargemPreferenciaAdicional",
+  tipo_margem_preferencia_codigo = t."tipoMargemPreferencia.codigo",
+  tipo_margem_preferencia_nome = t."tipoMargemPreferencia.nome",
+  tipo_margem_preferencia = t."tipoMargemPreferencia",
+  exigencia_conteudo_nacional = t."exigenciaConteudoNacional"
 FROM tmp_item_homologado_margens_csv AS t
 WHERE i.numero_controle_pncp = t.numero_controle_pncp
   AND i.numero_item = t.numero_item::integer;
@@ -76,8 +76,8 @@ COMMIT;
 
 SELECT
   COUNT(*) AS total_itens,
-  COUNT(*) FILTER (WHERE "aplicabilidadeMargemPreferenciaNormal" IS NOT NULL) AS com_aplicabilidade_normal,
-  COUNT(*) FILTER (WHERE "percentualMargemPreferenciaNormal" IS NOT NULL) AS com_percentual_normal,
-  COUNT(*) FILTER (WHERE "tipoMargemPreferencia.codigo" IS NOT NULL) AS com_tipo_margem,
-  COUNT(*) FILTER (WHERE "exigenciaConteudoNacional" IS NOT NULL) AS com_exigencia_conteudo_nacional
+  COUNT(*) FILTER (WHERE aplicabilidade_margem_preferencia_normal IS NOT NULL) AS com_aplicabilidade_normal,
+  COUNT(*) FILTER (WHERE percentual_margem_preferencia_normal IS NOT NULL) AS com_percentual_normal,
+  COUNT(*) FILTER (WHERE tipo_margem_preferencia_codigo IS NOT NULL) AS com_tipo_margem,
+  COUNT(*) FILTER (WHERE exigencia_conteudo_nacional IS NOT NULL) AS com_exigencia_conteudo_nacional
 FROM item_homologado;
