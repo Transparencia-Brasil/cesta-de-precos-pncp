@@ -45,18 +45,39 @@ O resultado esperado é a consulta `02 DEPOIS DO UPDATE` com cinco linhas e sem 
 Faça backup e execute primeiro o `ALTER`:
 
 ```bash
-psql -d medicamentos-transparentes -f tasks/alteracoes-no-banco-de-dados/descontos/src/sql/alter-item-homologado-descontos.sql
+psql -d medicamentos_transparentes \
+  -f tasks/alteracoes-no-banco-de-dados/descontos/src/sql/alter-item-homologado-descontos.sql
 ```
 
-Depois execute o preenchimento:
+Depois, a partir da raiz do repositório, execute o preenchimento em um terminal
+Bash/WSL com o cliente `psql` disponível:
 
 ```bash
-psql -d medicamentos-transparentes \
-  -v dataset_csv='tasks/verifica-descontos/outputs/itens_homologados_atualizados_com_legado.csv' \
-  -f tasks/alteracoes-no-banco-de-dados/descontos/src/sql/update-item-homologado-descontos.sql
+(
+  set -a
+  source <(sed 's/\r$//' .env)
+  set +a
+
+  export PGHOST="$DB_HOST"
+  export PGPORT="$DB_PORT"
+  export PGUSER="$DB_USER"
+  export PGPASSWORD="$DB_PASS"
+  export PGDATABASE="medicamentos_transparentes"
+
+  dataset_csv="$PWD/tasks/verifica-descontos/outputs/itens_homologados_atualizados_com_legado.csv"
+
+  psql -f <(
+    sed "s|FROM :'dataset_csv'|FROM '$dataset_csv'|" \
+      tasks/alteracoes-no-banco-de-dados/descontos/src/sql/update-item-homologado-descontos.sql
+  )
+)
 ```
 
-Antes do `COMMIT`, o script mostra quantas chaves do dataset foram encontradas. Chaves ausentes não são inseridas: apenas registros existentes em `item_homologado` são atualizados. O script interrompe a transação se houver chave nula, inválida ou duplicada no CSV.
+O subshell evita que as credenciais exportadas permaneçam no terminal. Antes do
+`COMMIT`, o script mostra quantas chaves do dataset foram encontradas. Chaves
+ausentes não são inseridas: apenas registros existentes em `item_homologado` são
+atualizados. O script interrompe a transação se houver chave nula, inválida ou
+duplicada no CSV.
 
 ## Observação sobre o schema-base
 
