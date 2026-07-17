@@ -12,13 +12,11 @@ BEGIN;
 CREATE TEMP TABLE tmp_item_homologado_margens_csv (
   numero_controle_pncp TEXT,
   numero_item TEXT,
-  "tipoBeneficioNome" TEXT,
   "aplicabilidadeMargemPreferenciaNormal" TEXT,
   "percentualMargemPreferenciaNormal" TEXT,
   "aplicabilidadeMargemPreferenciaAdicional" TEXT,
   "percentualMargemPreferenciaAdicional" TEXT,
   "tipoMargemPreferencia.codigo" TEXT,
-  "criterioJulgamentoNome" TEXT,
   "tipoMargemPreferencia.nome" TEXT,
   "tipoMargemPreferencia" TEXT,
   "exigenciaConteudoNacional" TEXT
