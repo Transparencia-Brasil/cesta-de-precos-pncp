@@ -39,14 +39,16 @@ ocds_json <- request(INPUT_PATH) |>
   resp_body_string() |>
   fromJSON()
 
+
 # Tidy the OCDS JSON data and extract relevant information
 ocds <- tidy_ocds_json(ocds_json) |>
+  mutate(immediateContainer = pluck(immediateContainer, "name")) |>
   mutate(
     strength = map_chr(activeIngredients, extrai_strength),
-    activeIngredients = map_chr(activeIngredients, extrai_activeIngredients),
-    immediateContainer = map_chr(immediateContainer, extrai_immediateContainer)
+    activeIngredients = map_chr(activeIngredients, extrai_activeIngredients)
   ) |>
   select(-attributes)
+
 
 # Create the final data frame with the relevant information and write it to a CSV file
 caracteristicas_ocds <- ocds |>
@@ -69,12 +71,14 @@ caracteristicas_ocds <- ocds |>
     )
   )
 
+
 # Wrap the caracteristicas_ocds column in a list column and convert it to JSON
 caracteristicas_ocds <- caracteristicas_ocds |>
   mutate(
     caracteristicas_ocds = map(caracteristicas_ocds, discard, ~ .x$nomeValorCaracteristica == ""),
     caracteristicas_ocds = map(caracteristicas_ocds, toJSON, auto_unbox = TRUE)
   )
+
 
 # Write the final data frame to a CSV file
 caracteristicas_ocds |>
