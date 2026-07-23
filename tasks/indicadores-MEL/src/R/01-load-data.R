@@ -2,6 +2,7 @@ library(tidyverse)
 library(here)
 options(width = 150)
 
+
 # :: FILEPATHS e SETUP ---------------------------------------------------------
 
 # Dados de entradas ficam em /tmp
@@ -21,6 +22,7 @@ LOCAL_PATH <- "tasks/unifica-dados/output"
 # Funções auxiliares
 UTILS <- here("tasks/indicadores-MEL/src/R/utils.R")
 source(UTILS, encoding = "UTF-8")
+
 
 # :: DATA PATHS ----------------------------------------------------------------
 
@@ -152,10 +154,8 @@ col_resultados |>
   pivot_wider(names_from = id_coleta, values_from = flag) |>
   googlesheets4::write_sheet(ss = ID_PLAN_CHECK, sheet = "resultados-long")
 
+
 # :: LOAD DATA -----------------------------------------------------------------
-
-
-
 
 medicamentos <- TMP_PATH |>
   list.files(recursive = TRUE, full.names = TRUE, pattern = "medicamentos.csv") |>
@@ -169,7 +169,6 @@ medicamentos <- TMP_PATH |>
   unnest(dados) |>
   mutate(data.numeroControlePNCP = make_id(endpoint))
 
-
 contratacoes <- TMP_PATH |>
   list.files(recursive = TRUE, full.names = TRUE, pattern = "contratacoes.csv") |>
   here() |>
@@ -181,7 +180,6 @@ contratacoes <- TMP_PATH |>
     anomes_coleta = make_anomes_coleta(path)
   ) |>
   unnest(dados)
-
 
 resultados <- TMP_PATH |>
   list.files(recursive = TRUE, full.names = TRUE, pattern = "itens-medicamentos-resultados.csv") |>
@@ -224,7 +222,6 @@ col_itens <- itens |>
     anomes_coleta = make_anomes_coleta(path)
   )
 
-
 medicamentos |>
   distinct(path, anomes_coleta, colnames) |>
   mutate(
@@ -234,7 +231,6 @@ medicamentos |>
   unnest(colnames) |>
   pivot_wider(names_from = colnames, values_from = flag, values_fill = "-") |>
   googlesheets4::write_sheet(ss = PLAN_CHECK)
-
 
 ids_validos <- medicamentos |>
   distinct(data.numeroControlePNCP)
