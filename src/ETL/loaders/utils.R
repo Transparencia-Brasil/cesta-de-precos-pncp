@@ -32,7 +32,8 @@ suppressPackageStartupMessages(library(dotenv))
     "item_ativo",
     "item_sustentavel",
     "buscaItemCaracteristica",
-    "unidadeFornecimento"
+    "unidadeFornecimento",
+    "caracteristicas_ocds"
   )
 
   COLUNAS_CONTRATANTE <- c(
@@ -172,23 +173,112 @@ suppressPackageStartupMessages(library(dotenv))
   )
 }
 
+#' Lê e valida o mapeamento de características OCDS do catálogo
+#'
+#' @param caminho Caminho do CSV versionado com o mapeamento OCDS.
+#'
+#' @return Dataframe com `codigo_item` e `caracteristicas_ocds`.
+le_mapeamento_caracteristicas_ocds <- function(
+  caminho = here::here(
+    "tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds",
+    "outputs/tabela-mapeamento-ocds.csv"
+  )
+) {
+  colunas_esperadas <- c("codigo_item", "caracteristicas_ocds")
+
+  mapeamento <- readr::read_csv(
+    caminho,
+    col_types = readr::cols(.default = readr::col_character()),
+    show_col_types = FALSE,
+    progress = FALSE
+  )
+
+  colunas_ausentes <- setdiff(colunas_esperadas, names(mapeamento))
+  if (length(colunas_ausentes) > 0) {
+    stop(sprintf(
+      "O mapeamento OCDS não contém as colunas obrigatórias: %s.",
+      paste(colunas_ausentes, collapse = ", ")
+    ))
+  }
+
+  mapeamento <- mapeamento[, colunas_esperadas, drop = FALSE]
+  mapeamento$codigo_item <- trimws(mapeamento$codigo_item)
+  mapeamento$caracteristicas_ocds <- trimws(mapeamento$caracteristicas_ocds)
+  valores_vazios <- !is.na(mapeamento$caracteristicas_ocds) &
+    mapeamento$caracteristicas_ocds == ""
+  mapeamento$caracteristicas_ocds[valores_vazios] <- NA_character_
+
+  if (any(is.na(mapeamento$codigo_item) | mapeamento$codigo_item == "")) {
+    stop("O mapeamento OCDS contém codigo_item ausente ou vazio.")
+  }
+
+  codigos_duplicados <- unique(
+    mapeamento$codigo_item[duplicated(mapeamento$codigo_item)]
+  )
+  if (length(codigos_duplicados) > 0) {
+    stop(sprintf(
+      "O mapeamento OCDS contém codigo_item duplicado: %s.",
+      paste(utils::head(codigos_duplicados, 10), collapse = ", ")
+    ))
+  }
+
+  preenchidos <- !is.na(mapeamento$caracteristicas_ocds)
+  json_valido <- vapply(
+    mapeamento$caracteristicas_ocds[preenchidos],
+    jsonlite::validate,
+    logical(1)
+  )
+  if (any(!json_valido)) {
+    codigos_invalidos <- mapeamento$codigo_item[preenchidos][!json_valido]
+    stop(sprintf(
+      "O mapeamento OCDS contém JSON inválido para codigo_item: %s.",
+      paste(utils::head(codigos_invalidos, 10), collapse = ", ")
+    ))
+  }
+
+  mapeamento
+}
+
+#' Adiciona as características OCDS aos itens do catálogo
+#'
+#' @param catalogo Dataframe do catálogo CATMAT.
+#' @param mapeamento Dataframe validado com o mapeamento OCDS.
+#'
+#' @return Catálogo enriquecido por `codigo_br = codigo_item`.
+adiciona_caracteristicas_ocds <- function(
+  catalogo,
+  mapeamento = le_mapeamento_caracteristicas_ocds()
+) {
+  if ("caracteristicas_ocds" %in% names(catalogo)) {
+    catalogo$caracteristicas_ocds <- NULL
+  }
+
+  dplyr::left_join(
+    catalogo,
+    mapeamento,
+    by = c("codigo_br" = "codigo_item")
+  )
+}
+
 # Consultas de inserção no banco
 {
 
   # Insere um item do catálogo
   CONSULTA_INSERIR_CATALOGO <- "
     INSERT INTO catalogo (codigo_classe, nome_classe, codigo_pdm, nome_pdm,
-    codigo_item, nome_item, item_suspenso, item_ativo, item_sustentavel, características,
-    unidades_fornecimento)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11::jsonb)
+    codigo_item, nome_item, item_suspenso, item_ativo, item_sustentavel,
+    caracteristicas_ocds, características, unidades_fornecimento)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,
+    $10::jsonb, $11::jsonb, $12::jsonb)
     ON CONFLICT (codigo_item) DO NOTHING;"
 
-  # Insere um item do catálogo
+  # Insere ou atualiza um item do catálogo
   CONSULTA_UPDATE_CATALOGO <- "
     INSERT INTO catalogo (codigo_classe, nome_classe, codigo_pdm, nome_pdm,
-    codigo_item, nome_item, item_suspenso, item_ativo, item_sustentavel, características,
-    unidades_fornecimento)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11::jsonb)
+    codigo_item, nome_item, item_suspenso, item_ativo, item_sustentavel,
+    caracteristicas_ocds, características, unidades_fornecimento)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,
+    $10::jsonb, $11::jsonb, $12::jsonb)
     ON CONFLICT (codigo_item)
     DO UPDATE SET
       codigo_classe = $1,
@@ -199,8 +289,9 @@ suppressPackageStartupMessages(library(dotenv))
       item_suspenso = $7,
       item_ativo = $8,
       item_sustentavel = $9,
-      características = $10::jsonb,
-      unidades_fornecimento = $11::jsonb;"
+      caracteristicas_ocds = $10::jsonb,
+      características = $11::jsonb,
+      unidades_fornecimento = $12::jsonb;"
 
   # Insere um contratante
   CONSULTA_INSERIR_CONTRATANTE <- "

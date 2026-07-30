@@ -13,9 +13,13 @@ CREATE TABLE catalogo (
     item_ativo BOOLEAN,
     item_sustentavel BOOLEAN,
     características JSONB NOT NULL,
+    caracteristicas_ocds JSONB,
     unidades_fornecimento JSONB NOT NULL,
     data_insercao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+COMMENT ON COLUMN catalogo.caracteristicas_ocds IS
+    'Atributos técnicos do medicamento mapeados para o padrão OCDS.';
 
 CREATE TABLE contratante (
     cnpj BIGINT,

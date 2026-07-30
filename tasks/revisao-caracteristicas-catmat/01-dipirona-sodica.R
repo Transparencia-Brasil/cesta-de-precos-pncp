@@ -99,6 +99,7 @@ catalogo_dipirona <- catalogo_dipirona %>%
 # TRANSFORMA A TABELA ----------------------------------------------------------
 
 tb_catalogo <- catalogo_dipirona %>%
+  adiciona_caracteristicas_ocds() %>%
   select(all_of(COLUNAS_CATALOGO)) %>%
   mutate( # Seleciona atributos de interesse
     características = map(buscaItemCaracteristica, ~ select(.x, nomeCaracteristica, nomeValorCaracteristica))

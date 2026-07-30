@@ -106,6 +106,7 @@ catalogo_paracetamol <- catalogo_paracetamol %>%
 # TRANSFORMA A TABELA ----------------------------------------------------------
 
 tb_catalogo <- catalogo_paracetamol %>%
+  adiciona_caracteristicas_ocds() %>%
   select(all_of(COLUNAS_CATALOGO)) %>%
   mutate( # Seleciona atributos de interesse
     características = map(buscaItemCaracteristica, ~ select(.x, nomeCaracteristica, nomeValorCaracteristica))
