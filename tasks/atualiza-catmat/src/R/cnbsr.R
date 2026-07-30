@@ -11,7 +11,7 @@
 # Instalar o pacote privado (requer token github no .Renviron)
 
 # Instale novamente sempre que houver atualizações no pacote
-remotes::install_github(repo = "rdurl0/cnbsr", upgrade = "never", force = TRUE)
+remotes::install_github(repo = "rdurl0/cnbsr", upgrade = "ask", force = TRUE)
 
 
 # LIBS -------------------------------------------------------------------------
@@ -61,13 +61,12 @@ pdms <- pdms |>
   )
 
 # Dados de classe e grupo
-
 codbr_raw <- pdms |>
   select(codigoPDM, descricaoPDM) |>
   mutate(codbr = map(codigoPDM, cnbsr::get_material_caracteristica_valor_pdm_sem_filtro))
 
-# CodigoBr
 
+# CodigoBr
 codbr <- codbr_raw |>
   unnest(codbr, keep_empty = TRUE) |>
   select(
@@ -96,7 +95,6 @@ codbr <- codbr_raw |>
   )
 
 # descricaoItem
-
 codbr <- codbr |>
   mutate(
     codbr = coalesce(codigoItem, codigoPDM) |>
@@ -104,8 +102,17 @@ codbr <- codbr |>
   )
 
 
+ codbr_raw |>
+   unnest(codbr, keep_empty = TRUE) |>
+   filter(codigoItem == 267203) |>
+   unnest(buscaItemCaracteristica, keep_empty = TRUE, names_sep = "_") |>
+   select(-buscaItemCaracteristica_tuplaCaracteristica) |>
+   glimpse()
+
 catalogo_bd |>
-  filter(codigo_pdm == 17708)
+  filter(codigo_pdm == 17708) |>
+  filter(codigo_item == 267203) |>
+  glimpse()
 
 codbr |>
   filter(descricaoPDM == "Dipirona Sódica") |>
