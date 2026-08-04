@@ -93,6 +93,7 @@ catalogo_aciclovir <- catalogo_aciclovir %>%
 # TRANSFORMA A TABELA ----------------------------------------------------------
 
 tb_catalogo <- catalogo_aciclovir %>%
+  adiciona_caracteristicas_ocds() %>%
   select(all_of(COLUNAS_CATALOGO)) %>%
   mutate( # Seleciona atributos de interesse
     características = map(buscaItemCaracteristica, ~ select(.x, nomeCaracteristica, nomeValorCaracteristica))
