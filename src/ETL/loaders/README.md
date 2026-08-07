@@ -6,14 +6,14 @@ Use este diretório para duas cargas principais:
 
 | Script | Entrada | Tabelas afetadas |
 | --- | --- | --- |
-| [`carrega-catalogo.R`](carrega-catalogo.R) | Catálogo CATMAT em `.rds` | `catalogo` |
+| [`carrega-catalogo.R`](carrega-catalogo.R) | Catálogo CATMAT em `.rds` e mapeamento OCDS versionado | `catalogo` |
 | [`carrega-dados.R`](carrega-dados.R) | CSVs de contratações, medicamentos e resultados | `contratante`, `fornecedor`, `contratacao`, `item_homologado`, `item_licitado` |
 
 ## Arquivos do diretório
 
 | Arquivo | Função |
 | --- | --- |
-| [`carrega-catalogo.R`](carrega-catalogo.R) | Prepara o catálogo CATMAT, transforma características e unidades de fornecimento em JSON e insere os itens na tabela `catalogo`. |
+| [`carrega-catalogo.R`](carrega-catalogo.R) | Prepara o catálogo CATMAT, integra características OCDS, transforma campos JSON e faz upsert dos itens na tabela `catalogo`. |
 | [`carrega-dados.R`](carrega-dados.R) | Lê os CSVs gerados pela coleta, monta as tabelas relacionais e executa a carga principal no banco. |
 | [`utils.R`](utils.R) | Centraliza mapeamentos de colunas, consultas SQL parametrizadas, conexão com PostgreSQL e função de inserção linha a linha. |
 | [`utils-historico.R`](utils-historico.R) | Conta registros antes/depois da carga e registra o histórico em [`historico-cargas.csv`](historico-cargas.csv). |
@@ -104,15 +104,21 @@ As inserções são idempotentes por chave de negócio. As consultas em [`utils.
 data/catmat/catmat.rds
 ```
 
+O mapeamento OCDS usado automaticamente na mesma carga fica em:
+
+```text
+tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/outputs/tabela-mapeamento-ocds.csv
+```
+
 Execução:
 
 ```bash
 Rscript.exe src/ETL/loaders/carrega-catalogo.R data/catmat/catmat.rds
 ```
 
-O script seleciona até três características mais informativas por PDM, mantendo apenas características com mais de um valor distinto. Em seguida, grava características e unidades de fornecimento como `jsonb` no banco.
+O script respeita o caminho `.rds` informado, seleciona até três características mais informativas por PDM e grava características e unidades de fornecimento como `jsonb`. O CSV OCDS é localizado com `here::here()`, reduzido a `codigo_item` e `caracteristicas_ocds`, validado e integrado por `codigo_br = codigo_item`.
 
-> Observação: no estado atual do código, o script recebe um caminho `.rds`, mas redefine internamente `CAMINHO_CATALOGO` para `data/catmat/catmat.rds`. Mantenha esse arquivo atualizado antes de executar a carga.
+Itens sem correspondência no CSV recebem `NULL` em `caracteristicas_ocds`. A carga usa upsert, portanto uma versão futura do mapeamento pode atualizar itens já existentes. A versão atual e o procedimento de atualização do CSV estão documentados na [task `catalogo-caracteristicas-ocds`](../../../tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/README.md).
 
 ## Histórico e auditoria
 

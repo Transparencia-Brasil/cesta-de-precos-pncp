@@ -78,10 +78,11 @@ Armazena o catálogo CATMAT de medicamentos. Populada pelo loader [`carrega-cata
 | `item_ativo` | BOOLEAN | — | Indica se o item está ativo |
 | `item_sustentavel` | BOOLEAN | — | Indica critério de sustentabilidade |
 | `características` | **JSONB** | NOT NULL | Atributos técnicos do medicamento (estrutura variável por PDM) |
+| `caracteristicas_ocds` | **JSONB** | nullable | Atributos técnicos do medicamento mapeados para o padrão OCDS |
 | `unidades_fornecimento` | **JSONB** | NOT NULL | Unidades de fornecimento aceitas |
 | `data_insercao` | TIMESTAMP | DEFAULT NOW() | Timestamp automático de carga |
 
-**Comportamento em conflito:** `ON CONFLICT (codigo_item) DO NOTHING` — inserções duplicadas são ignoradas. Para atualizar o catálogo, o loader usa uma consulta de `DO UPDATE` separada.
+**Comportamento em conflito:** o loader usa `ON CONFLICT (codigo_item) DO UPDATE`, permitindo atualizar o catálogo e o mapeamento OCDS em cargas futuras. A consulta de inserção sem atualização permanece disponível em `utils.R` para usos específicos.
 
 ---
 
@@ -238,7 +239,7 @@ Os loaders em [`src/ETL/loaders/`](../loaders/) são responsáveis por popular o
 
 | Loader | Tabelas afetadas | Fonte de dados |
 | --- | --- | --- |
-| [`carrega-catalogo.R`](../loaders/carrega-catalogo.R) | `catalogo` | `data/catmat/catmat.rds` |
+| [`carrega-catalogo.R`](../loaders/carrega-catalogo.R) | `catalogo` | `data/catmat/catmat.rds` e `tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/outputs/tabela-mapeamento-ocds.csv` |
 | [`carrega-dados.R`](../loaders/carrega-dados.R) | `contratante`, `fornecedor`, `contratacao`, `item_homologado`, `item_licitado` | CSVs em `coleta/<periodo>/` |
 
 A ordem de inserção dentro de `carrega-dados.R` respeita as dependências de FK:

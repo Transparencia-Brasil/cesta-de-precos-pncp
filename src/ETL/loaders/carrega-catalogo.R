@@ -36,14 +36,13 @@ if (length(args) < 1) {
 CAMINHO_CATALOGO <- args[1]
 
 # Verifica se a extensão do arquivo é .rds
-if (tolower(tools::file_ext(arg)) != ".rds") {
+if (tolower(tools::file_ext(CAMINHO_CATALOGO)) != "rds") {
   stop("Erro: O arquivo do catálogo deve ser no formato .rds.")
 }
 
-CAMINHO_CATALOGO <- here("data/catmat/catmat.rds")
-
 # Lê os arquivos de dados
 catalogo <- readRDS(CAMINHO_CATALOGO)
+mapeamento_caracteristicas_ocds <- le_mapeamento_caracteristicas_ocds()
 
 # SELECIONA CARACTERÍSTICAS DOS MEDICAMENTOS ------------------------------
 
@@ -101,6 +100,12 @@ catalogo <- catalogo %>%
 catalogo <- catalogo %>%
   mutate(buscaItemCaracteristica = map(buscaItemCaracteristica, ~ filter(.x, manter == TRUE)))
 
+# Integra as características OCDS por codigo_br = codigo_item
+catalogo <- adiciona_caracteristicas_ocds(
+  catalogo,
+  mapeamento_caracteristicas_ocds
+)
+
 
 # TRANSFORMA A TABELA -----------------------------------------------------
 
@@ -126,7 +131,7 @@ con <- conecta_bd_medicamentos_transparentes()
 
 # INSERE OS DADOS ---------------------------------------------------------
 
-insere_tabela(con, tb_catalogo, CONSULTA_INSERIR_CATALOGO)
+insere_tabela(con, tb_catalogo, CONSULTA_UPDATE_CATALOGO)
 
 # Fechar conexão
 dbDisconnect(con)
