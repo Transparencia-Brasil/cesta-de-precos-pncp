@@ -26,6 +26,12 @@ con <- conecta_bd_medicamentos_transparentes()
 
 catalogo_bd <- get_query("select * from catalogo;")
 
+
+# DADO DE ENTRADA NO LOADER ----------------------------------------------------
+CAMINHO_CATALOGO <- here("data/catmat/catmat.rds")
+catalogo <- readRDS(CAMINHO_CATALOGO)
+
+
 # USANDO PACOTE ----------------------------------------------------------------
 
 # HIERARQUIA DE CÓDIGOS CATMAT
@@ -38,35 +44,68 @@ catalogo_bd <- get_query("select * from catalogo;")
 # │ codigoBr│ -- │ Código do item (mais granular)
 #
 
+
+# :: PDM -----------------------------------------------------------------------
+
 # obter PDM's da classe 6505
 pdms <- cnbsr::get_codigo_pdm_classe(6505, busca_classe = TRUE)
 
 pdms <- pdms |>
   select(
-    # --GRUPO
-    codigoGrupo,
+    # ---GRUPO
+    # codigoGrupo,
     descricaoGrupo,
     #statusGrupo,
-    # --CLASSE
-    codigoClasse,
+    # ---CLASSE
+    # codigoClasse,
     descricaoClasse,
     #nomeClasse, # (é igual a descricaoClasse)
     #statusClasse,
-    # --PDM
+    # ---PDM
     codigoPDM,
     descricaoPDM,
+    statusPDM,
     #codigoPdm,  # (é igual a codigoPDM)
     #nomePdm, # (é igual a descricaoPDM)
-    #statusPDM
   )
+
+# detalhes de Classe, Grupo e Conjunto (seja lá o que for isso)
+pdms <- pdms |>
+  mutate(pdms = map(codigoPDM, cnbsr::get_dados_basicos_pdm_por_codigo))
+
+pdms <- pdms |>
+  unnest(pdms, keep_empty = TRUE) |>
+  select(
+    # ---Conjunto
+    codigoConjunto, #?
+    nomeAcentuadoConjunto,
+    # ---GRUPO
+    codigoGrupo,
+    descricaoGrupo,
+    #nomeGrupo
+    # ---CLASSE
+    codigoClasse,
+    descricaoClasse,
+    #nomeClasse
+    # ---PDM
+    codigoPDM,
+    descricaoPDM,
+    statusPDM,
+    # ---Pdm
+    #codigoPdm,
+    #nomePdm,
+    #statusPdm
+  )
+
+
+# :: CODIGO BR -----------------------------------------------------------------
 
 # Dados de classe e grupo
 codbr_raw <- pdms |>
   select(codigoPDM, descricaoPDM) |>
   mutate(codbr = map(codigoPDM, cnbsr::get_material_caracteristica_valor_pdm_sem_filtro))
 
-
-# CodigoBr
+# CodigoBr e características
 codbr <- codbr_raw |>
   unnest(codbr, keep_empty = TRUE) |>
   select(
@@ -75,52 +114,99 @@ codbr <- codbr_raw |>
     codigoItem,
     # nomePdm,
     statusItem,
-    # itemSuspenso,
-    # itemSustentavel,
+    itemSuspenso,
+    itemSustentavel,
     # itemExclusivoUasgCentral,
     # codigoClasse,
     codigoNcm,
     nomeNcm,
     # aplicaMargemPreferencia,
-    # codigoCaracteristica,
-    # codigoValorCaracteristica,
-    # nomeCaracteristica,
-    # caracteristicaObrigatoria,
-    # statusCaracteristica,
-    # numeroCaracteristica,
-    # nomeValorCaracteristica,
-    # siglaUnidadeMedida,
-    # statusValorCaracteristica,
-    # tuplaCaracteristica
+    buscaItemCaracteristica,
+    # - codigoCaracteristica,
+    # - codigoValorCaracteristica,
+    # - nomeCaracteristica,
+    # - caracteristicaObrigatoria,
+    # - statusCaracteristica,
+    # - numeroCaracteristica,
+    # - nomeValorCaracteristica,
+    # - siglaUnidadeMedida,
+    # - statusValorCaracteristica,
+    # - tuplaCaracteristica
   )
 
-# descricaoItem
+# descricaoItem completa
 codbr <- codbr |>
-  mutate(
-    codbr = coalesce(codigoItem, codigoPDM) |>
-      map(cnbsr::get_dados_item_material_por_codigo)
+  mutate(codbr = coalesce(codigoItem, codigoPDM) |>
+    map(cnbsr::get_dados_item_material_por_codigo)
+  ) |>
+  unnest(codbr, keep_empty = TRUE)
+
+# Unidade de fornecimento (ex: "UN", "CX", "FR", etc)
+codbr <- codbr |>
+  filter(!is.na(codigoItem)) |>
+  mutate(unidadeFornecimento = map(
+    coalesce(codigoItem, codigoPDM),
+    cnbsr::get_unidade_fornecimento_por_codigo_item_material
+  ))
+
+
+# :: EXPORTAR PARA OCDS --------------------------------------------------------
+
+# aqui nós exportaremos o dado criação do campo `caracteristicas_ocds`
+# no repositório
+codbr |>
+  filter(statusItem) |>
+  select(
+    codigo_br = codigoItem,
+    desc_item = descricaoItem,
+    codigo_pdm = codigoPDM,
+    desc_pdm = descricaoPDM,
+    buscaItemCaracteristica
+  ) |>
+  unnest(buscaItemCaracteristica, keep_empty = TRUE) |>
+  select(
+    codigo_br,
+    desc_item,
+    codigo_pdm,
+    desc_pdm,
+    numeroCaracteristica,
+    nomeCaracteristica,
+    nomeValorCaracteristica,
+    siglaUnidadeMedida
+  ) |>
+  write_csv("caracteristicas-catmat.csv")
+
+
+# :: CATALOGO ------------------------------------------------------------------
+
+# essa é a tabela de catálogo que entra no loader, com as colunas que interessam para o banco de dados
+codbr_catalogo <- codbr |>
+  left_join(pdms) |>
+  transmute(
+    codigo_grupo = codigoGrupo,
+    nome_grupo = descricaoGrupo,
+    codigo_classe = codigoClasse,
+    nome_classe = descricaoClasse,
+    codigo_pdm = codigoPDM,
+    nome_pdm = descricaoPDM,
+    codigo_br = codigoItem,
+    nome_item = descricaoItem,
+    item_suspenso = itemSuspenso,
+    item_ativo = statusItem,
+    # desc_item_ativo = ...,
+    item_sustentavel = itemSustentavel,
+    # desc_item_sustentavel = ...,
+    buscaItemCaracteristica = map(buscaItemCaracteristica, select, -tuplaCaracteristica),
+    # classificacaoContabil = ...,
+    unidadeFornecimento
   )
 
 
- codbr_raw |>
-   unnest(codbr, keep_empty = TRUE) |>
-   filter(codigoItem == 267203) |>
-   unnest(buscaItemCaracteristica, keep_empty = TRUE, names_sep = "_") |>
-   select(-buscaItemCaracteristica_tuplaCaracteristica) |>
-   glimpse()
-
-catalogo_bd |>
-  filter(codigo_pdm == 17708) |>
-  filter(codigo_item == 267203) |>
-  glimpse()
-
-codbr |>
-  filter(descricaoPDM == "Dipirona Sódica") |>
-  unnest(codbr, keep_empty = TRUE) |>
-  count(statusItem) |>
-  print(n = Inf)
 
 # Documentação
 ?cnbsr::get_codigo_pdm_classe
 ?cnbsr::get_material_caracteristica_valor_pdm_sem_filtro
 ?cnbsr::get_dados_item_material_por_codigo
+?cnbsr::get_unidade_fornecimento_por_codigo_item_material
+
+codbr_catalogo
