@@ -21,7 +21,11 @@ library(here)
 
 
 # :: OUTPUTS -------------------------------------------------------------------
-PATH_OCDS <- here("tasks/atualiza-catmat/outputs/catalogo-ocds.csv")
+
+# esse arquivo entrará no repositório `medicine-extension `e será usado para criar o campo `caracteristicas_ocds` no banco de dados
+PATH_OCDS <- here("tasks/atualiza-catmat/outputs/caracteristicas-catmat.csv")
+
+# essa será a versão atualizada do catálogo de materiais que entrará no loader do banco de dados
 PATH_CATALOGO_ATUALIZADO <- here("tasks/atualiza-catmat/outputs/catalogo-atualizado.rds")
 
 
@@ -144,6 +148,8 @@ codbr <- codbr |>
 
 
 # :: EXPORTAR PARA OCDS --------------------------------------------------------
+
+# esse arquivo entrará no repositório `medicine-extension `e será usado para criar o campo `caracteristicas_ocds` no banco de dados
 
 # aqui nós exportaremos o dado criação do campo `caracteristicas_ocds`
 # no repositório
