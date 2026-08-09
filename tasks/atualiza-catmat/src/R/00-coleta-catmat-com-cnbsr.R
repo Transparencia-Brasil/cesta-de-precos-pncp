@@ -26,7 +26,7 @@ library(here)
 PATH_OCDS <- here("tasks/atualiza-catmat/outputs/caracteristicas-catmat.csv")
 
 # essa será a versão atualizada do catálogo de materiais que entrará no loader do banco de dados
-PATH_CATALOGO_ATUALIZADO <- here("tasks/atualiza-catmat/outputs/catalogo-atualizado.rds")
+PATH_CATALOGO_ATUALIZADO <- here("tasks/atualiza-catmat/outputs/catmat.rds")
 
 
 # :: USANDO PACOTE -------------------------------------------------------------
