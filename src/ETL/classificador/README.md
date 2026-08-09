@@ -43,7 +43,7 @@ Cada item do PNCP tem sua descrição normalizada (remoção de acentos, stopwor
 
 ### 2. Vetorização (geração de embeddings)
 
-As descrições dos itens candidatos e dos medicamentos do catálogo são transformadas em vetores numéricos pelo modelo de linguagem. Os embeddings do catálogo são calculados uma única vez e armazenados em cache (`catalogo-vetorizado.csv`), evitando reprocessamento nas execuções seguintes.
+As descrições dos itens candidatos e dos medicamentos do catálogo são transformadas em vetores numéricos pelo modelo de linguagem. Os embeddings do catálogo são calculados uma única vez e armazenados em cache (`catalogo-vetorizado.csv`), evitando reprocessamento nas execuções seguintes. O classificador usa o CSV versionado mais recente no formato `data/catmat/catmat-N.csv`. O cache registra a versão e o SHA-256 desse arquivo e é regenerado automaticamente quando o conteúdo do CATMAT muda.
 
 ### 3. Comparação por similaridade
 
@@ -82,7 +82,7 @@ O threshold de 0,5 foi determinado por análise experimental como o valor que ma
 
 - **Dependências Python:** listadas em [`requirements.txt`](../../../requirements.txt) (`sentence-transformers`, `nltk`, `pandas`, `numpy`).
 - **Modelo de embedding:** baixado automaticamente do Hugging Face na primeira execução. Requer conexão com a internet apenas nesse momento.
-- **Cache:** o arquivo `catalogo-vetorizado.csv` armazena os embeddings do catálogo. É regenerado automaticamente se o modelo mudar ou se o cache for incompatível.
+- **Cache:** o arquivo `catalogo-vetorizado.csv` armazena os embeddings e os metadados do catálogo. É regenerado automaticamente se o modelo, a versão ou o SHA-256 do CATMAT mudar, ou se o cache for incompatível.
 - **Parametrização opcional:**
   - `EMBEDDING_MODEL` — troca o modelo de embeddings (padrão: `Snowflake/snowflake-arctic-embed-l-v2.0`).
   - `CATALOGO_VETORIZADO_PATH` — define um caminho alternativo para o cache de embeddings.
