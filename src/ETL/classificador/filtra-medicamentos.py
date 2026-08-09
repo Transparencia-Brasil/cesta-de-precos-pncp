@@ -25,8 +25,10 @@ cada execução do script.
 """
 
 import argparse  # Conversor para opções de linha de comando
+import hashlib  # Funções de hash para identificar a versão exata do catálogo
 import json  # Codificador e decodificador JSON
 import os  # Sistema operacional
+import re  # Expressões regulares
 import unicodedata  # Unicode Database
 
 import nltk  # Natural Language ToolKit
@@ -63,9 +65,32 @@ dir_catalogo = os.path.dirname(args.catalogo)
 
 # Carrega os dados
 catmat_df = pd.read_csv(args.catalogo)  # CATMAT (fonte)
+
 # Mantém uma cópia da fonte para reprocessar o catálogo quando necessário
 catmat_src_df = catmat_df.copy()
 itens_df = pd.read_csv(args.itens, on_bad_lines='warn', encoding='utf-8', engine='python')      # Itens PNCP
+
+CATMAT_COLUNAS_OBRIGATORIAS = {'codigo_pdm', 'nome_pdm', 'codigo_br', 'nome_item'}
+colunas_ausentes = CATMAT_COLUNAS_OBRIGATORIAS.difference(catmat_src_df.columns)
+if colunas_ausentes:
+    raise ValueError(
+        'O catálogo não contém as colunas obrigatórias: '
+        + ', '.join(sorted(colunas_ausentes))
+    )
+
+
+def _calcula_sha256(caminho: str) -> str:
+    """Calcula o SHA-256 de um arquivo sem carregá-lo integralmente em memória."""
+    digest = hashlib.sha256()
+    with open(caminho, 'rb') as arquivo:
+        for bloco in iter(lambda: arquivo.read(1024 * 1024), b''):
+            digest.update(bloco)
+    return digest.hexdigest()
+
+
+catalogo_sha256 = _calcula_sha256(args.catalogo)
+versao_match = re.fullmatch(r'catmat-(\d+)\.csv', os.path.basename(args.catalogo))
+catalogo_versao = versao_match.group(1) if versao_match else 'sem-versao'
 
 
 ### DETECÇÃO DE PDMS ######################################################################
@@ -215,6 +240,8 @@ def _vectoriza_e_salva_catalogo(src_df: pd.DataFrame, output_csv: str) -> pd.Dat
     df_to_save['embedding'] = list(embeddings)
     df_to_save['embedding'] = df_to_save['embedding'].apply(lambda x: json.dumps(x.tolist()))
     df_to_save['embedding_model'] = model_name
+    df_to_save['catalogo_versao'] = catalogo_versao
+    df_to_save['catalogo_sha256'] = catalogo_sha256
     print(f'\rVetorização do catálogo completa. Resultados salvos em {output_csv}', end="\n")
     df_to_save.to_csv(output_csv, index=False)
 
@@ -230,32 +257,26 @@ if not os.path.exists(NOME_CATALOGO_VETORIZADO):
 else:
     cache_df = pd.read_csv(NOME_CATALOGO_VETORIZADO)
 
-    # Verifica compatibilidade do cache
+    # O cache só é reutilizado quando foi gerado pelo mesmo modelo e a partir dos
+    # mesmos bytes do catálogo versionado. Caches legados são regenerados.
+    metadados_esperados = {
+        'embedding_model': model_name,
+        'catalogo_versao': catalogo_versao,
+        'catalogo_sha256': catalogo_sha256,
+    }
     needs_revectorize = False
-    if 'embedding_model' in cache_df.columns:
-        cache_model = str(cache_df['embedding_model'].iloc[0])
-        if cache_model != model_name:
-            print(f"\rModelo do cache ('{cache_model}') difere do modelo atual ('{model_name}'); recalculando...", end="", flush=True)
+
+    for coluna, valor_esperado in metadados_esperados.items():
+        if coluna not in cache_df.columns or cache_df.empty:
+            print(f"\rCache sem metadado '{coluna}'; recalculando...", end="", flush=True)
             needs_revectorize = True
-    else:
-        # Cache legado: checar dimensão
-        try:
-            # Olha a primeira linha válida
-            first_emb = None
-            for val in cache_df['embedding']:
-                if isinstance(val, str) and val.strip():
-                    first_emb = np.array(json.loads(val))
-                    break
-            if first_emb is not None:
-                expected_dim = getattr(model, 'get_sentence_embedding_dimension', lambda: len(model.encode(["."])[0]))()
-                if len(first_emb) != expected_dim:
-                    print(f"\rDimensão do cache ({len(first_emb)}) difere da dimensão do modelo ({expected_dim}); recalculando...", end="", flush=True)
-                    needs_revectorize = True
-                else:
-                    print(f"\rDimensão do cache compatível com o modelo ({expected_dim}); usando cache.", end="", flush=True)
-        except Exception:
-            # Em caso de erro ao ler, força revectorização para segurança
+            break
+
+        valores_cache = cache_df[coluna].dropna().astype(str).unique()
+        if len(valores_cache) != 1 or valores_cache[0] != valor_esperado:
+            print(f"\rMetadado '{coluna}' do cache difere do catálogo/modelo atual; recalculando...", end="", flush=True)
             needs_revectorize = True
+            break
 
     if needs_revectorize:
         catmat_df = _vectoriza_e_salva_catalogo(catmat_src_df, NOME_CATALOGO_VETORIZADO)
