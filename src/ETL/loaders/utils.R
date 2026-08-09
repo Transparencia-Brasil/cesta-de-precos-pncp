@@ -178,9 +178,7 @@ suppressPackageStartupMessages(library(dotenv))
 #' @param caminho Caminho do CSV versionado com o mapeamento OCDS.
 #'
 #' @return Dataframe com `codigo_item` e `caracteristicas_ocds`.
-le_mapeamento_caracteristicas_ocds <- function(
-  caminho = here::here("data/catmat/tabela-mapeamento-ocds.csv")
-) {
+le_mapeamento_caracteristicas_ocds <- function(caminho) {
   colunas_esperadas <- c("codigo_item", "caracteristicas_ocds")
 
   mapeamento <- readr::read_csv(
@@ -244,7 +242,7 @@ le_mapeamento_caracteristicas_ocds <- function(
 #' @return Catálogo enriquecido por `codigo_br = codigo_item`.
 adiciona_caracteristicas_ocds <- function(
   catalogo,
-  mapeamento = le_mapeamento_caracteristicas_ocds()
+  mapeamento
 ) {
   if ("caracteristicas_ocds" %in% names(catalogo)) {
     catalogo$caracteristicas_ocds <- NULL

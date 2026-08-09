@@ -1,7 +1,8 @@
 #' Este script insere os dados do catálogo de itens no banco de dados configurado.
 #'
-#' O parâmetro de entrada obrigatório é o caminho para o arquivo do catálogo em
-#' formato .rds.
+#' O parâmetro de entrada obrigatório é o caminho para o arquivo versionado do
+#' catálogo no formato `catmat-N.rds`. O mapeamento OCDS correspondente deve
+#' estar no mesmo diretório, no formato `tabela-mapeamento-ocds-N.csv`.
 #'
 #' O catálogo foi obtido a partir da seguinte API:
 #' https://cnbs.estaleiro.serpro.gov.br/cnbs-api/swagger-ui/index.html#/
@@ -28,21 +29,55 @@ args <- commandArgs(trailingOnly = TRUE)
 # Verifica se os argumentos foram fornecidos corretamente
 if (length(args) < 1) {
   stop(
-    "Uso correto: Rscript carrega-catalogo.R <catalogo.rds>"
+    "Uso correto: Rscript carrega-catalogo.R <catmat-N.rds>"
   )
 }
 
 # Lê os argumentos
-CAMINHO_CATALOGO <- args[1]
+# CAMINHO_CATALOGO <- args[1]
+CAMINHO_CATALOGO <- here("data/catmat/catmat-1.rds")
+
+# Verifica se o arquivo do catálogo existe
+if (!file.exists(CAMINHO_CATALOGO)) {
+  stop(sprintf("O arquivo do catálogo não foi encontrado: %s", CAMINHO_CATALOGO))
+}
 
 # Verifica se a extensão do arquivo é .rds
 if (tolower(tools::file_ext(CAMINHO_CATALOGO)) != "rds") {
-  stop("Erro: O arquivo do catálogo deve ser no formato .rds.")
+  stop("O arquivo do catálogo deve ser no formato .rds.")
 }
 
+# Extrai a versão do nome do catálogo
+nome_catalogo <- basename(CAMINHO_CATALOGO)
+
+# checa se o nome do catálogo segue o padrão catmat-N.rds, em que N é a versão numérica
+correspondencia_versao <- regexec("^catmat-([0-9]+)\\.rds$", nome_catalogo, ignore.case = TRUE)
+partes_nome_catalogo <- regmatches(nome_catalogo, correspondencia_versao)[[1]]
+
+if (length(partes_nome_catalogo) == 0) {
+  stop("O nome do catálogo deve seguir o padrão catmat-N.rds, em que N é a versão numérica.")
+}
+
+# Definição da versão do catálogo a partir do nome do arquivo
+versao_catalogo <- partes_nome_catalogo[[2]]
+
+# Define o caminho do arquivo de mapeamento OCDS correspondente à versão do catálogo
+CAMINHO_MAPEAMENTO_OCDS <- file.path(dirname(CAMINHO_CATALOGO), sprintf("tabela-mapeamento-ocds-%s.csv", versao_catalogo))
+
+if (!file.exists(CAMINHO_MAPEAMENTO_OCDS)) {
+  stop(sprintf("O mapeamento OCDS da versão %s não foi encontrado: %s", versao_catalogo, CAMINHO_MAPEAMENTO_OCDS))
+}
+
+
+# LOAD FILES -----------------------------------------------------------------
+
 # Lê os arquivos de dados
-catalogo <- readRDS(CAMINHO_CATALOGO)
-mapeamento_caracteristicas_ocds <- le_mapeamento_caracteristicas_ocds()
+catalogo <- readRDS(CAMINHO_CATALOGO) |>
+  # Converte codigo_br para character para evitar problemas de join com o mapeamento OCDS
+  mutate(codigo_br = as.character(codigo_br))
+
+mapeamento_caracteristicas_ocds <- le_mapeamento_caracteristicas_ocds(CAMINHO_MAPEAMENTO_OCDS)
+
 
 # SELECIONA CARACTERÍSTICAS DOS MEDICAMENTOS ------------------------------
 
@@ -91,7 +126,8 @@ catalogo <- catalogo %>%
       nomeValorCaracteristica,
       siglaUnidadeMedida,
       statusValorCaracteristica,
-      manter
+      manter,
+      n_valores_unicos
     )
   ) %>%
   ungroup()
@@ -101,10 +137,7 @@ catalogo <- catalogo %>%
   mutate(buscaItemCaracteristica = map(buscaItemCaracteristica, ~ filter(.x, manter == TRUE)))
 
 # Integra as características OCDS por codigo_br = codigo_item
-catalogo <- adiciona_caracteristicas_ocds(
-  catalogo,
-  mapeamento_caracteristicas_ocds
-)
+catalogo <- adiciona_caracteristicas_ocds(catalogo, mapeamento_caracteristicas_ocds)
 
 
 # TRANSFORMA A TABELA -----------------------------------------------------
