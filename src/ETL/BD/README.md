@@ -239,7 +239,7 @@ Os loaders em [`src/ETL/loaders/`](../loaders/) são responsáveis por popular o
 
 | Loader | Tabelas afetadas | Fonte de dados |
 | --- | --- | --- |
-| [`carrega-catalogo.R`](../loaders/carrega-catalogo.R) | `catalogo` | `data/catmat/catmat.rds` e `tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/outputs/tabela-mapeamento-ocds.csv` |
+| [`carrega-catalogo.R`](../loaders/carrega-catalogo.R) | `catalogo` | `data/catmat/catmat-N.rds` e `data/catmat/tabela-mapeamento-ocds-N.csv` |
 | [`carrega-dados.R`](../loaders/carrega-dados.R) | `contratante`, `fornecedor`, `contratacao`, `item_homologado`, `item_licitado` | CSVs em `coleta/<periodo>/` |
 
 A ordem de inserção dentro de `carrega-dados.R` respeita as dependências de FK:

@@ -98,25 +98,25 @@ As inserções são idempotentes por chave de negócio. As consultas em [`utils.
 
 ## Carga do catálogo CATMAT
 
-`carrega-catalogo.R` carrega medicamentos do CATMAT para a tabela `catalogo`. O catálogo de referência esperado pelo projeto fica em:
+`carrega-catalogo.R` carrega medicamentos do CATMAT para a tabela `catalogo`. O catálogo de referência atual do projeto fica em:
 
 ```text
-data/catmat/catmat.rds
+data/catmat/catmat-1.rds
 ```
 
-O mapeamento OCDS usado automaticamente na mesma carga fica em:
+O mapeamento OCDS correspondente fica no mesmo diretório:
 
 ```text
-tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/outputs/tabela-mapeamento-ocds.csv
+data/catmat/tabela-mapeamento-ocds-1.csv
 ```
 
 Execução:
 
 ```bash
-Rscript.exe src/ETL/loaders/carrega-catalogo.R data/catmat/catmat.rds
+Rscript.exe src/ETL/loaders/carrega-catalogo.R data/catmat/catmat-1.rds
 ```
 
-O script respeita o caminho `.rds` informado, seleciona até três características mais informativas por PDM e grava características e unidades de fornecimento como `jsonb`. O CSV OCDS é localizado com `here::here()`, reduzido a `codigo_item` e `caracteristicas_ocds`, validado e integrado por `codigo_br = codigo_item`.
+O nome do RDS deve seguir o padrão `catmat-N.rds`. O loader extrai a versão `N` e exige, no mesmo diretório, o arquivo `tabela-mapeamento-ocds-N.csv`. Assim, versões atuais e históricas são sempre carregadas com o respectivo mapeamento. Em seguida, o script seleciona até três características mais informativas por PDM e grava características e unidades de fornecimento como `jsonb`. O CSV OCDS é reduzido a `codigo_item` e `caracteristicas_ocds`, validado e integrado por `codigo_br = codigo_item`.
 
 Itens sem correspondência no CSV recebem `NULL` em `caracteristicas_ocds`. A carga usa upsert, portanto uma versão futura do mapeamento pode atualizar itens já existentes. A versão atual e o procedimento de atualização do CSV estão documentados na [task `catalogo-caracteristicas-ocds`](../../../tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/README.md).
 
