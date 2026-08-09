@@ -179,10 +179,7 @@ suppressPackageStartupMessages(library(dotenv))
 #'
 #' @return Dataframe com `codigo_item` e `caracteristicas_ocds`.
 le_mapeamento_caracteristicas_ocds <- function(
-  caminho = here::here(
-    "tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds",
-    "outputs/tabela-mapeamento-ocds.csv"
-  )
+  caminho = here::here("data/catmat/tabela-mapeamento-ocds.csv")
 ) {
   colunas_esperadas <- c("codigo_item", "caracteristicas_ocds")
 
