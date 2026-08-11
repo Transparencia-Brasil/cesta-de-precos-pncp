@@ -29,13 +29,26 @@ args <- commandArgs(trailingOnly = TRUE)
 # Verifica se os argumentos foram fornecidos corretamente
 if (length(args) < 1) {
   stop(
-    "Uso correto: Rscript carrega-catalogo.R <catmat-N.rds>"
+    paste0(
+      "Uso correto: Rscript carrega-catalogo.R <catmat-N.rds> ",
+      "[--validar-apenas]"
+    )
   )
 }
 
 # Lê os argumentos
-# CAMINHO_CATALOGO <- args[1]
-CAMINHO_CATALOGO <- here("data/catmat/catmat-1.rds")
+CAMINHO_CATALOGO <- args[1]
+opcoes <- args[-1]
+opcoes_invalidas <- setdiff(opcoes, "--validar-apenas")
+
+if (length(opcoes_invalidas) > 0) {
+  stop(sprintf(
+    "Opção desconhecida: %s.",
+    paste(opcoes_invalidas, collapse = ", ")
+  ))
+}
+
+VALIDAR_APENAS <- "--validar-apenas" %in% opcoes
 
 # Verifica se o arquivo do catálogo existe
 if (!file.exists(CAMINHO_CATALOGO)) {
