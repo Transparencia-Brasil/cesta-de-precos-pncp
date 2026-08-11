@@ -47,6 +47,7 @@ CAMINHO_RESULTADOS <- args[3]
 contratacoes <- read_csv(CAMINHO_CONTRATACOES, show_col_types = FALSE)
 medicamentos <- read_csv(CAMINHO_MEDICAMENTOS, show_col_types = FALSE)
 resultados <- read_csv(CAMINHO_RESULTADOS, show_col_types = FALSE)
+classificacao_compras_judiciais <- le_classificacao_compras_judiciais()
 
 list(
   nrow(contratacoes),
@@ -102,6 +103,12 @@ contratacoes <- contratacoes %>%
 # Filtra somente as contratações de medicamentos
 contratacoes <- contratacoes %>%
   semi_join(medicamentos, by = join_by(endpoint == endpointContratacao))
+
+# Adiciona a classificação versionada de compras judiciais
+contratacoes <- adiciona_classificacao_compras_judiciais(
+  contratacoes,
+  classificacao_compras_judiciais
+)
 
 
 # EXTRAI TABELAS----------------------------------------------------------
