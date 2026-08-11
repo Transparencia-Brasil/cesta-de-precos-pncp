@@ -116,9 +116,18 @@ Execução:
 Rscript.exe src/ETL/loaders/carrega-catalogo.R data/catmat/catmat-1.rds
 ```
 
+Validação completa da fonte, sem abrir conexão com o banco:
+
+```bash
+Rscript.exe src/ETL/loaders/carrega-catalogo.R \
+  data/catmat/catmat-1.rds --validar-apenas
+```
+
 O nome do RDS deve seguir o padrão `catmat-N.rds`. O loader extrai a versão `N` e exige, no mesmo diretório, o arquivo `tabela-mapeamento-ocds-N.csv`. Assim, versões atuais e históricas são sempre carregadas com o respectivo mapeamento. Em seguida, o script seleciona até três características mais informativas por PDM e grava características e unidades de fornecimento como `jsonb`. O CSV OCDS é reduzido a `codigo_item` e `caracteristicas_ocds`, validado e integrado por `codigo_br = codigo_item`.
 
-Itens sem correspondência no CSV recebem `NULL` em `caracteristicas_ocds`. A carga usa upsert, portanto uma versão futura do mapeamento pode atualizar itens já existentes. A versão atual e o procedimento de atualização do CSV estão documentados na [task `catalogo-caracteristicas-ocds`](../../../tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/README.md).
+Itens sem correspondência no CSV recebem `NULL` em `caracteristicas_ocds`. Códigos do mapeamento que não pertencem ao RDS interrompem a carga por indicarem versões incompatíveis.
+
+A carga usa um upsert híbrido: atualiza os códigos presentes na fonte, insere códigos novos e preserva registros antigos ausentes na nova versão. Todos os upserts e as verificações finais são executados em uma única transação; qualquer erro provoca rollback. `data_insercao` é preservada e `data_atualizacao` registra o upsert mais recente. O procedimento de migração, backup e reversão está documentado na [task `catalogo-upsert-atomico`](../../../tasks/alteracoes-no-banco-de-dados/catalogo-upsert-atomico/README.md). A versão atual e a atualização do CSV OCDS estão documentadas na [task `catalogo-caracteristicas-ocds`](../../../tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/README.md).
 
 ## Histórico e auditoria
 

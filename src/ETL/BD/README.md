@@ -83,7 +83,7 @@ Armazena o catálogo CATMAT de medicamentos. Populada pelo loader [`carrega-cata
 | `data_insercao` | TIMESTAMP | DEFAULT NOW() | Timestamp automático de carga |
 | `data_atualizacao` | TIMESTAMP | NOT NULL, DEFAULT NOW() | Inserção ou atualização mais recente pelo loader do catálogo |
 
-**Comportamento em conflito:** o loader usa `ON CONFLICT (codigo_item) DO UPDATE`, permitindo atualizar o catálogo e o mapeamento OCDS em cargas futuras. A consulta de inserção sem atualização permanece disponível em `utils.R` para usos específicos.
+**Comportamento em conflito:** o loader usa `ON CONFLICT (codigo_item) DO UPDATE`, atualiza `data_atualizacao`, insere códigos novos e preserva códigos antigos ausentes na fonte. A carga é transacional e qualquer erro reverte todos os upserts. A consulta de inserção sem atualização permanece disponível em `utils.R` para usos específicos.
 
 ---
 
