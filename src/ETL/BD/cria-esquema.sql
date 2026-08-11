@@ -66,12 +66,8 @@ CREATE TABLE contratacao (
     nome_amparo_legal VARCHAR(100) NOT NULL,
     codigo_modo_disputa SMALLINT NOT NULL,
     nome_modo_disputa VARCHAR(100) NOT NULL,
-    compra_judicial BOOLEAN,
     data_insercao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-COMMENT ON COLUMN contratacao.compra_judicial IS
-  'Indica se o objeto da contratação contém possível referência a demanda judicial.';
 
 CREATE TABLE item_homologado (
     numero_controle_pncp VARCHAR(30),

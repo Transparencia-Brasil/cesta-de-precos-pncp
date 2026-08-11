@@ -7,7 +7,7 @@ Use este diretório para duas cargas principais:
 | Script | Entrada | Tabelas afetadas |
 | --- | --- | --- |
 | [`carrega-catalogo.R`](carrega-catalogo.R) | Catálogo CATMAT em `.rds` e mapeamento OCDS versionado | `catalogo` |
-| [`carrega-dados.R`](carrega-dados.R) | CSVs de contratações, medicamentos e resultados, mais a classificação versionada de compras judiciais | `contratante`, `fornecedor`, `contratacao`, `item_homologado`, `item_licitado` |
+| [`carrega-dados.R`](carrega-dados.R) | CSVs de contratações, medicamentos e resultados | `contratante`, `fornecedor`, `contratacao`, `item_homologado`, `item_licitado` |
 
 ## Arquivos do diretório
 
@@ -80,7 +80,6 @@ Durante a transformação, o script:
 - remove linhas sem `endpoint`;
 - reconstrói URLs de rastreabilidade (`urlAPI` e `urlPNCP`);
 - mantém somente contratações que possuem itens classificados como medicamentos;
-- integra a classificação de compras judiciais por `numero_controle_pncp`;
 - inclui contratantes principais e, quando existirem, contratantes sub-rogados;
 - separa itens com resultado em `item_homologado` e itens sem resultado em `item_licitado`;
 - preenche como `NA` colunas opcionais ausentes nos CSVs de entrada.
@@ -96,14 +95,6 @@ A ordem de inserção respeita as dependências do schema:
 ```
 
 As inserções são idempotentes por chave de negócio. As consultas em [`utils.R`](utils.R) usam `ON CONFLICT`: contratantes e fornecedores duplicados são ignorados, enquanto contratações e itens já existentes são atualizados com os dados mais recentes.
-
-A classificação de compras judiciais usada automaticamente pelo loader fica em:
-
-```text
-tasks/alteracoes-no-banco-de-dados/verifica-compras-judiciais/outputs/compras-judiciais-completo.csv
-```
-
-O arquivo é localizado com `here::here()`, reduzido a `numero_controle_pncp` e `compra_judicial` e validado antes da conexão com o banco. Chaves duplicadas, ausentes ou vazias e valores diferentes de `True` ou `False` interrompem a carga. Contratações sem correspondência recebem `NULL`; o upsert permite atualizar classificações existentes quando o CSV versionado mudar.
 
 ## Carga do catálogo CATMAT
 

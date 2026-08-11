@@ -90,8 +90,7 @@ suppressPackageStartupMessages(library(dotenv))
     "data.amparoLegal.codigo",
     "data.amparoLegal.nome",
     "data.modoDisputaId",
-    "data.modoDisputaNome",
-    "compra_judicial"
+    "data.modoDisputaNome"
   )
 
   COLUNAS_ITEM_HOMOLOGADO <- c(
@@ -261,105 +260,6 @@ adiciona_caracteristicas_ocds <- function(
   )
 }
 
-#' Lê e valida a classificação versionada de compras judiciais
-#'
-#' @param caminho Caminho do CSV versionado com a classificação.
-#'
-#' @return Dataframe com `numero_controle_pncp` e `compra_judicial`.
-le_classificacao_compras_judiciais <- function(
-  caminho = here::here(
-    "tasks/alteracoes-no-banco-de-dados/verifica-compras-judiciais",
-    "outputs/compras-judiciais-completo.csv"
-  )
-) {
-  colunas_esperadas <- c("numero_controle_pncp", "compra_judicial")
-
-  classificacao <- readr::read_csv(
-    caminho,
-    col_types = readr::cols(.default = readr::col_character()),
-    show_col_types = FALSE,
-    progress = FALSE
-  )
-
-  colunas_ausentes <- setdiff(colunas_esperadas, names(classificacao))
-  if (length(colunas_ausentes) > 0) {
-    stop(sprintf(
-      "A classificação de compras judiciais não contém as colunas obrigatórias: %s.",
-      paste(colunas_ausentes, collapse = ", ")
-    ))
-  }
-
-  classificacao <- classificacao[, colunas_esperadas, drop = FALSE]
-  classificacao$numero_controle_pncp <- trimws(
-    classificacao$numero_controle_pncp
-  )
-  classificacao$compra_judicial <- trimws(classificacao$compra_judicial)
-
-  chaves_ausentes <- is.na(classificacao$numero_controle_pncp) |
-    classificacao$numero_controle_pncp == ""
-  if (any(chaves_ausentes)) {
-    stop(paste(
-      "A classificação de compras judiciais contém",
-      "numero_controle_pncp ausente ou vazio."
-    ))
-  }
-
-  chaves_duplicadas <- unique(
-    classificacao$numero_controle_pncp[
-      duplicated(classificacao$numero_controle_pncp)
-    ]
-  )
-  if (length(chaves_duplicadas) > 0) {
-    stop(sprintf(
-      "A classificação de compras judiciais contém numero_controle_pncp duplicado: %s.",
-      paste(utils::head(chaves_duplicadas, 10), collapse = ", ")
-    ))
-  }
-
-  valores_booleanos <- tolower(classificacao$compra_judicial)
-  booleanos_invalidos <- is.na(valores_booleanos) |
-    !valores_booleanos %in% c("true", "false")
-  if (any(booleanos_invalidos)) {
-    valores_invalidos <- unique(ifelse(
-      is.na(classificacao$compra_judicial[booleanos_invalidos]),
-      "<NA>",
-      classificacao$compra_judicial[booleanos_invalidos]
-    ))
-    stop(sprintf(
-      paste(
-        "A classificação de compras judiciais contém valores inválidos em",
-        "compra_judicial: %s. Use somente True ou False."
-      ),
-      paste(utils::head(valores_invalidos, 10), collapse = ", ")
-    ))
-  }
-
-  classificacao$compra_judicial <- valores_booleanos == "true"
-
-  classificacao
-}
-
-#' Adiciona a classificação de compra judicial às contratações
-#'
-#' @param contratacoes Dataframe de contratações coletadas do PNCP.
-#' @param classificacao Dataframe validado com a classificação.
-#'
-#' @return Contratações enriquecidas por `data.numeroControlePNCP`.
-adiciona_classificacao_compras_judiciais <- function(
-  contratacoes,
-  classificacao = le_classificacao_compras_judiciais()
-) {
-  if ("compra_judicial" %in% names(contratacoes)) {
-    contratacoes$compra_judicial <- NULL
-  }
-
-  dplyr::left_join(
-    contratacoes,
-    classificacao,
-    by = c("data.numeroControlePNCP" = "numero_controle_pncp")
-  )
-}
-
 # Consultas de inserção no banco
 {
 
@@ -416,9 +316,9 @@ adiciona_classificacao_compras_judiciais <- function(
         codigo_tipo_instrumento_convocatorio, nome_tipo_instrumento_convocatorio,
         codigo_modalidade, nome_modalidade,
         codigo_amparo_legal, nome_amparo_legal,
-        codigo_modo_disputa, nome_modo_disputa, compra_judicial
+        codigo_modo_disputa, nome_modo_disputa
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
     ON CONFLICT (numero_controle_pncp)
     DO UPDATE SET
         objeto_compra = $4,
@@ -434,8 +334,7 @@ adiciona_classificacao_compras_judiciais <- function(
         codigo_amparo_legal = $14,
         nome_amparo_legal = $15,
         codigo_modo_disputa = $16,
-        nome_modo_disputa = $17,
-        compra_judicial = $18;"
+        nome_modo_disputa = $17;"
 
   # Insere um item homologado novo ou, caso o item já exista no banco, atualiza os campos
   CONSULTA_INSERIR_ITEM_HOMOLOGADO <- "

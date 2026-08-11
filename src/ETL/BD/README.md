@@ -155,10 +155,9 @@ Compras públicas registradas no PNCP. Cada registro corresponde a um processo l
 | `nome_amparo_legal` | VARCHAR(100) | NOT NULL | Descrição do amparo legal (Lei 14.133/2021, etc.) |
 | `codigo_modo_disputa` | SMALLINT | NOT NULL | Código do modo de disputa |
 | `nome_modo_disputa` | VARCHAR(100) | NOT NULL | Descrição do modo de disputa (aberto, fechado, etc.) |
-| `compra_judicial` | BOOLEAN | nullable | Indica possível referência a demanda judicial no objeto da contratação |
 | `data_insercao` | TIMESTAMP | DEFAULT NOW() | Timestamp automático de carga |
 
-**Comportamento em conflito:** `ON CONFLICT (numero_controle_pncp) DO UPDATE` — atualiza os campos de valor, data, modalidade e a classificação de compra judicial com os dados mais recentes.
+**Comportamento em conflito:** `ON CONFLICT (numero_controle_pncp) DO UPDATE` — atualiza todos os campos de valor, data e modalidade com os dados mais recentes.
 
 ---
 
@@ -241,7 +240,7 @@ Os loaders em [`src/ETL/loaders/`](../loaders/) são responsáveis por popular o
 | Loader | Tabelas afetadas | Fonte de dados |
 | --- | --- | --- |
 | [`carrega-catalogo.R`](../loaders/carrega-catalogo.R) | `catalogo` | `data/catmat/catmat.rds` e `tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/outputs/tabela-mapeamento-ocds.csv` |
-| [`carrega-dados.R`](../loaders/carrega-dados.R) | `contratante`, `fornecedor`, `contratacao`, `item_homologado`, `item_licitado` | CSVs em `coleta/<periodo>/` e classificação versionada de compras judiciais |
+| [`carrega-dados.R`](../loaders/carrega-dados.R) | `contratante`, `fornecedor`, `contratacao`, `item_homologado`, `item_licitado` | CSVs em `coleta/<periodo>/` |
 
 A ordem de inserção dentro de `carrega-dados.R` respeita as dependências de FK:
 
@@ -254,8 +253,6 @@ A ordem de inserção dentro de `carrega-dados.R` respeita as dependências de F
 ```
 
 As queries SQL parametrizadas ficam centralizadas em [`src/ETL/loaders/utils.R`](../loaders/utils.R), que também expõe a função `conecta_bd_medicamentos_transparentes()` para leitura das variáveis do `.env`.
-
-A coluna `contratacao.compra_judicial` é preenchida automaticamente a partir de [`compras-judiciais-completo.csv`](../../../tasks/alteracoes-no-banco-de-dados/verifica-compras-judiciais/outputs/compras-judiciais-completo.csv). O loader relaciona a classificação por `numero_controle_pncp`; contratações sem correspondência permanecem com `NULL`.
 
 ---
 
