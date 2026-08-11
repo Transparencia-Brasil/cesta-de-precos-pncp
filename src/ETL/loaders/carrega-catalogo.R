@@ -3,6 +3,7 @@
 #' O parâmetro de entrada obrigatório é o caminho para o arquivo versionado do
 #' catálogo no formato `catmat-N.rds`. O mapeamento OCDS correspondente deve
 #' estar no mesmo diretório, no formato `tabela-mapeamento-ocds-N.csv`.
+#' A opção `--validar-apenas` executa toda a preparação sem conectar ao banco.
 #'
 #' O catálogo foi obtido a partir da seguinte API:
 #' https://cnbs.estaleiro.serpro.gov.br/cnbs-api/swagger-ui/index.html#/
@@ -85,11 +86,16 @@ if (!file.exists(CAMINHO_MAPEAMENTO_OCDS)) {
 # LOAD FILES -----------------------------------------------------------------
 
 # Lê os arquivos de dados
-catalogo <- readRDS(CAMINHO_CATALOGO) |>
+catalogo <- readRDS(CAMINHO_CATALOGO)
+valida_catalogo_fonte(catalogo)
+total_catalogo_fonte <- dplyr::n_distinct(as.character(catalogo$codigo_br))
+
+catalogo <- catalogo |>
   # Converte codigo_br para character para evitar problemas de join com o mapeamento OCDS
   mutate(codigo_br = as.character(codigo_br))
 
 mapeamento_caracteristicas_ocds <- le_mapeamento_caracteristicas_ocds(CAMINHO_MAPEAMENTO_OCDS)
+valida_compatibilidade_mapeamento_ocds(catalogo, mapeamento_caracteristicas_ocds)
 
 
 # SELECIONA CARACTERÍSTICAS DOS MEDICAMENTOS ------------------------------
@@ -170,6 +176,16 @@ tb_catalogo <- catalogo %>%
   ) %>%
   select(-buscaItemCaracteristica, -unidadeFornecimento)
 
+valida_tabela_catalogo(tb_catalogo, total_catalogo_fonte)
+
+if (VALIDAR_APENAS) {
+  message(sprintf(
+    "Validação concluída: %d itens prontos para carga e nenhuma escrita realizada.",
+    total_catalogo_fonte
+  ))
+  quit(save = "no", status = 0)
+}
+
 
 # CONECTA-SE  COM O BD ----------------------------------------------------
 
@@ -177,7 +193,85 @@ con <- conecta_bd_medicamentos_transparentes()
 
 # INSERE OS DADOS ---------------------------------------------------------
 
-insere_tabela(con, tb_catalogo, CONSULTA_UPDATE_CATALOGO)
+tryCatch(DBI::dbWithTransaction(con, {
+  colunas_catalogo_banco <- DBI::dbListFields(con, "catalogo")
+  if (!"data_atualizacao" %in% colunas_catalogo_banco) {
+    stop(paste0(
+      "A coluna catalogo.data_atualizacao não existe. ",
+      "Aplique a migração antes da carga rodando ",
+      "`tasks/alteracoes-no-banco-de-dados/catalogo-upsert-atomico`."
+    ))
+  }
 
-# Fechar conexão
-dbDisconnect(con)
+  DBI::dbExecute(
+    con,
+    "LOCK TABLE catalogo IN SHARE ROW EXCLUSIVE MODE"
+  )
+
+  codigos_antes <- DBI::dbGetQuery(
+    con,
+    "SELECT codigo_item FROM catalogo"
+  )$codigo_item
+  total_antes <- length(codigos_antes)
+  codigos_fonte <- as.integer(tb_catalogo$codigo_br)
+  total_novos <- length(setdiff(codigos_fonte, codigos_antes))
+  total_esperado_depois <- total_antes + total_novos
+
+  total_processado <- insere_tabela(
+    con,
+    tb_catalogo,
+    CONSULTA_UPDATE_CATALOGO,
+    interromper_em_erro = TRUE
+  )
+
+  codigos_depois <- DBI::dbGetQuery(
+    con,
+    "SELECT codigo_item FROM catalogo"
+  )$codigo_item
+  total_depois <- length(codigos_depois)
+  codigos_fonte_ausentes <- setdiff(codigos_fonte, codigos_depois)
+  codigos_antigos_ausentes <- setdiff(codigos_antes, codigos_depois)
+
+  if (total_processado != total_catalogo_fonte) {
+    stop(sprintf(
+      "Carga incompleta: esperado processar %d itens, processados %d.",
+      total_catalogo_fonte,
+      total_processado
+    ))
+  }
+
+  if (total_depois != total_esperado_depois) {
+    stop(sprintf(
+      "Contagem final inválida: esperado %d itens, obtido %d.",
+      total_esperado_depois,
+      total_depois
+    ))
+  }
+
+  if (length(codigos_fonte_ausentes) > 0) {
+    stop(sprintf(
+      "Há códigos da fonte ausentes após a carga: %s.",
+      paste(utils::head(codigos_fonte_ausentes, 10), collapse = ", ")
+    ))
+  }
+
+  if (length(codigos_antigos_ausentes) > 0) {
+    stop(sprintf(
+      "A carga removeu códigos antigos inesperadamente: %s.",
+      paste(utils::head(codigos_antigos_ausentes, 10), collapse = ", ")
+    ))
+  }
+
+  message(sprintf(
+    paste0(
+      "Carga atômica validada: %d itens processados, %d atualizados, ",
+      "%d inseridos e %d preservados fora da nova fonte."
+    ),
+    total_processado,
+    total_processado - total_novos,
+    total_novos,
+    length(setdiff(codigos_antes, codigos_fonte))
+  ))
+}), finally = DBI::dbDisconnect(con))
+
+message("Carga do catálogo concluída com commit.")

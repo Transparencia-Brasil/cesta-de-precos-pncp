@@ -255,6 +255,144 @@ adiciona_caracteristicas_ocds <- function(
   )
 }
 
+#' Valida a fonte CATMAT antes de qualquer escrita no banco
+#'
+#' @param catalogo Dataframe lido do arquivo `catmat-N.rds`.
+#'
+#' @return O catálogo recebido, invisivelmente.
+valida_catalogo_fonte <- function(catalogo) {
+  colunas_esperadas <- setdiff(COLUNAS_CATALOGO, "caracteristicas_ocds")
+  colunas_ausentes <- setdiff(colunas_esperadas, names(catalogo))
+
+  if (length(colunas_ausentes) > 0) {
+    stop(sprintf(
+      "O catálogo não contém as colunas obrigatórias: %s.",
+      paste(colunas_ausentes, collapse = ", ")
+    ))
+  }
+
+  codigos <- trimws(as.character(catalogo$codigo_br))
+  codigos_ausentes <- is.na(catalogo$codigo_br) | codigos == ""
+
+  if (any(codigos_ausentes)) {
+    stop("O catálogo contém codigo_br ausente ou vazio.")
+  }
+
+  if (any(!grepl("^[0-9]+$", codigos))) {
+    stop("O catálogo contém codigo_br não numérico.")
+  }
+
+  codigos_inteiros <- suppressWarnings(as.integer(codigos))
+  if (any(is.na(codigos_inteiros))) {
+    stop("O catálogo contém codigo_br fora do intervalo aceito por INTEGER.")
+  }
+
+  colunas_nao_nulas <- c(
+    "codigo_classe", "nome_classe", "codigo_pdm", "nome_pdm", "nome_item"
+  )
+  colunas_com_ausencias <- colunas_nao_nulas[vapply(
+    catalogo[colunas_nao_nulas],
+    anyNA,
+    logical(1)
+  )]
+  if (length(colunas_com_ausencias) > 0) {
+    stop(sprintf(
+      "O catálogo contém valores ausentes em colunas obrigatórias: %s.",
+      paste(colunas_com_ausencias, collapse = ", ")
+    ))
+  }
+
+  codigos_duplicados <- unique(codigos[duplicated(codigos)])
+  if (length(codigos_duplicados) > 0) {
+    stop(sprintf(
+      "O catálogo contém codigo_br duplicado: %s.",
+      paste(utils::head(codigos_duplicados, 10), collapse = ", ")
+    ))
+  }
+
+  invisible(catalogo)
+}
+
+#' Valida se o mapeamento OCDS pertence ao catálogo informado
+#'
+#' Itens do catálogo sem mapeamento continuam permitidos e recebem `NULL`. Já
+#' códigos no mapeamento que não existem no catálogo indicam arquivos de versões
+#' incompatíveis e interrompem a carga.
+#'
+#' @param catalogo Dataframe CATMAT validado.
+#' @param mapeamento Dataframe retornado por `le_mapeamento_caracteristicas_ocds()`.
+#'
+#' @return O mapeamento recebido, invisivelmente.
+valida_compatibilidade_mapeamento_ocds <- function(catalogo, mapeamento) {
+  codigos_catalogo <- as.character(catalogo$codigo_br)
+  codigos_extras <- setdiff(as.character(mapeamento$codigo_item), codigos_catalogo)
+
+  if (length(codigos_extras) > 0) {
+    stop(sprintf(
+      paste0(
+        "O mapeamento OCDS contém códigos ausentes no catálogo informado: %s. ",
+        "Verifique se os arquivos possuem a mesma versão."
+      ),
+      paste(utils::head(codigos_extras, 10), collapse = ", ")
+    ))
+  }
+
+  invisible(mapeamento)
+}
+
+#' Valida a tabela de catálogo pronta para o banco
+#'
+#' @param tabela Dataframe transformado para a consulta de upsert.
+#' @param total_esperado Quantidade de códigos únicos da fonte CATMAT.
+#'
+#' @return A tabela recebida, invisivelmente.
+valida_tabela_catalogo <- function(tabela, total_esperado) {
+  colunas_esperadas <- c(
+    "codigo_classe", "nome_classe", "codigo_pdm", "nome_pdm", "codigo_br",
+    "nome_item", "item_suspenso", "item_ativo", "item_sustentavel",
+    "caracteristicas_ocds", "caracteristicas", "unidade_fornecimento"
+  )
+  colunas_ausentes <- setdiff(colunas_esperadas, names(tabela))
+
+  if (length(colunas_ausentes) > 0) {
+    stop(sprintf(
+      "A tabela transformada não contém as colunas obrigatórias: %s.",
+      paste(colunas_ausentes, collapse = ", ")
+    ))
+  }
+
+  if (nrow(tabela) != total_esperado) {
+    stop(sprintf(
+      "A transformação alterou a quantidade de itens: esperado %d, obtido %d.",
+      total_esperado,
+      nrow(tabela)
+    ))
+  }
+
+  if (anyDuplicated(as.character(tabela$codigo_br)) > 0) {
+    stop("A tabela transformada contém codigo_br duplicado.")
+  }
+
+  for (coluna in c("caracteristicas", "unidade_fornecimento")) {
+    json_valido <- vapply(tabela[[coluna]], jsonlite::validate, logical(1))
+    if (any(!json_valido)) {
+      stop(sprintf("A coluna %s contém JSON inválido.", coluna))
+    }
+  }
+
+  preenchidos <- !is.na(tabela$caracteristicas_ocds)
+  json_ocds_valido <- vapply(
+    tabela$caracteristicas_ocds[preenchidos],
+    jsonlite::validate,
+    logical(1)
+  )
+  if (any(!json_ocds_valido)) {
+    stop("A coluna caracteristicas_ocds contém JSON inválido.")
+  }
+
+  invisible(tabela)
+}
+
 # Consultas de inserção no banco
 {
 
