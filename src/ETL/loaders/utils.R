@@ -657,9 +657,10 @@ get_query <- function(qry, conectar = FALSE, quiet = FALSE) {
 #' @param tabela Dataframe contendo os dados a serem inseridos no banco.
 #' @param consulta Consulta SQL parametrizada (`INSERT INTO ... VALUES ($1, $2, ...)`)
 #' para inserção dos dados.
+#' @param interromper_em_erro Se `TRUE`, interrompe no primeiro erro para permitir
+#' rollback pelo chamador. O padrão preserva o comportamento dos demais loaders.
 #'
-#' @return Nenhum valor é retornado explicitamente. As inserções são feitas diretamente
-#' no banco de dados.
+#' @return Quantidade de linhas processadas com sucesso, invisivelmente.
 #'
 #' @examples
 #' \dontrun{
@@ -676,19 +677,30 @@ get_query <- function(qry, conectar = FALSE, quiet = FALSE) {
 #'
 #' @import DBI
 #' @import RPostgres
-insere_tabela <- function(con, tabela, consulta) {
+insere_tabela <- function(con, tabela, consulta, interromper_em_erro = FALSE) {
+  total_inserido <- 0L
+
   for (i in seq_len(nrow(tabela))) {
     tryCatch({
       params <- unname(as.list(tabela[i, ]))
       dbExecute(con, consulta, params = params)
+      total_inserido <- total_inserido + 1L
     }, error = function(e) {
       nome_tabela <- deparse(substitute(tabela))
-      message(sprintf(
+      mensagem <- sprintf(
         "Erro ao inserir a linha %d da tabela %s: %s",
         i,
         nome_tabela,
         e$message
-      ))
+      )
+
+      if (interromper_em_erro) {
+        stop(mensagem, call. = FALSE)
+      }
+
+      message(mensagem)
     })
   }
+
+  invisible(total_inserido)
 }
