@@ -286,7 +286,8 @@ adiciona_caracteristicas_ocds <- function(
       item_sustentavel = $9,
       caracteristicas_ocds = $10::jsonb,
       características = $11::jsonb,
-      unidades_fornecimento = $12::jsonb;"
+      unidades_fornecimento = $12::jsonb,
+      data_atualizacao = CURRENT_TIMESTAMP;"
 
   # Insere um contratante
   CONSULTA_INSERIR_CONTRATANTE <- "

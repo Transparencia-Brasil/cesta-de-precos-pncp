@@ -81,6 +81,7 @@ Armazena o catálogo CATMAT de medicamentos. Populada pelo loader [`carrega-cata
 | `caracteristicas_ocds` | **JSONB** | nullable | Atributos técnicos do medicamento mapeados para o padrão OCDS |
 | `unidades_fornecimento` | **JSONB** | NOT NULL | Unidades de fornecimento aceitas |
 | `data_insercao` | TIMESTAMP | DEFAULT NOW() | Timestamp automático de carga |
+| `data_atualizacao` | TIMESTAMP | NOT NULL, DEFAULT NOW() | Inserção ou atualização mais recente pelo loader do catálogo |
 
 **Comportamento em conflito:** o loader usa `ON CONFLICT (codigo_item) DO UPDATE`, permitindo atualizar o catálogo e o mapeamento OCDS em cargas futuras. A consulta de inserção sem atualização permanece disponível em `utils.R` para usos específicos.
 
