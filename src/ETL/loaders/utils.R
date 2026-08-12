@@ -94,6 +94,51 @@ suppressPackageStartupMessages(library(dotenv))
     "compra_judicial"
   )
 
+  COLUNAS_DESCONTOS_ITEM <- c(
+    "incentivoProdutivoBasico",
+    "exigenciaConteudoNacional",
+    "aplicabilidadeMargemPreferenciaNormal",
+    "aplicabilidadeMargemPreferenciaAdicional",
+    "tipoMargemPreferencia.codigo",
+    "tipoMargemPreferencia.nome",
+    "percentualMargemPreferenciaNormal",
+    "percentualMargemPreferenciaAdicional"
+  )
+
+  COLUNAS_DESCONTOS_RESULTADO <- c(
+    "aplicacaoBeneficioMeEpp",
+    "aplicacaoMargemPreferencia",
+    "amparoLegalMargemPreferencia.id",
+    "amparoLegalMargemPreferencia.nome",
+    "amparoLegalMargemPreferencia.descricao",
+    "aplicacaoCriterioDesempate",
+    "amparoLegalCriterioDesempate.id",
+    "amparoLegalCriterioDesempate.nome",
+    "amparoLegalCriterioDesempate.descricao",
+    "percentualDesconto"
+  )
+
+  COLUNAS_DESCONTOS_ITEM_HOMOLOGADO <- c(
+    "aplicacaoBeneficioMeEpp",
+    "incentivoProdutivoBasico",
+    "exigenciaConteudoNacional",
+    "aplicabilidadeMargemPreferenciaNormal",
+    "aplicabilidadeMargemPreferenciaAdicional",
+    "tipoMargemPreferencia.codigo",
+    "tipoMargemPreferencia.nome",
+    "percentualMargemPreferenciaNormal",
+    "percentualMargemPreferenciaAdicional",
+    "aplicacaoMargemPreferencia",
+    "amparoLegalMargemPreferencia.id",
+    "amparoLegalMargemPreferencia.nome",
+    "amparoLegalMargemPreferencia.descricao",
+    "aplicacaoCriterioDesempate",
+    "amparoLegalCriterioDesempate.id",
+    "amparoLegalCriterioDesempate.nome",
+    "amparoLegalCriterioDesempate.descricao",
+    "percentualDesconto"
+  )
+
   COLUNAS_ITEM_HOMOLOGADO <- c(
     "data.numeroControlePNCP",
     "codigo_br",
@@ -135,8 +180,55 @@ suppressPackageStartupMessages(library(dotenv))
     "dataResultado",
     "dataCancelamento",
     "motivoCancelamento",
+    COLUNAS_DESCONTOS_ITEM_HOMOLOGADO,
     "urlAPI",
     "urlPNCP"
+  )
+
+  COLUNAS_ITEM_HOMOLOGADO_RECOLETA <- c(
+    "numero_controle_pncp",
+    "codigo_item_catalogo",
+    "cnpj_contratante",
+    "codigo_unidade_contratante",
+    "cnpj_contratante_subrogado",
+    "codigo_unidade_contratante_subrogado",
+    "niFornecedor",
+    "numero_item",
+    "descricao",
+    "unidade_medida",
+    "material_servico",
+    "codigo_categoria_item",
+    "nome_categoria_item",
+    "codigo_catalogo",
+    "nome_catalogo",
+    "codigo_categoria_item_catalogo",
+    "nome_categoria_item_catalogo",
+    "codigo_item_catalogo_pncp",
+    "codigo_ncm_nbs",
+    "descricao_ncm_nbs",
+    "codigo_criterio_julgamento",
+    "nome_criterio_julgamento",
+    "codigo_situacao_item",
+    "nome_situacao_item",
+    "codigo_tipo_beneficio",
+    "nome_tipo_beneficio",
+    "orcamento_sigiloso",
+    "valor_unitario_estimado",
+    "valor_total_estimado",
+    "quantidade_estimada",
+    "situacaoCompraItemResultadoId",
+    "situacaoCompraItemResultadoNome",
+    "valorUnitarioHomologado",
+    "valorTotalHomologado",
+    "quantidadeHomologada",
+    "moedaEstrangeira.simbolo",
+    "valorNominalMoedaEstrangeira",
+    "dataResultado",
+    "dataCancelamento",
+    "motivoCancelamento",
+    COLUNAS_DESCONTOS_ITEM_HOMOLOGADO,
+    "url_api",
+    "url_pncp"
   )
 
   COLUNAS_ITEM_LICITADO <- c(
@@ -172,6 +264,190 @@ suppressPackageStartupMessages(library(dotenv))
     "urlAPI",
     "urlPNCP"
   )
+}
+
+#' Normaliza representacoes textuais de valores nulos do PNCP
+#'
+#' @param x Vetor a normalizar.
+#' @return Vetor de caracteres com valores vazios representados por `NA`.
+normaliza_nulo_pncp <- function(x) {
+  valor <- trimws(as.character(x))
+  valor[is.na(x) | valor %in% c("", "NA", "N/A", "NULL", "null")] <- NA_character_
+  valor
+}
+
+#' Converte um campo booleano recebido do PNCP
+#'
+#' @param x Vetor a converter.
+#' @param coluna Nome do campo, usado em mensagens de erro.
+#' @return Vetor logico.
+converte_booleano_pncp <- function(x, coluna) {
+  valor <- tolower(normaliza_nulo_pncp(x))
+  verdadeiros <- c("true", "t", "1", "sim", "s", "yes", "y", "verdadeiro", "v")
+  falsos <- c("false", "f", "0", "nao", "não", "n", "no", "falso")
+  invalidos <- unique(valor[!is.na(valor) & !valor %in% c(verdadeiros, falsos)])
+
+  if (length(invalidos) > 0) {
+    stop(sprintf(
+      "Valores booleanos invalidos na coluna '%s': %s.",
+      coluna,
+      paste(invalidos, collapse = ", ")
+    ))
+  }
+
+  resultado <- rep(NA, length(valor))
+  resultado[valor %in% verdadeiros] <- TRUE
+  resultado[valor %in% falsos] <- FALSE
+  resultado
+}
+
+#' Converte um campo inteiro recebido do PNCP
+#'
+#' @param x Vetor a converter.
+#' @param coluna Nome do campo, usado em mensagens de erro.
+#' @return Vetor de inteiros.
+converte_inteiro_pncp <- function(x, coluna) {
+  valor <- normaliza_nulo_pncp(x)
+  convertido <- suppressWarnings(as.integer(valor))
+  invalidos <- unique(valor[!is.na(valor) & is.na(convertido)])
+
+  if (length(invalidos) > 0) {
+    stop(sprintf(
+      "Valores inteiros invalidos na coluna '%s': %s.",
+      coluna,
+      paste(invalidos, collapse = ", ")
+    ))
+  }
+
+  convertido
+}
+
+#' Converte um campo numerico recebido do PNCP
+#'
+#' @param x Vetor a converter.
+#' @param coluna Nome do campo, usado em mensagens de erro.
+#' @return Vetor numerico, sem restricao de faixa.
+converte_numerico_pncp <- function(x, coluna) {
+  valor <- normaliza_nulo_pncp(x)
+  convertido <- suppressWarnings(as.numeric(valor))
+  invalidos <- unique(valor[!is.na(valor) & is.na(convertido)])
+
+  if (length(invalidos) > 0) {
+    stop(sprintf(
+      "Valores numericos invalidos na coluna '%s': %s.",
+      coluna,
+      paste(invalidos, collapse = ", ")
+    ))
+  }
+
+  convertido
+}
+
+#' Completa e normaliza os campos de descontos de item_homologado
+#'
+#' @param tabela Dataframe resultante dos joins do loader.
+#' @return Dataframe com os 18 campos presentes e tipados.
+normaliza_campos_descontos_item_homologado <- function(tabela) {
+  colunas_faltantes <- setdiff(COLUNAS_DESCONTOS_ITEM_HOMOLOGADO, names(tabela))
+  for (coluna in colunas_faltantes) {
+    tabela[[coluna]] <- rep(NA, nrow(tabela))
+  }
+
+  colunas_booleanas <- c(
+    "aplicacaoBeneficioMeEpp",
+    "incentivoProdutivoBasico",
+    "exigenciaConteudoNacional",
+    "aplicabilidadeMargemPreferenciaNormal",
+    "aplicabilidadeMargemPreferenciaAdicional",
+    "aplicacaoMargemPreferencia",
+    "aplicacaoCriterioDesempate"
+  )
+  colunas_inteiras <- c(
+    "tipoMargemPreferencia.codigo",
+    "amparoLegalMargemPreferencia.id",
+    "amparoLegalCriterioDesempate.id"
+  )
+  colunas_numericas <- c(
+    "percentualMargemPreferenciaNormal",
+    "percentualMargemPreferenciaAdicional",
+    "percentualDesconto"
+  )
+  colunas_textuais <- setdiff(
+    COLUNAS_DESCONTOS_ITEM_HOMOLOGADO,
+    c(colunas_booleanas, colunas_inteiras, colunas_numericas)
+  )
+
+  for (coluna in colunas_booleanas) {
+    tabela[[coluna]] <- converte_booleano_pncp(tabela[[coluna]], coluna)
+  }
+  for (coluna in colunas_inteiras) {
+    tabela[[coluna]] <- converte_inteiro_pncp(tabela[[coluna]], coluna)
+  }
+  for (coluna in colunas_numericas) {
+    tabela[[coluna]] <- converte_numerico_pncp(tabela[[coluna]], coluna)
+  }
+  for (coluna in colunas_textuais) {
+    tabela[[coluna]] <- normaliza_nulo_pncp(tabela[[coluna]])
+  }
+
+  tabela
+}
+
+#' Seleciona colunas de item_homologado na ordem da consulta parametrizada
+#'
+#' @param tabela Dataframe resultante dos joins do loader.
+#' @param colunas Colunas esperadas pela consulta de insercao.
+#' @return Dataframe completo, tipado e ordenado.
+seleciona_colunas_item_homologado <- function(tabela, colunas) {
+  tabela <- normaliza_campos_descontos_item_homologado(tabela)
+  colunas_faltantes <- setdiff(colunas, names(tabela))
+  for (coluna in colunas_faltantes) {
+    tabela[[coluna]] <- rep(NA, nrow(tabela))
+  }
+
+  tabela[colunas]
+}
+
+#' Constroi item_homologado para a carga regular
+#'
+#' @param medicamentos Itens classificados como medicamentos.
+#' @param resultados Resultados coletados do PNCP.
+#' @param contratacoes Contratacoes de origem.
+#' @return Dataframe pronto para `CONSULTA_INSERIR_ITEM_HOMOLOGADO`.
+monta_item_homologado <- function(medicamentos, resultados, contratacoes) {
+  medicamentos |>
+    dplyr::inner_join(
+      resultados,
+      by = dplyr::join_by(endpointResultado == endpoint),
+      suffix = c("", "Resultado"),
+      multiple = "first"
+    ) |>
+    dplyr::inner_join(
+      contratacoes,
+      by = dplyr::join_by(endpointContratacao == endpoint),
+      suffix = c("", "Contratacao")
+    ) |>
+    seleciona_colunas_item_homologado(COLUNAS_ITEM_HOMOLOGADO)
+}
+
+#' Constroi item_homologado durante a recoleta de resultados
+#'
+#' @param itens_licitados Itens ainda sem resultado armazenados no banco.
+#' @param resultados Resultados recoletados do PNCP.
+#' @return Dataframe pronto para `CONSULTA_INSERIR_ITEM_HOMOLOGADO`.
+monta_item_homologado_recoleta <- function(itens_licitados, resultados) {
+  itens_licitados |>
+    dplyr::inner_join(
+      resultados,
+      by = dplyr::join_by(
+        numero_controle_pncp == numeroControlePNCPCompra,
+        numero_item == numeroItem
+      ),
+      suffix = c("", "Resultado"),
+      multiple = "first"
+    ) |>
+    tibble::as_tibble() |>
+    seleciona_colunas_item_homologado(COLUNAS_ITEM_HOMOLOGADO_RECOLETA)
 }
 
 #' Lê e valida o mapeamento de características OCDS do catálogo
@@ -422,13 +698,30 @@ possui_indicativo_judicial <- function(descricao) {
         valor_unitario_homologado, valor_total_homologado, quantidade_homologada,
         moeda_estrangeira, valor_nominal_moeda_estrangeira,
         data_resultado, data_cancelamento, motivo_cancelamento,
+        aplicacao_beneficio_me_epp,
+        incentivo_produtivo_basico, exigencia_conteudo_nacional,
+        aplicabilidade_margem_preferencia_normal,
+        aplicabilidade_margem_preferencia_adicional,
+        tipo_margem_preferencia_codigo, tipo_margem_preferencia_nome,
+        percentual_margem_preferencia_normal,
+        percentual_margem_preferencia_adicional,
+        aplicacao_margem_preferencia,
+        amparo_legal_margem_preferencia_id,
+        amparo_legal_margem_preferencia_nome,
+        amparo_legal_margem_preferencia_descricao,
+        aplicacao_criterio_desempate,
+        amparo_legal_criterio_desempate_id,
+        amparo_legal_criterio_desempate_nome,
+        amparo_legal_criterio_desempate_descricao,
+        percentual_desconto,
         url_api, url_pncp)
     VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
         $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,
         $21, $22, $23, $24, $25, $26, $27, $28, $29, $30,
         $31, $32, $33, $34, $35, $36, $37, $38, $39, $40,
-        $41, $42)
+        $41, $42, $43, $44, $45, $46, $47, $48, $49, $50,
+        $51, $52, $53, $54, $55, $56, $57, $58, $59, $60)
     ON CONFLICT (numero_controle_pncp, numero_item)
     DO UPDATE SET
         codigo_item_catalogo = $2,
@@ -466,7 +759,25 @@ possui_indicativo_judicial <- function(descricao) {
         valor_nominal_moeda_estrangeira = $37,
         data_resultado = $38,
         data_cancelamento = $39,
-        motivo_cancelamento = $40;"
+        motivo_cancelamento = $40,
+        aplicacao_beneficio_me_epp = $41,
+        incentivo_produtivo_basico = $42,
+        exigencia_conteudo_nacional = $43,
+        aplicabilidade_margem_preferencia_normal = $44,
+        aplicabilidade_margem_preferencia_adicional = $45,
+        tipo_margem_preferencia_codigo = $46,
+        tipo_margem_preferencia_nome = $47,
+        percentual_margem_preferencia_normal = $48,
+        percentual_margem_preferencia_adicional = $49,
+        aplicacao_margem_preferencia = $50,
+        amparo_legal_margem_preferencia_id = $51,
+        amparo_legal_margem_preferencia_nome = $52,
+        amparo_legal_margem_preferencia_descricao = $53,
+        aplicacao_criterio_desempate = $54,
+        amparo_legal_criterio_desempate_id = $55,
+        amparo_legal_criterio_desempate_nome = $56,
+        amparo_legal_criterio_desempate_descricao = $57,
+        percentual_desconto = $58;"
 
   # Insere um item licitado novo ou, caso o item já exista no banco, atualiza os campos
   CONSULTA_INSERIR_ITEM_LICITADO <- "

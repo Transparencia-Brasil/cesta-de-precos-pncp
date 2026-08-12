@@ -52,6 +52,18 @@ Cada etapa gera 3 arquivos no diretório de saída:
 - `erros.csv` — endpoints que retornaram erro e a respectiva mensagem.
 - `monitoramento.csv` — metadados de duração por lote.
 
+### Benefícios, margens, desempate e descontos
+
+Os templates de itens e resultados preservam os 18 campos usados em
+`item_homologado`. Oito campos vêm do endpoint de itens
+(`incentivoProdutivoBasico`, conteúdo nacional, aplicabilidade, tipo e
+percentuais de margem) e dez vêm do endpoint de resultados (benefício ME/EPP,
+margem aplicada, amparos legais, desempate e `percentualDesconto`).
+
+Quando a API omite um campo ou o devolve como nulo, o template mantém a coluna
+no `dados.csv` com valor vazio. Assim, o schema dos artefatos permanece estável
+sem substituir dados da API por fontes externas.
+
 ## Parâmetros dos wrappers Bash
 
 Todos os wrappers recebem os mesmos três argumentos posicionais:
