@@ -94,30 +94,6 @@ suppressPackageStartupMessages(library(dotenv))
     "compra_judicial"
   )
 
-  COLUNAS_DESCONTOS_ITEM <- c(
-    "incentivoProdutivoBasico",
-    "exigenciaConteudoNacional",
-    "aplicabilidadeMargemPreferenciaNormal",
-    "aplicabilidadeMargemPreferenciaAdicional",
-    "tipoMargemPreferencia.codigo",
-    "tipoMargemPreferencia.nome",
-    "percentualMargemPreferenciaNormal",
-    "percentualMargemPreferenciaAdicional"
-  )
-
-  COLUNAS_DESCONTOS_RESULTADO <- c(
-    "aplicacaoBeneficioMeEpp",
-    "aplicacaoMargemPreferencia",
-    "amparoLegalMargemPreferencia.id",
-    "amparoLegalMargemPreferencia.nome",
-    "amparoLegalMargemPreferencia.descricao",
-    "aplicacaoCriterioDesempate",
-    "amparoLegalCriterioDesempate.id",
-    "amparoLegalCriterioDesempate.nome",
-    "amparoLegalCriterioDesempate.descricao",
-    "percentualDesconto"
-  )
-
   COLUNAS_DESCONTOS_ITEM_HOMOLOGADO <- c(
     "aplicacaoBeneficioMeEpp",
     "incentivoProdutivoBasico",
