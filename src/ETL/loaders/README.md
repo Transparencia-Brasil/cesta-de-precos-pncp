@@ -80,6 +80,7 @@ Durante a transformação, o script:
 - remove linhas sem `endpoint`;
 - reconstrói URLs de rastreabilidade (`urlAPI` e `urlPNCP`);
 - mantém somente contratações que possuem itens classificados como medicamentos;
+- preserva `data.usuarioNome` em `contratacao.usuario_nome`;
 - calcula `compra_judicial` a partir de `data.objetoCompra`;
 - inclui contratantes principais e, quando existirem, contratantes sub-rogados;
 - separa itens com resultado em `item_homologado` e itens sem resultado em `item_licitado`;
@@ -96,6 +97,8 @@ A ordem de inserção respeita as dependências do schema:
 ```
 
 As inserções são idempotentes por chave de negócio. As consultas em [`utils.R`](utils.R) usam `ON CONFLICT`: contratantes e fornecedores duplicados são ignorados, enquanto contratações e itens já existentes são atualizados com os dados mais recentes.
+
+O campo nullable `contratacao.usuario_nome` armazena o nome do usuário ou sistema que enviou a contratação ao PNCP. Valores ausentes em `data.usuarioNome` permanecem `NULL`, e uma nova carga atualiza o campo pela chave `numero_controle_pncp`.
 
 Para calcular `compra_judicial`, o loader transpõe a regra do notebook da task `verifica-compras-judiciais`: converte a descrição para minúsculas, remove as stopwords em português do NLTK 3.9.1, remove acentos com normalização Unicode NFKD, normaliza espaços e procura a ocorrência literal de `judic`. Descrições ausentes recebem `FALSE`. Como o campo também faz parte do `DO UPDATE`, uma nova carga recalcula a classificação quando `objeto_compra` mudar.
 

@@ -91,6 +91,7 @@ suppressPackageStartupMessages(library(dotenv))
     "data.amparoLegal.nome",
     "data.modoDisputaId",
     "data.modoDisputaNome",
+    "data.usuarioNome",
     "compra_judicial"
   )
 
@@ -379,9 +380,9 @@ possui_indicativo_judicial <- function(descricao) {
         codigo_tipo_instrumento_convocatorio, nome_tipo_instrumento_convocatorio,
         codigo_modalidade, nome_modalidade,
         codigo_amparo_legal, nome_amparo_legal,
-        codigo_modo_disputa, nome_modo_disputa, compra_judicial
+        codigo_modo_disputa, nome_modo_disputa, usuario_nome, compra_judicial
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
     ON CONFLICT (numero_controle_pncp)
     DO UPDATE SET
         objeto_compra = $4,
@@ -398,7 +399,8 @@ possui_indicativo_judicial <- function(descricao) {
         nome_amparo_legal = $15,
         codigo_modo_disputa = $16,
         nome_modo_disputa = $17,
-        compra_judicial = $18;"
+        usuario_nome = $18,
+        compra_judicial = $19;"
 
   # Insere um item homologado novo ou, caso o item já exista no banco, atualiza os campos
   CONSULTA_INSERIR_ITEM_HOMOLOGADO <- "
