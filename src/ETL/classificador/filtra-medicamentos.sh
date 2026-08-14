@@ -89,7 +89,12 @@ echo ""
 
 # Caminhos para os arquivos de entrada
 ITENS="coleta/itens/${ALIAS_COLETA}/dados.csv"
-CATALOGO="data/catmat/catmat.csv"
+CATALOGO=$(find data/catmat -maxdepth 1 -type f -name 'catmat-[0-9]*.csv' | sort -V | tail -n 1)
+
+if [ -z "$CATALOGO" ]; then
+  echo "Erro: Nenhum catálogo versionado catmat-N.csv foi encontrado em data/catmat."
+  exit 1
+fi
 
 # parâmetros do script em python
 echo "Parâmetros do classificador:"

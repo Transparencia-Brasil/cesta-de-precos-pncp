@@ -1,7 +1,9 @@
 #' Este script insere os dados do catálogo de itens no banco de dados configurado.
 #'
-#' O parâmetro de entrada obrigatório é o caminho para o arquivo do catálogo em
-#' formato .rds.
+#' O parâmetro de entrada obrigatório é o caminho para o arquivo versionado do
+#' catálogo no formato `catmat-N.rds`. O mapeamento OCDS correspondente deve
+#' estar no mesmo diretório, no formato `tabela-mapeamento-ocds-N.csv`.
+#' A opção `--validar-apenas` executa toda a preparação sem conectar ao banco.
 #'
 #' O catálogo foi obtido a partir da seguinte API:
 #' https://cnbs.estaleiro.serpro.gov.br/cnbs-api/swagger-ui/index.html#/
@@ -28,21 +30,73 @@ args <- commandArgs(trailingOnly = TRUE)
 # Verifica se os argumentos foram fornecidos corretamente
 if (length(args) < 1) {
   stop(
-    "Uso correto: Rscript carrega-catalogo.R <catalogo.rds>"
+    paste0(
+      "Uso correto: Rscript carrega-catalogo.R <catmat-N.rds> ",
+      "[--validar-apenas]"
+    )
   )
 }
 
 # Lê os argumentos
 CAMINHO_CATALOGO <- args[1]
+opcoes <- args[-1]
+opcoes_invalidas <- setdiff(opcoes, "--validar-apenas")
+
+if (length(opcoes_invalidas) > 0) {
+  stop(sprintf(
+    "Opção desconhecida: %s.",
+    paste(opcoes_invalidas, collapse = ", ")
+  ))
+}
+
+VALIDAR_APENAS <- "--validar-apenas" %in% opcoes
+
+# Verifica se o arquivo do catálogo existe
+if (!file.exists(CAMINHO_CATALOGO)) {
+  stop(sprintf("O arquivo do catálogo não foi encontrado: %s", CAMINHO_CATALOGO))
+}
 
 # Verifica se a extensão do arquivo é .rds
 if (tolower(tools::file_ext(CAMINHO_CATALOGO)) != "rds") {
-  stop("Erro: O arquivo do catálogo deve ser no formato .rds.")
+  stop("O arquivo do catálogo deve ser no formato .rds.")
 }
+
+# Extrai a versão do nome do catálogo
+nome_catalogo <- basename(CAMINHO_CATALOGO)
+
+# checa se o nome do catálogo segue o padrão catmat-N.rds, em que N é a versão numérica
+correspondencia_versao <- regexec("^catmat-([0-9]+)\\.rds$", nome_catalogo, ignore.case = TRUE)
+partes_nome_catalogo <- regmatches(nome_catalogo, correspondencia_versao)[[1]]
+
+if (length(partes_nome_catalogo) == 0) {
+  stop("O nome do catálogo deve seguir o padrão catmat-N.rds, em que N é a versão numérica.")
+}
+
+# Definição da versão do catálogo a partir do nome do arquivo
+versao_catalogo <- partes_nome_catalogo[[2]]
+
+# Define o caminho do arquivo de mapeamento OCDS correspondente à versão do catálogo
+CAMINHO_MAPEAMENTO_OCDS <- file.path(dirname(CAMINHO_CATALOGO), sprintf("tabela-mapeamento-ocds-%s.csv", versao_catalogo))
+
+if (!file.exists(CAMINHO_MAPEAMENTO_OCDS)) {
+  stop(sprintf("O mapeamento OCDS da versão %s não foi encontrado: %s", versao_catalogo, CAMINHO_MAPEAMENTO_OCDS))
+}
+
+
+# LOAD FILES -----------------------------------------------------------------
 
 # Lê os arquivos de dados
 catalogo <- readRDS(CAMINHO_CATALOGO)
-mapeamento_caracteristicas_ocds <- le_mapeamento_caracteristicas_ocds()
+valida_catalogo_fonte(catalogo)
+total_catalogo_fonte <- dplyr::n_distinct(as.character(catalogo$codigo_br))
+
+catalogo <- catalogo |>
+  # Converte codigo_br para character para evitar problemas de join com o mapeamento OCDS
+  mutate(codigo_br = as.character(codigo_br))
+
+mapeamento_caracteristicas_ocds <- le_mapeamento_caracteristicas_ocds(CAMINHO_MAPEAMENTO_OCDS)
+valida_compatibilidade_mapeamento_ocds(catalogo, mapeamento_caracteristicas_ocds)
+
 
 # SELECIONA CARACTERÍSTICAS DOS MEDICAMENTOS ------------------------------
 
@@ -91,7 +145,8 @@ catalogo <- catalogo %>%
       nomeValorCaracteristica,
       siglaUnidadeMedida,
       statusValorCaracteristica,
-      manter
+      manter,
+      n_valores_unicos
     )
   ) %>%
   ungroup()
@@ -101,10 +156,7 @@ catalogo <- catalogo %>%
   mutate(buscaItemCaracteristica = map(buscaItemCaracteristica, ~ filter(.x, manter == TRUE)))
 
 # Integra as características OCDS por codigo_br = codigo_item
-catalogo <- adiciona_caracteristicas_ocds(
-  catalogo,
-  mapeamento_caracteristicas_ocds
-)
+catalogo <- adiciona_caracteristicas_ocds(catalogo, mapeamento_caracteristicas_ocds)
 
 
 # TRANSFORMA A TABELA -----------------------------------------------------
@@ -124,6 +176,16 @@ tb_catalogo <- catalogo %>%
   ) %>%
   select(-buscaItemCaracteristica, -unidadeFornecimento)
 
+valida_tabela_catalogo(tb_catalogo, total_catalogo_fonte)
+
+if (VALIDAR_APENAS) {
+  message(sprintf(
+    "Validação concluída: %d itens prontos para carga e nenhuma escrita realizada.",
+    total_catalogo_fonte
+  ))
+  quit(save = "no", status = 0)
+}
+
 
 # CONECTA-SE  COM O BD ----------------------------------------------------
 
@@ -131,7 +193,85 @@ con <- conecta_bd_medicamentos_transparentes()
 
 # INSERE OS DADOS ---------------------------------------------------------
 
-insere_tabela(con, tb_catalogo, CONSULTA_UPDATE_CATALOGO)
+tryCatch(DBI::dbWithTransaction(con, {
+  colunas_catalogo_banco <- DBI::dbListFields(con, "catalogo")
+  if (!"data_atualizacao" %in% colunas_catalogo_banco) {
+    stop(paste0(
+      "A coluna catalogo.data_atualizacao não existe. ",
+      "Aplique a migração antes da carga rodando ",
+      "`tasks/alteracoes-no-banco-de-dados/catalogo-upsert-atomico`."
+    ))
+  }
 
-# Fechar conexão
-dbDisconnect(con)
+  DBI::dbExecute(
+    con,
+    "LOCK TABLE catalogo IN SHARE ROW EXCLUSIVE MODE"
+  )
+
+  codigos_antes <- DBI::dbGetQuery(
+    con,
+    "SELECT codigo_item FROM catalogo"
+  )$codigo_item
+  total_antes <- length(codigos_antes)
+  codigos_fonte <- as.integer(tb_catalogo$codigo_br)
+  total_novos <- length(setdiff(codigos_fonte, codigos_antes))
+  total_esperado_depois <- total_antes + total_novos
+
+  total_processado <- insere_tabela(
+    con,
+    tb_catalogo,
+    CONSULTA_UPDATE_CATALOGO,
+    interromper_em_erro = TRUE
+  )
+
+  codigos_depois <- DBI::dbGetQuery(
+    con,
+    "SELECT codigo_item FROM catalogo"
+  )$codigo_item
+  total_depois <- length(codigos_depois)
+  codigos_fonte_ausentes <- setdiff(codigos_fonte, codigos_depois)
+  codigos_antigos_ausentes <- setdiff(codigos_antes, codigos_depois)
+
+  if (total_processado != total_catalogo_fonte) {
+    stop(sprintf(
+      "Carga incompleta: esperado processar %d itens, processados %d.",
+      total_catalogo_fonte,
+      total_processado
+    ))
+  }
+
+  if (total_depois != total_esperado_depois) {
+    stop(sprintf(
+      "Contagem final inválida: esperado %d itens, obtido %d.",
+      total_esperado_depois,
+      total_depois
+    ))
+  }
+
+  if (length(codigos_fonte_ausentes) > 0) {
+    stop(sprintf(
+      "Há códigos da fonte ausentes após a carga: %s.",
+      paste(utils::head(codigos_fonte_ausentes, 10), collapse = ", ")
+    ))
+  }
+
+  if (length(codigos_antigos_ausentes) > 0) {
+    stop(sprintf(
+      "A carga removeu códigos antigos inesperadamente: %s.",
+      paste(utils::head(codigos_antigos_ausentes, 10), collapse = ", ")
+    ))
+  }
+
+  message(sprintf(
+    paste0(
+      "Carga atômica validada: %d itens processados, %d atualizados, ",
+      "%d inseridos e %d preservados fora da nova fonte."
+    ),
+    total_processado,
+    total_processado - total_novos,
+    total_novos,
+    length(setdiff(codigos_antes, codigos_fonte))
+  ))
+}), finally = DBI::dbDisconnect(con))
+
+message("Carga do catálogo concluída com commit.")

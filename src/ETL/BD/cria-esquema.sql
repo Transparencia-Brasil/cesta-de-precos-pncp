@@ -15,11 +15,15 @@ CREATE TABLE catalogo (
     características JSONB NOT NULL,
     caracteristicas_ocds JSONB,
     unidades_fornecimento JSONB NOT NULL,
-    data_insercao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    data_insercao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_atualizacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 COMMENT ON COLUMN catalogo.caracteristicas_ocds IS
     'Atributos técnicos do medicamento mapeados para o padrão OCDS.';
+
+COMMENT ON COLUMN catalogo.data_atualizacao IS
+    'Data da inserção ou da atualização mais recente pelo loader do catálogo.';
 
 CREATE TABLE contratante (
     cnpj BIGINT,
