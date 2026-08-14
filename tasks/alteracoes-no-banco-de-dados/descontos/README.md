@@ -5,7 +5,7 @@ margens de preferência, critérios de desempate e desconto disponíveis no
 dataset `src/inputs/descontos.csv`.
 
 - Entrada em produção das colunas e do backfill: **22/07/2026**.
-- Resolução da integração permanente no ETL (issue #65): **12/08/2026**.
+- Resolução da integração permanente no ETL (issue #65): **14/08/2026**.
 
 Após a resolução da issue #65, esta task permanece exclusivamente como snapshot
 de auditoria, validação e eventual migração ou reversão de bancos antigos. O

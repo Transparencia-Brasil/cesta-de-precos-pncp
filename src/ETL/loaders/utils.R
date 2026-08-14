@@ -95,7 +95,7 @@ suppressPackageStartupMessages(library(dotenv))
   )
 
   COLUNAS_DESCONTOS_ITEM_HOMOLOGADO <- c(
-    "aplicacaoBeneficioMeEpp",
+    "aplicacaoBeneficioMeEpp",                  # Essa coluna vem dos resultados
     "incentivoProdutivoBasico",
     "exigenciaConteudoNacional",
     "aplicabilidadeMargemPreferenciaNormal",
@@ -104,15 +104,15 @@ suppressPackageStartupMessages(library(dotenv))
     "tipoMargemPreferencia.nome",
     "percentualMargemPreferenciaNormal",
     "percentualMargemPreferenciaAdicional",
-    "aplicacaoMargemPreferencia",
-    "amparoLegalMargemPreferencia.id",
-    "amparoLegalMargemPreferencia.nome",
-    "amparoLegalMargemPreferencia.descricao",
-    "aplicacaoCriterioDesempate",
-    "amparoLegalCriterioDesempate.id",
-    "amparoLegalCriterioDesempate.nome",
-    "amparoLegalCriterioDesempate.descricao",
-    "percentualDesconto"
+    "aplicacaoMargemPreferencia",                # Essa coluna vem dos resultados
+    "amparoLegalMargemPreferencia.id",           # Essa coluna vem dos resultados
+    "amparoLegalMargemPreferencia.nome",         # Essa coluna vem dos resultados
+    "amparoLegalMargemPreferencia.descricao",    # Essa coluna vem dos resultados
+    "aplicacaoCriterioDesempate",                # Essa coluna vem dos resultados
+    "amparoLegalCriterioDesempate.id",           # Essa coluna vem dos resultados
+    "amparoLegalCriterioDesempate.nome",         # Essa coluna vem dos resultados
+    "amparoLegalCriterioDesempate.descricao",    # Essa coluna vem dos resultados
+    "percentualDesconto"                         # Essa coluna vem dos resultados
   )
 
   COLUNAS_ITEM_HOMOLOGADO <- c(
@@ -168,7 +168,7 @@ suppressPackageStartupMessages(library(dotenv))
     "codigo_unidade_contratante",
     "cnpj_contratante_subrogado",
     "codigo_unidade_contratante_subrogado",
-    "niFornecedor",
+    "niFornecedor",                      # Essa coluna vem dos resultados
     "numero_item",
     "descricao",
     "unidade_medida",
@@ -192,16 +192,16 @@ suppressPackageStartupMessages(library(dotenv))
     "valor_unitario_estimado",
     "valor_total_estimado",
     "quantidade_estimada",
-    "situacaoCompraItemResultadoId",
-    "situacaoCompraItemResultadoNome",
-    "valorUnitarioHomologado",
-    "valorTotalHomologado",
-    "quantidadeHomologada",
-    "moedaEstrangeira.simbolo",
-    "valorNominalMoedaEstrangeira",
-    "dataResultado",
-    "dataCancelamento",
-    "motivoCancelamento",
+    "situacaoCompraItemResultadoId",     # Essa coluna vem dos resultados
+    "situacaoCompraItemResultadoNome",   # Essa coluna vem dos resultados
+    "valorUnitarioHomologado",           # Essa coluna vem dos resultados
+    "valorTotalHomologado",              # Essa coluna vem dos resultados
+    "quantidadeHomologada",              # Essa coluna vem dos resultados
+    "moedaEstrangeira.simbolo",          # Essa coluna vem dos resultados
+    "valorNominalMoedaEstrangeira",      # Essa coluna vem dos resultados
+    "dataResultado",                     # Essa coluna vem dos resultados
+    "dataCancelamento",                  # Essa coluna vem dos resultados
+    "motivoCancelamento",                # Essa coluna vem dos resultados
     COLUNAS_DESCONTOS_ITEM_HOMOLOGADO,
     "url_api",
     "url_pncp"

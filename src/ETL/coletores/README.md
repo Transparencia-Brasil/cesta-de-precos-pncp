@@ -55,7 +55,7 @@ Cada etapa gera 3 arquivos no diretório de saída:
 ### Benefícios, margens, desempate e descontos
 
 Os templates de itens e resultados preservam os 18 campos usados em
-`item_homologado`. Oito campos vêm do endpoint de itens
+`item_homologado`. Oito campos vêm do endpoint de `itens_licitados`
 (`incentivoProdutivoBasico`, conteúdo nacional, aplicabilidade, tipo e
 percentuais de margem) e dez vêm do endpoint de resultados (benefício ME/EPP,
 margem aplicada, amparos legais, desempate e `percentualDesconto`).
