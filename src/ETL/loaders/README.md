@@ -32,7 +32,7 @@ DB_PASS="..."
 DB_PORT="..."
 ```
 
-- Pacotes R usados pelos scripts: `readr`, `dplyr`, `tidyr`, `purrr`, `here`, `jsonlite`, `DBI`, `RPostgres` e `dotenv`.
+- Pacotes R usados pelos scripts: `readr`, `dplyr`, `tidyr`, `purrr`, `here`, `jsonlite`, `stringi`, `DBI`, `RPostgres` e `dotenv`.
 - Execução a partir da raiz do repositório, para que `here::here()` resolva os caminhos corretamente.
 
 ## Fluxo recomendado
@@ -80,6 +80,7 @@ Durante a transformação, o script:
 - remove linhas sem `endpoint`;
 - reconstrói URLs de rastreabilidade (`urlAPI` e `urlPNCP`);
 - mantém somente contratações que possuem itens classificados como medicamentos;
+- calcula `compra_judicial` a partir de `data.objetoCompra`;
 - inclui contratantes principais e, quando existirem, contratantes sub-rogados;
 - separa itens com resultado em `item_homologado` e itens sem resultado em `item_licitado`;
 - preenche como `NA` colunas opcionais ausentes nos CSVs de entrada.
@@ -95,6 +96,10 @@ A ordem de inserção respeita as dependências do schema:
 ```
 
 As inserções são idempotentes por chave de negócio. As consultas em [`utils.R`](utils.R) usam `ON CONFLICT`: contratantes e fornecedores duplicados são ignorados, enquanto contratações e itens já existentes são atualizados com os dados mais recentes.
+
+Para calcular `compra_judicial`, o loader transpõe a regra do notebook da task `verifica-compras-judiciais`: converte a descrição para minúsculas, remove as stopwords em português do NLTK 3.9.1, remove acentos com normalização Unicode NFKD, normaliza espaços e procura a ocorrência literal de `judic`. Descrições ausentes recebem `FALSE`. Como o campo também faz parte do `DO UPDATE`, uma nova carga recalcula a classificação quando `objeto_compra` mudar.
+
+O arquivo `tasks/alteracoes-no-banco-de-dados/verifica-compras-judiciais/outputs/compras-judiciais-completo.csv` é apenas um snapshot histórico para auditoria e validação de paridade; ele não é lido pelo loader.
 
 ## Carga do catálogo CATMAT
 

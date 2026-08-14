@@ -2,7 +2,7 @@
 
 Esta task analisa descrições de compras públicas para localizar registros com possíveis indícios de atendimento a demandas judiciais.
 
-O trabalho é exploratório e parte de uma regra textual simples, transparente e auditável. Uma compra é marcada quando o conteúdo da coluna `objeto_compra` contém uma palavra iniciada por `judic`, reconhecendo palavras como `judicial` e `judiciais`.
+O trabalho é exploratório e parte de uma regra textual simples, transparente e auditável. Uma compra é marcada quando o conteúdo normalizado da coluna `objeto_compra` contém o trecho `judic`, reconhecendo palavras como `judicial` e `judiciais`.
 
 ## Estrutura
 
@@ -31,14 +31,19 @@ A expressão usada no notebook é:
 REGEX_TERMO_JUDICIAL = r"judic"
 ```
 
-O padrão `judic\w*` contempla palavras iniciadas por `judic`, incluindo `judicial` e `judiciais`.
+O trecho `judic` contempla palavras como `judicial` e `judiciais` e é procurado
+literalmente no texto normalizado.
 
-A função `possui_indicativo_judicial`:
+A função `limpa_texto`:
 
-1. retorna `False` para descrições ausentes;
-2. converte a descrição para texto em letras minúsculas;
-3. procura o trecho definido em `REGEX_TERMO_JUDICIAL`;
-4. retorna `True` quando encontra uma correspondência.
+1. converte o texto para minúsculas;
+2. remove as 207 stopwords em português do NLTK 3.9.1;
+3. remove acentos com normalização Unicode NFKD;
+4. normaliza os espaços em branco.
+
+A função `possui_indicativo_judicial` retorna `False` para descrições ausentes,
+aplica `limpa_texto` e procura o trecho definido em
+`REGEX_TERMO_JUDICIAL`.
 
 Exemplo de descrição identificada:
 
@@ -62,7 +67,8 @@ O notebook utiliza:
 
 - Python;
 - pandas;
-- módulo `re(regular expressions)` da biblioteca padrão.
+- NLTK e seu corpus de stopwords em português;
+- módulos `re` e `unicodedata` da biblioteca padrão.
 
 O notebook localiza automaticamente a raiz do repositório e monta os caminhos de entrada e saída a partir dela.
 
@@ -70,19 +76,17 @@ O notebook localiza automaticamente a raiz do repositório e monta os caminhos d
 
 Foi realizada uma validação por amostragem dos registros do início, do meio e do fim do dataset resultante, com o objetivo de verificar a aderência à regra de identificação e a ausência de falsos positivos nas amostras analisadas.
 
-## Inclusão da classificação no banco
+## Versionamento do snapshot histórico
 
-Os scripts em `src/sql/` preparam a inclusão e a população da coluna booleana
-`contratacao.compra_judicial`. A mudança permanece isolada nesta task enquanto
-o fluxo é validado e, por isso, ainda não altera
-`src/ETL/BD/cria-esquema.sql`.
+| Versão | Arquivo | Registros | `TRUE` | `FALSE` | Entrada em produção | Integração ao ETL |
+| --- | --- | ---: | ---: | ---: | --- | --- |
+| 0 | `outputs/compras-judiciais-completo.csv` | 101.387 | 15.770 | 85.617 | 26/06/2026 | 11/08/2026 |
 
-O arquivo `outputs/compras-judiciais-completo.csv` é o dataset de entrada do
-backfill. A atualização relaciona o CSV à tabela `contratacao` pela chave
-`numero_controle_pncp` e copia os valores `True` e `False` da coluna
-`compra_judicial`.
+O arquivo `outputs/compras-judiciais-completo.csv` é um snapshot histórico para
+auditoria e validação da paridade da implementação em R. Ele não é lido pelo
+loader nem deve ser tratado como fonte operacional para cargas futuras.
 
-O dataset foi validado localmente com:
+O snapshot da versão 0 foi validado localmente com:
 
 - `101.387` registros;
 - `101.387` valores únicos de `numero_controle_pncp`;
@@ -90,24 +94,14 @@ O dataset foi validado localmente com:
 - `85.617` registros com `compra_judicial = False`;
 - nenhum valor diferente de `True` ou `False`.
 
-### Como testar no SQLTools
+## Inclusão da classificação no banco
 
-O arquivo `src/sql/test-populacao-sqltools.sql` simula o fluxo completo usando
-tabelas temporárias:
+### Banco existente com schema antigo
 
-1. reproduz o schema atual de `contratacao`;
-2. insere uma contratação judicial e uma não judicial;
-3. adiciona a coluna `compra_judicial`;
-4. simula a carga do CSV;
-5. atualiza os registros por `numero_controle_pncp`;
-6. mostra as contagens finais;
-7. executa `ROLLBACK`.
-
-Para testar, conecte o SQLTools a um banco PostgreSQL, abra o arquivo e execute
-todo o script com `Run on active connection`. Como o teste usa tabelas
-temporárias e termina com `ROLLBACK`, nenhuma tabela real é alterada.
-
-### Como aplicar no banco
+Os scripts em `src/sql/` permanecem como ferramentas de migração pontual para
+bancos criados antes da integração da coluna ao ETL. Eles adicionam a coluna e
+aplicam o backfill usando o snapshot histórico, mas não fazem parte da execução
+regular do loader.
 
 Execute primeiro o script que adiciona a coluna:
 
@@ -149,5 +143,16 @@ script de atualização:
 - atualiza somente `contratacao.compra_judicial`;
 - mostra as contagens finais de valores `NULL`, `TRUE` e `FALSE`.
 
-O CSV em `outputs/` é um artefato operacional volumoso e não deve ser
-versionado sem solicitação explícita.
+O arquivo `src/sql/test-populacao-sqltools.sql` continua disponível para
+simular esse fluxo legado com tabelas temporárias e `ROLLBACK`.
+
+### Banco novo ou carga futura
+
+- `src/ETL/BD/cria-esquema.sql` cria e documenta a coluna nullable
+  `compra_judicial BOOLEAN`;
+- `src/ETL/loaders/carrega-dados.R` calcula a classificação diretamente de
+  `data.objetoCompra`, depois de filtrar as contratações de medicamentos;
+- descrições ausentes recebem `FALSE` e as demais seguem a mesma normalização
+  e regra `judic` do notebook;
+- o upsert recalcula e atualiza a classificação quando `objeto_compra` mudar;
+- o snapshot histórico não é consultado durante a carga.

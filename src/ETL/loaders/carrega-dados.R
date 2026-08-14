@@ -103,6 +103,16 @@ contratacoes <- contratacoes %>%
 contratacoes <- contratacoes %>%
   semi_join(medicamentos, by = join_by(endpoint == endpointContratacao))
 
+# Calcula a classificação de compras judiciais a partir do objeto da compra
+contratacoes <- contratacoes %>%
+  mutate(
+    compra_judicial = vapply(
+      data.objetoCompra,
+      possui_indicativo_judicial,
+      logical(1)
+    )
+  )
+
 
 # EXTRAI TABELAS----------------------------------------------------------
 

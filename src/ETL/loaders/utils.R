@@ -90,7 +90,8 @@ suppressPackageStartupMessages(library(dotenv))
     "data.amparoLegal.codigo",
     "data.amparoLegal.nome",
     "data.modoDisputaId",
-    "data.modoDisputaNome"
+    "data.modoDisputaNome",
+    "compra_judicial"
   )
 
   COLUNAS_ITEM_HOMOLOGADO <- c(
@@ -393,6 +394,68 @@ valida_tabela_catalogo <- function(tabela, total_esperado) {
   invisible(tabela)
 }
 
+# Lista usada por nltk.corpus.stopwords.words("portuguese") no NLTK 3.9.1.
+STOPWORDS_PORTUGUES_NLTK <- strsplit(
+  paste(
+    "a à ao aos aquela aquelas aquele aqueles aquilo as às até com como",
+    "da das de dela delas dele deles depois do dos e é ela elas ele eles em",
+    "entre era eram éramos essa essas esse esses esta está estamos estão",
+    "estar estas estava estavam estávamos este esteja estejam estejamos estes",
+    "esteve estive estivemos estiver estivera estiveram estivéramos estiverem",
+    "estivermos estivesse estivessem estivéssemos estou eu foi fomos for fora",
+    "foram fôramos forem formos fosse fossem fôssemos fui há haja hajam",
+    "hajamos hão havemos haver hei houve houvemos houver houvera houverá",
+    "houveram houvéramos houverão houverei houverem houveremos houveria",
+    "houveriam houveríamos houvermos houvesse houvessem houvéssemos isso isto",
+    "já lhe lhes mais mas me mesmo meu meus minha minhas muito na não nas nem",
+    "no nos nós nossa nossas nosso nossos num numa o os ou para pela pelas",
+    "pelo pelos por qual quando que quem são se seja sejam sejamos sem ser",
+    "será serão serei seremos seria seriam seríamos seu seus só somos sou sua",
+    "suas também te tem tém temos tenha tenham tenhamos tenho terá terão terei",
+    "teremos teria teriam teríamos teu teus teve tinha tinham tínhamos tive",
+    "tivemos tiver tivera tiveram tivéramos tiverem tivermos tivesse tivessem",
+    "tivéssemos tu tua tuas um uma você vocês vos"
+  ),
+  "[[:space:]]+"
+)[[1]]
+
+#' Normaliza texto seguindo a regra de referência do notebook
+#'
+#' A normalização converte o texto para minúsculas, remove as stopwords em
+#' português do NLTK, remove acentos com normalização NFKD e normaliza espaços.
+#'
+#' @param texto Texto escalar a ser normalizado.
+#'
+#' @return Texto normalizado.
+limpa_texto <- function(texto) {
+  texto <- tolower(as.character(texto))
+
+  palavras <- strsplit(texto, "[[:space:]]+", perl = TRUE)[[1]]
+  palavras <- palavras[nzchar(palavras)]
+  palavras <- palavras[!palavras %in% STOPWORDS_PORTUGUES_NLTK]
+  texto <- paste(palavras, collapse = " ")
+
+  texto <- stringi::stri_trans_nfkd(texto)
+  texto <- stringi::stri_replace_all_regex(texto, "\\p{M}", "")
+  texto <- gsub("[[:space:]]+", " ", texto, perl = TRUE)
+
+  trimws(texto)
+}
+
+#' Identifica possível referência a demanda judicial em uma descrição
+#'
+#' @param descricao Descrição escalar do objeto da contratação.
+#'
+#' @return `TRUE` quando o texto normalizado contém `judic`; caso contrário,
+#'   `FALSE`.
+possui_indicativo_judicial <- function(descricao) {
+  if (length(descricao) == 0 || is.na(descricao)) {
+    return(FALSE)
+  }
+
+  grepl("judic", limpa_texto(descricao), fixed = TRUE)
+}
+
 # Consultas de inserção no banco
 {
 
@@ -450,9 +513,9 @@ valida_tabela_catalogo <- function(tabela, total_esperado) {
         codigo_tipo_instrumento_convocatorio, nome_tipo_instrumento_convocatorio,
         codigo_modalidade, nome_modalidade,
         codigo_amparo_legal, nome_amparo_legal,
-        codigo_modo_disputa, nome_modo_disputa
+        codigo_modo_disputa, nome_modo_disputa, compra_judicial
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
     ON CONFLICT (numero_controle_pncp)
     DO UPDATE SET
         objeto_compra = $4,
@@ -468,7 +531,8 @@ valida_tabela_catalogo <- function(tabela, total_esperado) {
         codigo_amparo_legal = $14,
         nome_amparo_legal = $15,
         codigo_modo_disputa = $16,
-        nome_modo_disputa = $17;"
+        nome_modo_disputa = $17,
+        compra_judicial = $18;"
 
   # Insere um item homologado novo ou, caso o item já exista no banco, atualiza os campos
   CONSULTA_INSERIR_ITEM_HOMOLOGADO <- "
