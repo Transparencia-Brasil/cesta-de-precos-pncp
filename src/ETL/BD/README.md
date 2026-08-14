@@ -155,6 +155,7 @@ Compras públicas registradas no PNCP. Cada registro corresponde a um processo l
 | `nome_amparo_legal` | VARCHAR(100) | NOT NULL | Descrição do amparo legal (Lei 14.133/2021, etc.) |
 | `codigo_modo_disputa` | SMALLINT | NOT NULL | Código do modo de disputa |
 | `nome_modo_disputa` | VARCHAR(100) | NOT NULL | Descrição do modo de disputa (aberto, fechado, etc.) |
+| `usuario_nome` | TEXT | nullable | Nome do usuário ou sistema que enviou a contratação ao PNCP |
 | `compra_judicial` | BOOLEAN | nullable | Indica possível referência a demanda judicial no objeto da contratação |
 | `data_insercao` | TIMESTAMP | DEFAULT NOW() | Timestamp automático de carga |
 

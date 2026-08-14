@@ -80,6 +80,7 @@ Durante a transformação, o script:
 - remove linhas sem `endpoint`;
 - reconstrói URLs de rastreabilidade (`urlAPI` e `urlPNCP`);
 - mantém somente contratações que possuem itens classificados como medicamentos;
+- preserva `data.usuarioNome` em `contratacao.usuario_nome`;
 - calcula `compra_judicial` a partir de `data.objetoCompra`;
 - inclui contratantes principais e, quando existirem, contratantes sub-rogados;
 - separa itens com resultado em `item_homologado` e itens sem resultado em `item_licitado`;
