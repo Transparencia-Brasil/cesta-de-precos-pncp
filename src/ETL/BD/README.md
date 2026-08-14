@@ -159,7 +159,7 @@ Compras públicas registradas no PNCP. Cada registro corresponde a um processo l
 | `compra_judicial` | BOOLEAN | nullable | Indica possível referência a demanda judicial no objeto da contratação |
 | `data_insercao` | TIMESTAMP | DEFAULT NOW() | Timestamp automático de carga |
 
-**Comportamento em conflito:** `ON CONFLICT (numero_controle_pncp) DO UPDATE` — atualiza os campos de valor, data, modalidade, usuário de envio e classificação de compra judicial com os dados mais recentes. Quando `data.usuarioNome` não é informado pela API, `usuario_nome` permanece `NULL`.
+**Comportamento em conflito:** `ON CONFLICT (numero_controle_pncp) DO UPDATE` — atualiza os campos de valor, data, modalidade e a classificação de compra judicial com os dados mais recentes.
 
 ---
 
@@ -256,7 +256,7 @@ A ordem de inserção dentro de `carrega-dados.R` respeita as dependências de F
 
 As queries SQL parametrizadas ficam centralizadas em [`src/ETL/loaders/utils.R`](../loaders/utils.R), que também expõe a função `conecta_bd_medicamentos_transparentes()` para leitura das variáveis do `.env`.
 
-A coluna `contratacao.usuario_nome` recebe diretamente `data.usuarioNome` da API do PNCP e é atualizada em reexecuções pela chave `numero_controle_pncp`. A coluna `contratacao.compra_judicial` é calculada pelo loader a partir de `data.objetoCompra`, depois do filtro de contratações com itens classificados como medicamentos. Descrições ausentes recebem `FALSE`; nos demais casos, o texto é normalizado e classificado pela ocorrência de `judic`. O snapshot histórico da task não é uma dependência da carga.
+A coluna `contratacao.compra_judicial` é calculada pelo loader a partir de `data.objetoCompra`, depois do filtro de contratações com itens classificados como medicamentos. Descrições ausentes recebem `FALSE`; nos demais casos, o texto é normalizado e classificado pela ocorrência de `judic`. O snapshot histórico da task não é uma dependência da carga.
 
 ---
 
