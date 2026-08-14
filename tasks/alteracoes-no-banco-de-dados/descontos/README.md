@@ -4,6 +4,14 @@ Esta task adiciona e popula em `item_homologado` os atributos de benefícios,
 margens de preferência, critérios de desempate e desconto disponíveis no
 dataset `src/inputs/descontos.csv`.
 
+- Entrada em produção das colunas e do backfill: **22/07/2026**.
+- Resolução da integração permanente no ETL (issue #65): **14/08/2026**.
+
+Após a resolução da issue #65, esta task permanece exclusivamente como snapshot
+de auditoria, validação e eventual migração ou reversão de bancos antigos. O
+fluxo permanente obtém os campos diretamente das respostas da API do PNCP e não
+lê o CSV desta task.
+
 A atualização usa a chave composta `(numero_controle_pncp, numero_item)`. Ela
 altera somente itens já existentes no banco e não insere chaves ausentes.
 
@@ -15,9 +23,10 @@ altera somente itens já existentes no banco e não insere chaves ausentes.
 - `src/sql/test-populacao-sqltools.sql`: teste autocontido que termina com `ROLLBACK`;
 - `src/sql/rollback-item-homologado-descontos.sql`: rollback emergencial do schema.
 
-Os arquivos `tasks/verifica-descontos/src/join-descontos.R` e
-`src/ETL/BD/cria-esquema.sql` são referências desta alteração e não são
-modificados pela task.
+O arquivo `tasks/verifica-descontos/src/join-descontos.R` documenta a preparação
+do snapshot. O schema permanente em `src/ETL/BD/cria-esquema.sql` passou a
+incorporar as mesmas 18 colunas, mas os scripts e o CSV desta task não fazem
+parte da execução normal do ETL.
 
 ## Colunas de destino
 

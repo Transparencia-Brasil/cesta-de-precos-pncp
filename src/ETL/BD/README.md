@@ -156,6 +156,7 @@ Compras públicas registradas no PNCP. Cada registro corresponde a um processo l
 | `nome_amparo_legal` | VARCHAR(100) | NOT NULL | Descrição do amparo legal (Lei 14.133/2021, etc.) |
 | `codigo_modo_disputa` | SMALLINT | NOT NULL | Código do modo de disputa |
 | `nome_modo_disputa` | VARCHAR(100) | NOT NULL | Descrição do modo de disputa (aberto, fechado, etc.) |
+| `usuario_nome` | TEXT | nullable | Nome do usuário ou sistema que enviou a contratação ao PNCP |
 | `compra_judicial` | BOOLEAN | nullable | Indica possível referência a demanda judicial no objeto da contratação |
 | `data_insercao` | TIMESTAMP | DEFAULT NOW() | Timestamp automático de carga |
 
@@ -207,6 +208,24 @@ Itens de medicamentos que já receberam resultado de adjudicação ou cancelamen
 | `data_resultado` | TIMESTAMP | — | Data do resultado |
 | `data_cancelamento` | TIMESTAMP | — | Data de cancelamento (quando aplicável) |
 | `motivo_cancelamento` | VARCHAR(1000) | — | Descrição do motivo de cancelamento |
+| `aplicacao_beneficio_me_epp` | BOOLEAN | nullable | Aplicação de benefício para ME/EPP no resultado |
+| `incentivo_produtivo_basico` | BOOLEAN | nullable | Incentivo ao processo produtivo básico informado no item |
+| `exigencia_conteudo_nacional` | BOOLEAN | nullable | Exigência de conteúdo nacional informada no item |
+| `aplicabilidade_margem_preferencia_normal` | BOOLEAN | nullable | Aplicabilidade da margem de preferência normal no item |
+| `aplicabilidade_margem_preferencia_adicional` | BOOLEAN | nullable | Aplicabilidade da margem de preferência adicional no item |
+| `tipo_margem_preferencia_codigo` | INTEGER | nullable | Código do tipo de margem de preferência do item |
+| `tipo_margem_preferencia_nome` | TEXT | nullable | Nome do tipo de margem de preferência do item |
+| `percentual_margem_preferencia_normal` | NUMERIC | nullable | Percentual da margem de preferência normal |
+| `percentual_margem_preferencia_adicional` | NUMERIC | nullable | Percentual da margem de preferência adicional |
+| `aplicacao_margem_preferencia` | BOOLEAN | nullable | Aplicação de margem de preferência no resultado |
+| `amparo_legal_margem_preferencia_id` | INTEGER | nullable | Identificador do amparo legal da margem de preferência |
+| `amparo_legal_margem_preferencia_nome` | TEXT | nullable | Nome do amparo legal da margem de preferência |
+| `amparo_legal_margem_preferencia_descricao` | TEXT | nullable | Descrição do amparo legal da margem de preferência |
+| `aplicacao_criterio_desempate` | BOOLEAN | nullable | Aplicação de critério de desempate no resultado |
+| `amparo_legal_criterio_desempate_id` | INTEGER | nullable | Identificador do amparo legal do critério de desempate |
+| `amparo_legal_criterio_desempate_nome` | TEXT | nullable | Nome do amparo legal do critério de desempate |
+| `amparo_legal_criterio_desempate_descricao` | TEXT | nullable | Descrição do amparo legal do critério de desempate |
+| `percentual_desconto` | NUMERIC | nullable | Percentual de desconto do resultado, sem restrição de faixa |
 | `url_api` | VARCHAR(1000) | NOT NULL | URL do endpoint da API PNCP (rastreabilidade) |
 | `url_pncp` | VARCHAR(1000) | NOT NULL | URL pública no portal PNCP (rastreabilidade) |
 | `data_insercao` | TIMESTAMP | DEFAULT NOW() | Timestamp automático de carga |
@@ -215,17 +234,17 @@ Itens de medicamentos que já receberam resultado de adjudicação ou cancelamen
 
 **Chaves estrangeiras:** todas com `ON DELETE RESTRICT`.
 
-**Comportamento em conflito:** `ON CONFLICT DO UPDATE` — atualiza todos os campos de resultado e valor.
+**Comportamento em conflito:** `ON CONFLICT DO UPDATE` — atualiza todos os campos de resultado, valor, benefícios, margens, desempate e desconto.
 
 ---
 
 ### `item_licitado`
 
-Itens de medicamentos ainda sem resultado de adjudicação. Possui o mesmo conjunto de colunas descritivas de `item_homologado`, sem as colunas de resultado.
+Itens de medicamentos ainda sem resultado de adjudicação. Preserva a estrutura anterior e não recebe os 18 campos de benefícios, margens, desempate e descontos adicionados a `item_homologado`.
 
 **Colunas presentes (subconjunto de `item_homologado`)**: `numero_controle_pncp`, `numero_item`, `codigo_item_catalogo`, `cnpj_contratante`, `codigo_unidade_contratante`, `cnpj_contratante_subrogado`, `codigo_unidade_contratante_subrogado`, `descricao`, `unidade_medida`, `material_servico`, campos de categoria e catálogo, NCM/NBS, critério de julgamento, situação do item, tipo de benefício, `orcamento_sigiloso`, valores e quantidades estimadas, `url_api`, `url_pncp`, `data_insercao`.
 
-**Colunas ausentes em relação a `item_homologado`:** `ni_fornecedor` e todos os campos de resultado (`codigo_situacao_resultado`, `valor_unitario_homologado`, `valor_total_homologado`, `quantidade_homologada`, `moeda_estrangeira`, `valor_nominal_moeda_estrangeira`, `data_resultado`, `data_cancelamento`, `motivo_cancelamento`).
+**Colunas ausentes em relação a `item_homologado`:** `ni_fornecedor`, os campos tradicionais de resultado (`codigo_situacao_resultado`, `valor_unitario_homologado`, `valor_total_homologado`, `quantidade_homologada`, `moeda_estrangeira`, `valor_nominal_moeda_estrangeira`, `data_resultado`, `data_cancelamento`, `motivo_cancelamento`) e os 18 campos de benefícios, margens, desempate e descontos. Na recoleta, os dez campos retornados pelo endpoint de resultados são gravados em `item_homologado`; os oito campos exclusivos do item permanecem `NULL`.
 
 **PK composta:** `(numero_controle_pncp, numero_item)`.
 

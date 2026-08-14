@@ -156,31 +156,11 @@ contratacoes <- contratacoes %>%
 
 # Cria a tabela "item_homologado" (item com resultado)
 {
-  # Une as contratações, itens e resultados em um único dataframe
-  tb_item_homologado <- medicamentos %>%
-    inner_join(
-      resultados,
-      by = join_by(endpointResultado == endpoint),
-      suffix = c("", "Resultado"),
-      multiple = "first"
-    ) %>% # se ouver mais de um resultado, usar só o primeiro
-    inner_join(
-      contratacoes,
-      by = join_by(endpointContratacao == endpoint),
-      suffix = c("", "Contratacao")
-    )
-
-  # Seleciona apenas as colunas que serão inseridas no banco de dados
-  tb_item_homologado <- tb_item_homologado %>% select(any_of(COLUNAS_ITEM_HOMOLOGADO))
-
-  # Se houver colunas faltantes, elas são preenchidas como NA
-  colunas_faltantes <- setdiff(COLUNAS_ITEM_HOMOLOGADO, names(tb_item_homologado))
-  for (col in colunas_faltantes) {
-    tb_item_homologado[col] <- NA
-  }
-
-  # Organiza as colunas na ordem correta de inserção
-  tb_item_homologado <- tb_item_homologado[COLUNAS_ITEM_HOMOLOGADO]
+  tb_item_homologado <- monta_item_homologado(
+    medicamentos,
+    resultados,
+    contratacoes
+  )
 }
 
 # Cria a tabela "item_licitado" (item sem resultado)

@@ -94,53 +94,6 @@ resultados <- resultados %>%
   mutate(numeroItem = suppressWarnings(as.integer(numeroItem)))
 
 
-# Colunas da tabela item_licitado + colunas dos resultados do PNCP
-COLUNAS_ITEM_HOMOLOGADO <- c(
-  "numero_controle_pncp",
-  "codigo_item_catalogo",
-  "cnpj_contratante",
-  "codigo_unidade_contratante",
-  "cnpj_contratante_subrogado",
-  "codigo_unidade_contratante_subrogado",
-  "niFornecedor",                      # Essa coluna vem dos resultados
-  "numero_item",
-  "descricao",
-  "unidade_medida",
-  "material_servico",
-  "codigo_categoria_item",
-  "nome_categoria_item",
-  "codigo_catalogo",
-  "nome_catalogo",
-  "codigo_categoria_item_catalogo",
-  "nome_categoria_item_catalogo",
-  "codigo_item_catalogo_pncp",
-  "codigo_ncm_nbs",
-  "descricao_ncm_nbs",
-  "codigo_criterio_julgamento",
-  "nome_criterio_julgamento",
-  "codigo_situacao_item",
-  "nome_situacao_item",
-  "codigo_tipo_beneficio",
-  "nome_tipo_beneficio",
-  "orcamento_sigiloso",
-  "valor_unitario_estimado",
-  "valor_total_estimado",
-  "quantidade_estimada",
-  "situacaoCompraItemResultadoId",     # Essa coluna vem dos resultados
-  "situacaoCompraItemResultadoNome",   # Essa coluna vem dos resultados
-  "valorUnitarioHomologado",           # Essa coluna vem dos resultados
-  "valorTotalHomologado",              # Essa coluna vem dos resultados
-  "quantidadeHomologada",              # Essa coluna vem dos resultados
-  "moedaEstrangeira.simbolo",          # Essa coluna vem dos resultados
-  "valorNominalMoedaEstrangeira",      # Essa coluna vem dos resultados
-  "dataResultado",                     # Essa coluna vem dos resultados
-  "dataCancelamento",                  # Essa coluna vem dos resultados
-  "motivoCancelamento",                # Essa coluna vem dos resultados
-  "url_api",
-  "url_pncp"
-)
-
-
 # Cria a tabela "fornecedor"
 {
   message('Cria a tabela "fornecedor"')
@@ -153,18 +106,10 @@ COLUNAS_ITEM_HOMOLOGADO <- c(
 # Une os resultados dos itens ao restante das informações para criar a tabela item_homologado
 {
   message('Une os resultados dos itens ao restante das informações para criar a tabela item_homologado')
-  tb_item_homologado <- tb_item_licitado %>%
-    inner_join(
-      resultados,
-      by = join_by(
-        numero_controle_pncp == numeroControlePNCPCompra,
-        numero_item == numeroItem
-      ),
-      suffix = c("", "Resultado"),
-      multiple = "first" # se ouver mais de um resultado, usar só o primeiro
-    ) %>%
-    as_tibble() |>
-    select(all_of(COLUNAS_ITEM_HOMOLOGADO))
+  tb_item_homologado <- monta_item_homologado_recoleta(
+    tb_item_licitado,
+    resultados
+  )
 }
 
 # Contages antes da inserção
