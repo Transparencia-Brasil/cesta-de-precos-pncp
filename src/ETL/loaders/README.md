@@ -86,6 +86,18 @@ Durante a transformação, o script:
 - separa itens com resultado em `item_homologado` e itens sem resultado em `item_licitado`;
 - preenche como `NA` colunas opcionais ausentes nos CSVs de entrada.
 
+Na construção de `item_homologado`, o loader também combina oito campos de
+benefícios e margens vindos dos itens com dez campos de benefícios, margens,
+desempate e desconto vindos dos resultados. Esses campos são convertidos para
+os tipos PostgreSQL esperados; valores ausentes permanecem `NULL` e
+`percentual_desconto` não possui limite de faixa.
+
+Na recoleta, somente os dez campos retornados pelo endpoint de resultados estão
+disponíveis. Os oito campos exclusivos do item permanecem `NULL`, pois
+`item_licitado` não armazena esses atributos. A task
+`tasks/alteracoes-no-banco-de-dados/descontos/` é apenas um snapshot histórico
+de auditoria e nunca é lida pela carga regular ou pela recoleta.
+
 A ordem de inserção respeita as dependências do schema:
 
 ```text

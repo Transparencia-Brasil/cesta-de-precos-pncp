@@ -115,6 +115,24 @@ CREATE TABLE item_homologado (
     data_resultado TIMESTAMP,
     data_cancelamento TIMESTAMP,
     motivo_cancelamento VARCHAR(1000),
+    aplicacao_beneficio_me_epp BOOLEAN,
+    incentivo_produtivo_basico BOOLEAN,
+    exigencia_conteudo_nacional BOOLEAN,
+    aplicabilidade_margem_preferencia_normal BOOLEAN,
+    aplicabilidade_margem_preferencia_adicional BOOLEAN,
+    tipo_margem_preferencia_codigo INTEGER,
+    tipo_margem_preferencia_nome TEXT,
+    percentual_margem_preferencia_normal NUMERIC,
+    percentual_margem_preferencia_adicional NUMERIC,
+    aplicacao_margem_preferencia BOOLEAN,
+    amparo_legal_margem_preferencia_id INTEGER,
+    amparo_legal_margem_preferencia_nome TEXT,
+    amparo_legal_margem_preferencia_descricao TEXT,
+    aplicacao_criterio_desempate BOOLEAN,
+    amparo_legal_criterio_desempate_id INTEGER,
+    amparo_legal_criterio_desempate_nome TEXT,
+    amparo_legal_criterio_desempate_descricao TEXT,
+    percentual_desconto NUMERIC,
     url_api VARCHAR(1000) NOT NULL,
     url_pncp VARCHAR(1000) NOT NULL,
     data_insercao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -125,6 +143,43 @@ CREATE TABLE item_homologado (
     FOREIGN KEY (cnpj_contratante_subrogado, codigo_unidade_contratante_subrogado) REFERENCES contratante (cnpj, codigo_unidade) ON DELETE SET NULL,
     FOREIGN KEY (ni_fornecedor) REFERENCES fornecedor (ni) ON DELETE RESTRICT
 );
+
+COMMENT ON COLUMN item_homologado.aplicacao_beneficio_me_epp IS
+  'Indica a aplicacao de beneficio para microempresa ou empresa de pequeno porte no resultado do item.';
+COMMENT ON COLUMN item_homologado.incentivo_produtivo_basico IS
+  'Indica a aplicacao de incentivo ao processo produtivo basico no item licitado.';
+COMMENT ON COLUMN item_homologado.exigencia_conteudo_nacional IS
+  'Indica a exigencia de conteudo nacional no item licitado.';
+COMMENT ON COLUMN item_homologado.aplicabilidade_margem_preferencia_normal IS
+  'Indica a aplicabilidade de margem de preferencia normal no item licitado.';
+COMMENT ON COLUMN item_homologado.aplicabilidade_margem_preferencia_adicional IS
+  'Indica a aplicabilidade de margem de preferencia adicional no item licitado.';
+COMMENT ON COLUMN item_homologado.tipo_margem_preferencia_codigo IS
+  'Codigo do tipo de margem de preferencia do item licitado.';
+COMMENT ON COLUMN item_homologado.tipo_margem_preferencia_nome IS
+  'Nome do tipo de margem de preferencia do item licitado.';
+COMMENT ON COLUMN item_homologado.percentual_margem_preferencia_normal IS
+  'Percentual da margem de preferencia normal do item licitado.';
+COMMENT ON COLUMN item_homologado.percentual_margem_preferencia_adicional IS
+  'Percentual da margem de preferencia adicional do item licitado.';
+COMMENT ON COLUMN item_homologado.aplicacao_margem_preferencia IS
+  'Indica a aplicacao de margem de preferencia no resultado do item.';
+COMMENT ON COLUMN item_homologado.amparo_legal_margem_preferencia_id IS
+  'Identificador do amparo legal da margem de preferencia aplicada ao resultado do item.';
+COMMENT ON COLUMN item_homologado.amparo_legal_margem_preferencia_nome IS
+  'Nome do amparo legal da margem de preferencia aplicada ao resultado do item.';
+COMMENT ON COLUMN item_homologado.amparo_legal_margem_preferencia_descricao IS
+  'Descricao do amparo legal da margem de preferencia aplicada ao resultado do item.';
+COMMENT ON COLUMN item_homologado.aplicacao_criterio_desempate IS
+  'Indica a aplicacao de criterio de desempate no resultado do item.';
+COMMENT ON COLUMN item_homologado.amparo_legal_criterio_desempate_id IS
+  'Identificador do amparo legal do criterio de desempate aplicado ao resultado do item.';
+COMMENT ON COLUMN item_homologado.amparo_legal_criterio_desempate_nome IS
+  'Nome do amparo legal do criterio de desempate aplicado ao resultado do item.';
+COMMENT ON COLUMN item_homologado.amparo_legal_criterio_desempate_descricao IS
+  'Descricao do amparo legal do criterio de desempate aplicado ao resultado do item.';
+COMMENT ON COLUMN item_homologado.percentual_desconto IS
+  'Percentual de desconto informado no resultado do item, sem restricao de faixa.';
 
 CREATE TABLE item_licitado (
     numero_controle_pncp VARCHAR(30) NOT NULL,
