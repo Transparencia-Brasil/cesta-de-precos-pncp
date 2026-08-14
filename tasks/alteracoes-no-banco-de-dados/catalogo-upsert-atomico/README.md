@@ -30,7 +30,20 @@ psql -d medicamentos_transparentes \
 ```
 
 Registre o nome exibido como `BACKUP_CATALOGO`. O backup não é removido
-automaticamente.
+automaticamente. Ele pode ser consultado em:
+
+```sql
+SELECT schemaname,
+       tablename,
+       pg_size_pretty(
+         pg_total_relation_size(
+           format('%I.%I', schemaname, tablename)
+         )
+       ) AS tamanho
+FROM pg_tables
+WHERE tablename LIKE 'catalogo_backup_%'
+ORDER BY tablename DESC;
+```
 
 ## Carga
 
