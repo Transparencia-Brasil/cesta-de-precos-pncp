@@ -146,6 +146,25 @@ salva_resultados <- function(output_dir) {
 #' coleta(endpoints, output_dir = "dados_coletados", tamanho_lote = 500)
 coleta <- function(endpoints, output_dir = here("coleta"), tamanho_lote = 1000, template) {
 
+  novo_df_erros <- function() {
+    data.frame(
+      endpoint = character(),
+      mensagem_erro = character(),
+      stringsAsFactors = FALSE
+    )
+  }
+
+  novo_df_monitoramento <- function() {
+    data.frame(
+      lote = integer(),
+      tamanho = integer(),
+      inicio = as.POSIXct(character()),
+      fim = as.POSIXct(character()),
+      duracao = double(),
+      stringsAsFactors = FALSE
+    )
+  }
+
   #' Verifica o progresso da coleta de dados e retorna endpoints pendentes
   #'
   #' A função `checkpoint()` cria um diretório temporário se ele não existir e verifica
@@ -206,10 +225,37 @@ coleta <- function(endpoints, output_dir = here("coleta"), tamanho_lote = 1000, 
   df_dados <- data.frame()
 
   # Inicializa dataframe para armazenar erros
-  df_erros <- data.frame()
+  df_erros <- novo_df_erros()
 
   # Inicializa dataframe para monitoramento da coleta
-  df_monitoramento <- data.frame()
+  df_monitoramento <- novo_df_monitoramento()
+
+  if (length(endpoints_restantes) == 0) {
+    arquivos_vazios <- list(
+      dados = list(path = PATH_DADOS, dados = template),
+      erros = list(path = PATH_ERROS, dados = df_erros),
+      monitoramento = list(
+        path = PATH_MONITORAMENTO,
+        dados = df_monitoramento
+      )
+    )
+
+    for (arquivo in arquivos_vazios) {
+      if (!file.exists(arquivo$path) || file.size(arquivo$path) == 0) {
+        fwrite(
+          arquivo$dados,
+          arquivo$path,
+          sep = ",",
+          row.names = FALSE,
+          quote = TRUE
+        )
+      }
+    }
+
+    cat("Nenhum endpoint pendente. Arquivos de saída foram preparados.\n")
+    salva_resultados(output_dir)
+    return(invisible(NULL))
+  }
 
   # Total de lotes restantes
   total_lotes <- ceiling(length(endpoints_restantes) / tamanho_lote)
@@ -220,22 +266,45 @@ coleta <- function(endpoints, output_dir = here("coleta"), tamanho_lote = 1000, 
   # Loop para processar os endpoints pendentes
   for (i in seq_along(endpoints_restantes)) {
     endpoint <- endpoints_restantes[i]
+    endpoint_coletado <- TRUE
+    endpoint_sem_registros <- FALSE
 
     # Tenta coletar os dados e trata erros
     tryCatch({
       resposta <- coleta_endpoint(endpoint)
-      # Adiciona os dados coletados ao dataframe de dados
-      df_dados <- bind_rows(df_dados, resposta)
+
+      if (nrow(resposta) == 0) {
+        endpoint_sem_registros <- TRUE
+      } else {
+        # Adiciona os dados coletados ao dataframe de dados
+        df_dados <- bind_rows(df_dados, resposta)
+      }
 
     }, error = function(e) {
       # Se houve erro, adicionar ao dataframe de erros
-      print(e$message)
+      endpoint_coletado <<- FALSE
       df_erros <<- bind_rows(df_erros, data.frame(
         endpoint = endpoint,
         mensagem_erro = as.character(e$message),
         stringsAsFactors = FALSE
       ))
     })
+
+    if (!endpoint_coletado) {
+      cat(
+        sprintf(
+          "Endpoint %d falhou após as tentativas e foi registrado em erros.csv: %s",
+          i,
+          df_erros$mensagem_erro[[nrow(df_erros)]]
+        ),
+        "\n"
+      )
+    } else if (endpoint_sem_registros) {
+      cat(sprintf("Endpoint %d sem registros (HTTP 204).", i), "\n")
+    } else {
+      cat(sprintf("Endpoint %d coletado", i), "\r")
+    }
+    flush.console()
 
     # A cada fim de lote, salvar os resultados no disco
     if (i %% tamanho_lote == 0 || i == length(endpoints_restantes)) {
@@ -268,8 +337,8 @@ coleta <- function(endpoints, output_dir = here("coleta"), tamanho_lote = 1000, 
 
       # Reinicializa os dataframes de dados, erros e monitoramento
       df_dados <- data.frame()
-      df_erros <- data.frame()
-      df_monitoramento <- data.frame()
+      df_erros <- novo_df_erros()
+      df_monitoramento <- novo_df_monitoramento()
 
       # Monitoramento do progresso
       lotes_restantes <- total_lotes - ceiling(i / tamanho_lote)
@@ -278,11 +347,6 @@ coleta <- function(endpoints, output_dir = here("coleta"), tamanho_lote = 1000, 
       inicio_lote <- Sys.time()
     }
 
-    # Informa o progresso da coleta
-    cat(sprintf("Endpoint %d coletado", i), "\r")
-    flush.console()
-    # Pausar brevemente entre as requisições para evitar sobrecarregar o servidor
-    Sys.sleep(0.5)
   }
 
   # Ao final da coleta, transfere os arquivos .csv para o diretório de saída
