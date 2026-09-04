@@ -104,34 +104,64 @@ paginas_por_modalidade <- data.frame()
 for (i in MODALIDADES) {
   endpoint <- monta_endpoint(PRIMEIRO_DIA, ULTIMO_DIA, i, 1, TAMANHO_PAGINA)
 
-  # Tenta coletar os dados e lança erros caso haja
-  tryCatch(
+  resultado_modalidade <- tryCatch(
     {
       resposta <- coleta_endpoint(endpoint)
-      resposta$erro <- FALSE
-      resposta$codigoModalidade <- i
-      resposta$endpoint <- endpoint
-      # Adiciona a resposta retornada ao dataframe `paginas_por_modalidade`
-      paginas_por_modalidade <- bind_rows(paginas_por_modalidade, resposta)
-    },
-    error = function(e) {
-      # Se houve erro, mostra a mensagem de erro e adiciona aos resultados
-      print(e$message)
-      paginas_por_modalidade <- bind_rows(
-        paginas_por_modalidade,
-        data.frame(
-          erro = TRUE,
+
+      if (nrow(resposta) == 0) {
+        resposta <- data.frame(
+          erro = FALSE,
           codigoModalidade = i,
           endpoint = endpoint,
-          mensagem_erro = as.character(e$message),
+          totalRegistros = 0L,
+          totalPaginas = 0L,
           stringsAsFactors = FALSE
         )
+
+        cat(sprintf("Modalidade %d sem registros (HTTP 204).", i), "\n")
+      } else {
+        resposta$erro <- FALSE
+        resposta$codigoModalidade <- i
+        resposta$endpoint <- endpoint
+
+        cat(
+          sprintf(
+            "Modalidade %d coletada: %d registros em %d páginas.",
+            i,
+            resposta$totalRegistros[[1]],
+            resposta$totalPaginas[[1]]
+          ),
+          "\n"
+        )
+      }
+
+      resposta
+    },
+    error = function(e) {
+      mensagem_erro <- sprintf("Modalidade %d: %s", i, e$message)
+      cat(
+        sprintf(
+          "Modalidade %d falhou após as tentativas: %s",
+          i,
+          e$message
+        ),
+        "\n"
+      )
+
+      data.frame(
+        erro = TRUE,
+        codigoModalidade = i,
+        endpoint = endpoint,
+        mensagem_erro = mensagem_erro,
+        stringsAsFactors = FALSE
       )
     }
   )
 
-  # Acompanhamento das consultas
-  cat(sprintf("Modalidade %d coletada", i), "\r")
+  paginas_por_modalidade <- bind_rows(
+    paginas_por_modalidade,
+    resultado_modalidade
+  )
   flush.console()
 }
 
