@@ -1,0 +1,224 @@
+---
+# COLETORES
+---
+
+INÍCIO DA COLETA ÀS '16-Aug-2026 01:54:56'
+
+Diretório: ENTRADA
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/src/ETL
+
+
+Diretório:
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp
+
+PARÂMETROS: 
+ - PRIMEIRO_DIA='2026-05-06' - é a data de início da coleta
+ - ULTIMO_DIA='2026-05-15' - é a data final da coleta
+ - ALIAS_COLETA='2026-05/DIA-06-ATE-15' - é um alias para identificar a coleta e apontar um destino no diretório de /coletas
+
+---
+## VALIDADOR DE TEMPLATES
+
+---
+# VALIDADOR DE TEMPLATES PNCP
+---
+Script:
+ - 'src/ETL/template/src/python/atualiza-templates.py'
+Python:
+ - './.venv/Scripts/python.exe'
+
+---
+Atualizando template: contratacoes
+Resumo contratacoes: 62 campos no template, 0 novos, 0 legados.
+---
+Atualizando template: itens
+Resumo itens: 49 campos no template, 0 novos, 0 legados.
+---
+Atualizando template: resultados_itens
+Resumo resultados_itens: 51 campos no template, 0 novos, 0 legados.
+---
+Templates atualizados em: C:\Users\rdurl\OneDrive\Documentos\cesta-de-precos-pncp\src\ETL\template\templates
+Campos novos: 0
+Campos legados preservados: 0
+
+Validação de templates concluída!
+
+Resposta: N
+
+Resposta: N
+
+---
+## CONTRATAÇÃO
+
+Script:
+ - 'src/ETL/coletores/coleta-contratacoes.R'
+
+Diretório de saída:
+ - 'coleta/contratacoes/2026-05/DIA-06-ATE-15'
+
+Screen criada para coletar contratações:
+ - 'coletor-contratacoes-2026-05-06-ate-2026-05-15'
+
+Saída sendo registrada em:
+ - 'coleta/contratacoes/2026-05/DIA-06-ATE-15/run-coletor-contratacoes-2026-05-06-ate-2026-05-15.log'.
+
+Parâmetros do coletor: 
+ - PATH_OUTPUT_DIR="coleta/contratacoes/2026-05/DIA-06-ATE-15"
+ - PRIMEIRO_DIA="2026-05-06"
+ - ULTIMO_DIA="2026-05-15"
+
+Coleta de CONTRATAÇÕES em execução...
+
+There is a screen on:
+	717.coletor-contratacoes-2026-05-06-ate-2026-05-15	(08/16/26 01:55:01)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+
+Aguardando a screen 'coletor-contratacoes-2026-05-06-ate-2026-05-15' encerrar...
+Screen coletor-contratacoes-2026-05-06-ate-2026-05-15 encerrada
+
+Coleta de CONTRATAÇÕES concluída!
+
+---
+## ITENS
+
+Script:
+ - 'src/ETL/coletores/coleta-itens.R'
+
+Diretório de saída:
+ - 'coleta/itens/2026-05/DIA-06-ATE-15'
+
+Screen criada para coletar itens:
+ - 'coletor-itens-2026-05-06-ate-2026-05-15'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2026-05/DIA-06-ATE-15/run-coletor-itens-2026-05-06-ate-2026-05-15.log'.
+
+Parâmetro do coletor:
+ - CONTRATACOES='coleta/contratacoes/2026-05/DIA-06-ATE-15/dados.csv'
+
+Coleta de ITENS em execução...
+
+There is a screen on:
+	4413.coletor-itens-2026-05-06-ate-2026-05-15	(08/16/26 05:21:22)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+Aguardando a screen 'coletor-itens-2026-05-06-ate-2026-05-15' encerrar...
+Screen coletor-itens-2026-05-06-ate-2026-05-15 encerrada
+
+Coleta de ITENS concluída!
+
+---
+## CLASSIFICADOR - FILTRA MEDICAMENTOS
+
+Script:
+ - 'src/ETL/classificador/filtra-medicamentos.py'
+
+Diretório de saída:
+ - 'coleta/itens/2026-05/DIA-06-ATE-15'
+
+Screen criada para coletar contratações:
+ - 'classificador-2026-05-06-ate-2026-05-15'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2026-05/DIA-06-ATE-15/run-classificador-2026-05-06-ate-2026-05-15.log'.
+
+Parâmetros do classificador:
+ITENS='coleta/itens/2026-05/DIA-06-ATE-15/dados.csv'
+CATALOGO='data/catmat/catmat-1.csv'
+
+Python a ser utilizado:
+ - './.venv/Scripts/python.exe'
+
+Filtragem e classificação de MEDICAMENTOS em execução...
+
+There is a screen on:
+	41862.classificador-2026-05-06-ate-2026-05-15	(08/17/26 14:51:23)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+
+Aguardando o arquivo 'coleta/itens/2026-05/DIA-06-ATE-15/medicamentos.csv' ser criado...
+
+Arquivo coleta/itens/2026-05/DIA-06-ATE-15/medicamentos.csv criado.
+Classificação e filtragem de MEDICAMENTOS de ITENS concluída!
+
+---
+## RESULTADOS
+
+Script:
+ - 'src/ETL/coletores/coleta-resultados.R'
+
+Diretório de saída:
+ - 'coleta/resultados/2026-05/DIA-06-ATE-15'
+
+Screen criada para coletar resultados:
+ - 'coletor-resultados-2026-05-06-ate-2026-05-15'
+
+Saída sendo registrada em:
+ - 'coleta/resultados/2026-05/DIA-06-ATE-15/run-coletor-resultados-2026-05-06-ate-2026-05-15.log'.
+
+Parâmetro do coletor:
+ - 'coleta/itens/2026-05/DIA-06-ATE-15/medicamentos.csv'
+
+Coleta de RESULTADOS em execução...
+
+There are screens on:
+	42692.coletor-resultados-2026-05-06-ate-2026-05-15	(08/17/26 17:01:50)	(Detached)
+	41862.classificador-2026-05-06-ate-2026-05-15	(08/17/26 15:04:24)	(Detached)
+2 Sockets in /run/screen/S-rdurl0.
+coletando resultados das contratações de medicamentos
+
+Aguardando a screen 'coletor-resultados-2026-05-06-ate-2026-05-15' encerrar...
+Screen coletor-resultados-2026-05-06-ate-2026-05-15 encerrada
+
+Coleta de RESULTADOS de MEDICAMENTOS concluída!
+
+---
+## PACOTE DE DADOS
+
+Diretório 'coleta/data-package/2026/5 - Maio/DIA-06-ATE-15/DATA' criado.
+Diretório 'coleta/data-package/2026/5 - Maio/DIA-06-ATE-15/LOG' criado.
+
+Arquivos csv principais copiados para coleta/data-package/2026/5 - Maio/DIA-06-ATE-15/DATA
+---
+## CARGA NO BANCO
+
+Carga no banco ignorada (usuário optou por não executar).
+
+---
+## RECOLETA DE RESULTADOS
+
+
+Recoleta de RESULTADOS ignorada (usuário optou por não executar).
+
+
+Arquivos csv disponíveis em coleta/data-package/2026/5 - Maio/DIA-06-ATE-15/DATA
+
+Arquivos de log copiados para coleta/data-package/2026/5 - Maio/DIA-06-ATE-15/LOG
+
+Estrutura do pacote de dados:
+
+[ 512]  coleta/data-package/2026/5 - Maio/DIA-06-ATE-15
+├── [ 512]  DATA
+│   ├── [ 224]  contratacoes-erros.csv
+│   ├── [ 205]  contratacoes-monitoramento.csv
+│   ├── [ 71M]  contratacoes.csv
+│   ├── [  28]  itens-erros.csv
+│   ├── [  28]  itens-medicamentos-resultados-erros.csv
+│   ├── [ 609]  itens-medicamentos-resultados-monitoramento.csv
+│   ├── [1.6M]  itens-medicamentos-resultados.csv
+│   ├── [2.9M]  itens-medicamentos.csv
+│   ├── [4.7K]  itens-monitoramento.csv
+│   └── [ 94M]  itens.csv
+└── [ 512]  LOG
+    ├── [ 594]  run-classificador-2026-05-06-ate-2026-05-15.log
+    ├── [205K]  run-coletor-contratacoes-2026-05-06-ate-2026-05-15.log
+    ├── [8.1M]  run-coletor-itens-2026-05-06-ate-2026-05-15.log
+    ├── [956K]  run-coletor-resultados-2026-05-06-ate-2026-05-15.log
+    └── [5.2K]  run-coletores-2026-05-DIA-06-ATE-15.log
+
+3 directories, 15 files
+
+COLETA ENCERRADA ÀS '17-Aug-2026 20:33:46'!
+
+Fim! =)
