@@ -19,6 +19,233 @@ suppressPackageStartupMessages(library(DBI))
 suppressPackageStartupMessages(library(RPostgres))
 suppressPackageStartupMessages(library(dotenv))
 
+# Tipagem dos CSVs de entrada ---------------------------------------------
+
+CAMINHOS_TEMPLATES_CSV_PNCP <- c(
+  contratacoes = "src/ETL/template/templates/template-contratacoes.csv",
+  medicamentos = "src/ETL/template/templates/template-itens.csv",
+  resultados = "src/ETL/template/templates/template-resultados-itens.csv"
+)
+
+TIPOS_EXTRAS_CSV_PNCP <- list(
+  contratacoes = list(
+    totalRegistros = readr::col_integer(),
+    totalPaginas = readr::col_integer(),
+    numeroPagina = readr::col_integer(),
+    paginasRestantes = readr::col_integer(),
+    empty = readr::col_logical(),
+    endpoint = readr::col_character()
+  ),
+  medicamentos = list(
+    catalogo = readr::col_character(),
+    categoriaItemCatalogo = readr::col_character(),
+    tipoMargemPreferencia = readr::col_character(),
+    codigo_pdm = readr::col_double(),
+    embedding = readr::col_character(),
+    codigo_br = readr::col_integer(),
+    similaridade = readr::col_double(),
+    medicamento = readr::col_logical()
+  ),
+  resultados = list(
+    moedaEstrangeira = readr::col_character(),
+    amparoLegalMargemPreferencia = readr::col_character(),
+    amparoLegalCriterioDesempate = readr::col_character(),
+    paisOrigemProdutoServico = readr::col_character(),
+    localidadeFornecedor = readr::col_character()
+  )
+)
+
+#' Converte um tipo do template PNCP em coletor do readr
+#'
+#' @param tipo_api Tipo informado no schema da API.
+#' @param formato_api Formato informado no schema da API.
+#' @param coluna Nome da coluna, usado em mensagens de erro.
+#'
+#' @return Um coletor criado por `readr::col_*()`.
+coletor_readr_pncp <- function(tipo_api, formato_api, coluna) {
+  tipo_api <- if (is.na(tipo_api)) "" else trimws(tipo_api)
+  formato_api <- if (is.na(formato_api)) "" else trimws(formato_api)
+
+  if (tipo_api == "string" && formato_api == "date") return(readr::col_date())
+  if (tipo_api == "string" && formato_api == "date-time") return(readr::col_datetime())
+  if (tipo_api %in% c("", "string", "object", "array")) return(readr::col_character())
+  if (tipo_api == "boolean") return(readr::col_logical())
+  if (tipo_api == "number") return(readr::col_double())
+  if (tipo_api == "integer" && formato_api == "int32") return(readr::col_integer())
+  if (tipo_api == "integer" && formato_api == "int64") return(readr::col_double())
+
+  msg_stop <- paste0(
+    "Tipo não mapeado no template para a coluna '%s':\n",
+    "tipo_api='%s',\nformato_api='%s'."
+  )
+
+  stop(sprintf(msg_stop, coluna, tipo_api, formato_api), call. = FALSE)
+}
+
+#' Monta a especificação completa de tipos de um CSV do PNCP
+#'
+#' Os templates versionados são a fonte de verdade para os campos da API. Os
+#' campos operacionais e os campos criados pelo classificador são adicionados
+#' por `TIPOS_EXTRAS_CSV_PNCP`.
+#'
+#' @param dataset Um de `contratacoes`, `medicamentos` ou `resultados`.
+#'
+#' @return Objeto `readr::cols()` com os tipos do dataset.
+tipos_colunas_csv_pncp <- function(dataset) {
+  dataset <- match.arg(dataset, names(CAMINHOS_TEMPLATES_CSV_PNCP))
+  caminho_template <- here::here(CAMINHOS_TEMPLATES_CSV_PNCP[[dataset]])
+
+  template <- readr::read_csv(
+    caminho_template,
+    col_types = readr::cols(.default = readr::col_character()),
+    show_col_types = FALSE,
+    progress = FALSE
+  )
+
+  colunas_metadados <- c(
+    "coluna_template", "tipo_api", "formato_api", "usar_no_template"
+  )
+  colunas_ausentes <- setdiff(colunas_metadados, names(template))
+  if (length(colunas_ausentes) > 0) {
+    stop(sprintf(
+      "O template de %s não contém as colunas obrigatórias: %s.",
+      dataset,
+      paste(colunas_ausentes, collapse = ", ")
+    ), call. = FALSE)
+  }
+
+  template <- template[
+    toupper(trimws(template$usar_no_template)) == "TRUE",
+    ,
+    drop = FALSE
+  ]
+
+  nomes_colunas <- trimws(template$coluna_template)
+  nomes_invalidos <- is.na(nomes_colunas) | nomes_colunas == ""
+  if (any(nomes_invalidos)) {
+    stop(sprintf(
+      "O template de %s contém coluna_template ausente ou vazia.",
+      dataset
+    ), call. = FALSE)
+  }
+
+  nomes_duplicados <- unique(nomes_colunas[duplicated(nomes_colunas)])
+  if (length(nomes_duplicados) > 0) {
+    stop(sprintf(
+      "O template de %s contém colunas duplicadas: %s.",
+      dataset,
+      paste(nomes_duplicados, collapse = ", ")
+    ), call. = FALSE)
+  }
+
+  coletores <- Map(
+    coletor_readr_pncp,
+    template$tipo_api,
+    template$formato_api,
+    nomes_colunas
+  )
+  names(coletores) <- nomes_colunas
+
+  coletores_extras <- TIPOS_EXTRAS_CSV_PNCP[[dataset]]
+  extras_nao_presentes <- setdiff(names(coletores_extras), names(coletores))
+  coletores[extras_nao_presentes] <- coletores_extras[extras_nao_presentes]
+
+  do.call(
+    readr::cols,
+    c(list(.default = readr::col_character()), coletores)
+  )
+}
+
+#' Lê um CSV do PNCP com schema determinístico e valida o parsing
+#'
+#' @param caminho Caminho do arquivo CSV.
+#' @param dataset Um de `contratacoes`, `medicamentos` ou `resultados`.
+#'
+#' @return Tibble com os tipos definidos pelo template do dataset.
+le_csv_pncp <- function(caminho, dataset) {
+  dataset <- match.arg(dataset, names(CAMINHOS_TEMPLATES_CSV_PNCP))
+  if (!file.exists(caminho)) {
+    stop(sprintf("Arquivo de %s não encontrado: %s.", dataset, caminho),
+         call. = FALSE)
+  }
+
+  tipos_completos <- tipos_colunas_csv_pncp(dataset)
+  cabecalho <- readr::read_csv(
+    caminho,
+    n_max = 0,
+    col_types = readr::cols(.default = readr::col_character()),
+    name_repair = "minimal",
+    show_col_types = FALSE,
+    progress = FALSE
+  )
+  nomes_colunas <- names(cabecalho)
+
+  nomes_duplicados <- unique(nomes_colunas[duplicated(nomes_colunas)])
+  if (length(nomes_duplicados) > 0) {
+    stop(sprintf(
+      "O CSV de %s contém colunas duplicadas: %s.",
+      dataset,
+      paste(nomes_duplicados, collapse = ", ")
+    ), call. = FALSE)
+  }
+
+  colunas_novas <- setdiff(nomes_colunas, names(tipos_completos$cols))
+  if (length(colunas_novas) > 0) {
+    warning(sprintf(
+      paste0(
+        "O CSV de %s contém colunas não previstas no template; ",
+        "elas serão lidas como texto: %s."
+      ),
+      dataset,
+      paste(colunas_novas, collapse = ", ")
+    ), call. = FALSE)
+  }
+
+  tipos_presentes <- tipos_completos
+  tipos_presentes$cols <- tipos_presentes$cols[
+    names(tipos_presentes$cols) %in% nomes_colunas
+  ]
+
+  dados <- readr::read_csv(
+    caminho,
+    col_types = tipos_presentes,
+    locale = readr::locale(encoding = "UTF-8", tz = "UTC"),
+    name_repair = "minimal",
+    show_col_types = FALSE,
+    progress = FALSE
+  )
+
+  problemas <- readr::problems(dados)
+  if (nrow(problemas) > 0) {
+    problemas_exibidos <- utils::head(problemas, 10)
+    detalhes <- sprintf(
+      "linha %s, coluna %s: esperado %s; encontrado '%s'",
+      problemas_exibidos$row,
+      problemas_exibidos$col,
+      problemas_exibidos$expected,
+      problemas_exibidos$actual
+    )
+    sufixo <- if (nrow(problemas) > nrow(problemas_exibidos)) {
+      sprintf(
+        "\n... e mais %d problema(s).",
+        nrow(problemas) - nrow(problemas_exibidos)
+      )
+    } else {
+      ""
+    }
+
+    stop(sprintf(
+      "Falha ao interpretar o CSV de %s (%d problema(s)):\n%s%s",
+      dataset,
+      nrow(problemas),
+      paste(detalhes, collapse = "\n"),
+      sufixo
+    ), call. = FALSE)
+  }
+
+  dados
+}
+
 # Mapeamento entre colunas dos arquivos do PNCP e colunas do banco de dados
 {
   COLUNAS_CATALOGO <- c(

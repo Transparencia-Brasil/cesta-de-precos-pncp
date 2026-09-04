@@ -95,3 +95,26 @@ Funções compartilhadas por todos os scripts R:
 - `coleta_endpoint()` — faz a requisição GET ao endpoint com retry e timeout configuráveis.
 - `coleta()` — itera sobre uma lista de endpoints, consolida dados, erros e monitoramento.
 - `salva_resultados()` — persiste os três CSVs de saída no diretório especificado.
+
+### Controle de taxa e novas tentativas
+
+Todas as etapas que usam `coleta_endpoint()` compartilham a mesma política por
+processo R. A variável de ambiente `PNCP_INTERVALO_REQUISICOES_SEGUNDOS`
+define o intervalo mínimo entre chamadas ao PNCP, em segundos. Quando ela não
+é informada, o intervalo padrão é de 2 segundos.
+
+Respostas transitórias usam até 15 novas tentativas com espera exponencial e
+jitter, limitada a 60 segundos. Quando o PNCP envia o cabeçalho `Retry-After`,
+o tempo indicado pela API tem precedência. Na descoberta inicial das
+contratações, todas as modalidades são consultadas e seus erros são salvos em
+`erros.csv`; se alguma falhar, a paginação não é iniciada para evitar uma
+coleta incompleta.
+
+Respostas HTTP 204 são tratadas como sucesso sem registros em contratações,
+itens e resultados. Elas não geram linhas em `dados.csv` nem entradas em
+`erros.csv`. Na descoberta de contratações, uma modalidade com HTTP 204 recebe
+zero registros e zero páginas, e a coleta continua com as demais modalidades.
+Outros status de sucesso com corpo vazio continuam sendo tratados como erro.
+
+O controle de taxa vale apenas dentro de um processo R. Não execute coletores
+simultâneos contra o PNCP sem coordenar o limite total de requisições.

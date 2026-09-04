@@ -1,0 +1,376 @@
+Mensagen de aviso:
+pacote 'httr2' foi compilado no R versão 4.6.1 
+
+PATH_OUTPUT_DIR: C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/coleta/contratacoes/2026-05/DIA-01-ATE-05
+
+PRIMEIRO_DIA: 2026-05-01
+
+ULTIMO_DIA: 2026-05-05
+
+Modalidade 1 coletada: 12 registros em 1 páginas. 
+Modalidade 2 sem registros (HTTP 204). 
+Modalidade 3 coletada: 1 registros em 1 páginas. 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Modalidade 4 coletada: 660 registros em 14 páginas. 
+Modalidade 5 coletada: 33 registros em 1 páginas. 
+Modalidade 6 coletada: 3585 registros em 72 páginas. 
+Modalidade 7 coletada: 103 registros em 3 páginas. 
+Falha transitória ao consultar o endpoint; nova tentativa em 1.2 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 2.4 segundos.
+Waiting 3s for retry backoff ■■■■■■■■■■■■■                   
+Waiting 3s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■       
+Waiting 3s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Falha transitória ao consultar o endpoint; nova tentativa em 4.5 segundos.
+Waiting 5s for retry backoff ■■■■■■■■■■■■■                   
+Waiting 5s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 12.3 segundos.
+Waiting 13s for retry backoff ■■■                             
+Waiting 13s for retry backoff ■■■■■■■■■                       
+Waiting 13s for retry backoff ■■■■■■■■■■■■■■■■                
+Waiting 13s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■        
+Waiting 13s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Modalidade 8 coletada: 6052 registros em 122 páginas. 
+Modalidade 9 coletada: 2352 registros em 48 páginas. 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■                  
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Modalidade 10 coletada: 4 registros em 1 páginas. 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Modalidade 11 coletada: 6 registros em 1 páginas. 
+Modalidade 12 coletada: 290 registros em 6 páginas. 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■                  
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Modalidade 13 coletada: 4 registros em 1 páginas. 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Modalidade 14 sem registros (HTTP 204). 
+Total de páginas a coletar: 271 
+Total de registros a coletar: 13102 
+Endpoint 1 coletado Endpoint 2 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 3 coletado Endpoint 4 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 5 coletado Endpoint 6 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 7 coletado Endpoint 8 coletado Endpoint 9 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 10 coletado Endpoint 11 coletado Endpoint 12 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 13 coletado Endpoint 14 coletado Endpoint 15 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 16 coletado Endpoint 17 coletado Endpoint 18 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 19 coletado Endpoint 20 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 21 coletado Endpoint 22 coletado Endpoint 23 coletado Endpoint 24 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 25 coletado Endpoint 26 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 27 coletado Endpoint 28 coletado Endpoint 29 coletado Endpoint 30 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 31 coletado Endpoint 32 coletado Endpoint 33 coletado Endpoint 34 coletado Endpoint 35 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 36 coletado Endpoint 37 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 38 coletado Endpoint 39 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■                  
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 40 coletado Endpoint 41 coletado Endpoint 42 coletado Endpoint 43 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 44 coletado Endpoint 45 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Falha transitória ao consultar o endpoint; nova tentativa em 1.3 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 1.2 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 4.7 segundos.
+Waiting 5s for retry backoff ■■■■■■■                         
+Waiting 5s for retry backoff ■■■■■■■■■■■■■■■■■■■■            
+Waiting 5s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 2.6 segundos.
+Waiting 3s for retry backoff ■■■■■■■■■■■■■■                  
+Waiting 3s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 21.6 segundos.
+Waiting 22s for retry backoff ■■■                             
+Waiting 22s for retry backoff ■■■■■■■                         
+Waiting 22s for retry backoff ■■■■■■■■■■■                     
+Waiting 22s for retry backoff ■■■■■■■■■■■■■■■■                
+Waiting 22s for retry backoff ■■■■■■■■■■■■■■■■■■■■            
+Waiting 22s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■        
+Waiting 22s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■    
+Waiting 22s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 46 coletado Endpoint 47 coletado Endpoint 48 coletado Endpoint 49 coletado Endpoint 50 coletado Endpoint 51 coletado Endpoint 52 coletado Endpoint 53 coletado Endpoint 54 coletado Endpoint 55 coletado Endpoint 56 coletado Endpoint 57 coletado Endpoint 58 coletado Endpoint 59 coletado Endpoint 60 coletado Endpoint 61 coletado Endpoint 62 coletado Endpoint 63 coletado Endpoint 64 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 65 coletado Endpoint 66 coletado Endpoint 67 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 68 coletado Endpoint 69 coletado Endpoint 70 coletado Endpoint 71 coletado Endpoint 72 coletado Endpoint 73 coletado Endpoint 74 coletado Endpoint 75 coletado Endpoint 76 coletado Endpoint 77 coletado Endpoint 78 coletado Falha transitória ao consultar o endpoint; nova tentativa em 1.8 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 1.5 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 1.9 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 14.4 segundos.
+Waiting 15s for retry backoff ■■■                             
+Waiting 15s for retry backoff ■■■■                            
+Waiting 15s for retry backoff ■■■■■■■■■■                      
+Waiting 15s for retry backoff ■■■■■■■■■■■■■■■■                
+Waiting 15s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■          
+Waiting 15s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Waiting 15s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 79 coletado Endpoint 80 coletado Endpoint 81 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 82 coletado Endpoint 83 coletado Endpoint 84 coletado Endpoint 85 coletado Endpoint 86 coletado Endpoint 87 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 88 coletado Endpoint 89 coletado Endpoint 90 coletado Endpoint 91 coletado Endpoint 92 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 93 coletado Endpoint 94 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 95 coletado Endpoint 96 coletado Endpoint 97 coletado Endpoint 98 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 99 coletado Endpoint 100 coletado Endpoint 101 coletado Endpoint 102 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 1.5 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 3.7 segundos.
+Waiting 4s for retry backoff ■■■■■■■■■                       
+Waiting 4s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■         
+Waiting 4s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 6.5 segundos.
+Waiting 7s for retry backoff ■■■■■■■■■■■                     
+Waiting 7s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■        
+Waiting 7s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 9.2 segundos.
+Waiting 10s for retry backoff ■■■■■■                          
+Waiting 10s for retry backoff ■■■■■■■■■■■■■■■■                
+Waiting 10s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■      
+Waiting 10s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 103 coletado Endpoint 104 coletado Endpoint 105 coletado Endpoint 106 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 107 coletado Endpoint 108 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 1.9 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 3.8 segundos.
+Waiting 4s for retry backoff ■■■■■■■■■                       
+Waiting 4s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■        
+Waiting 4s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 5.4 segundos.
+Waiting 6s for retry backoff ■■■■■■■■■■■■                    
+Waiting 6s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Waiting 6s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 11.2 segundos.
+Waiting 12s for retry backoff ■■■■■■■■                        
+Waiting 12s for retry backoff ■■■■■■■■■■■■■■■■                
+Waiting 12s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■        
+Waiting 12s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 109 coletado Endpoint 110 coletado Endpoint 111 coletado Endpoint 112 coletado Endpoint 113 coletado Endpoint 114 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Falha transitória ao consultar o endpoint; nova tentativa em 1.6 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 1.3 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 6.4 segundos.
+Waiting 7s for retry backoff ■■■■■■                          
+Waiting 7s for retry backoff ■■■■■■■■                        
+Waiting 7s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■         
+Waiting 7s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 9.9 segundos.
+Waiting 10s for retry backoff ■■■■                            
+Waiting 10s for retry backoff ■■■■■■■■■■■■■■                  
+Waiting 10s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■         
+Waiting 10s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 115 coletado Endpoint 116 coletado Endpoint 117 coletado Endpoint 118 coletado Endpoint 119 coletado Endpoint 120 coletado Falha transitória ao consultar o endpoint; nova tentativa em 1.7 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 3.0 segundos.
+Waiting 4s for retry backoff ■■■■■■■■■■■                     
+Waiting 4s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Falha transitória ao consultar o endpoint; nova tentativa em 4.5 segundos.
+Waiting 5s for retry backoff ■■■■■■■■                        
+Waiting 5s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■        
+Waiting 5s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Falha transitória ao consultar o endpoint; nova tentativa em 3.6 segundos.
+Waiting 4s for retry backoff ■■■■■■■■■■■■■■■■■■              
+Waiting 4s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 23.0 segundos.
+Waiting 23s for retry backoff ■■■                             
+Waiting 23s for retry backoff ■■■■■■                          
+Waiting 23s for retry backoff ■■■■■■■■■■                      
+Waiting 23s for retry backoff ■■■■■■■■■■■■■■                  
+Waiting 23s for retry backoff ■■■■■■■■■■■■■■■■■■              
+Waiting 23s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■          
+Waiting 23s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■      
+Waiting 23s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Waiting 23s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 121 coletado Endpoint 122 coletado Endpoint 123 coletado Endpoint 124 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 125 coletado Endpoint 126 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 127 coletado Endpoint 128 coletado Endpoint 129 coletado Falha transitória ao consultar o endpoint; nova tentativa em 1.9 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 1.6 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 6.9 segundos.
+Waiting 7s for retry backoff ■■■■■                           
+Waiting 7s for retry backoff ■■■■■■■■                        
+Waiting 7s for retry backoff ■■■■■■■■■■■■■■■■■■■■■           
+Waiting 7s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 10.2 segundos.
+Waiting 11s for retry backoff ■■■■                            
+Waiting 11s for retry backoff ■■■■■■■■■■■■                    
+Waiting 11s for retry backoff ■■■■■■■■■■■■■■■■■■■■■           
+Waiting 11s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Waiting 11s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 4.3 segundos.
+Waiting 5s for retry backoff ■■■■■■■■■■■■■■■■■■              
+Waiting 5s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 130 coletado Endpoint 131 coletado Endpoint 132 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 133 coletado Endpoint 134 coletado Endpoint 135 coletado Endpoint 136 coletado Endpoint 137 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 138 coletado Endpoint 139 coletado Endpoint 140 coletado Endpoint 141 coletado Endpoint 142 coletado Endpoint 143 coletado Endpoint 144 coletado Endpoint 145 coletado Endpoint 146 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 147 coletado Endpoint 148 coletado Endpoint 149 coletado Endpoint 150 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 151 coletado Endpoint 152 coletado Endpoint 153 coletado Endpoint 154 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 155 coletado Endpoint 156 coletado Endpoint 157 coletado Endpoint 158 coletado Falha transitória ao consultar o endpoint; nova tentativa em 1.8 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 2.7 segundos.
+Waiting 3s for retry backoff ■■■■■■■■■■■■                    
+Waiting 3s for retry backoff ■■■■■■■■■■■■■                   
+Waiting 3s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 1.9 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 4.2 segundos.
+Waiting 5s for retry backoff ■■■■■■■■                        
+Waiting 5s for retry backoff ■■■■■■■■■■■■■■■■■               
+Waiting 5s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 22.7 segundos.
+Waiting 23s for retry backoff ■■                              
+Waiting 23s for retry backoff ■■■■■■                          
+Waiting 23s for retry backoff ■■■■■■■■■■                      
+Waiting 23s for retry backoff ■■■■■■■■■■■■■■                  
+Waiting 23s for retry backoff ■■■■■■■■■■■■■■■■■■              
+Waiting 23s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■          
+Waiting 23s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■      
+Waiting 23s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Waiting 23s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 159 coletado Endpoint 160 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 161 coletado Endpoint 162 coletado Endpoint 163 coletado Endpoint 164 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 165 coletado Endpoint 166 coletado Endpoint 167 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 168 coletado Endpoint 169 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 170 coletado Endpoint 171 coletado Endpoint 172 coletado Endpoint 173 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 174 coletado Endpoint 175 coletado Endpoint 176 coletado Endpoint 177 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 178 coletado Endpoint 179 coletado Endpoint 180 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 181 coletado Endpoint 182 coletado Endpoint 183 coletado Endpoint 184 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 185 coletado Endpoint 186 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 187 coletado Endpoint 188 coletado Endpoint 189 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 190 coletado Endpoint 191 coletado Endpoint 192 coletado Endpoint 193 coletado Endpoint 194 coletado Endpoint 195 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 196 coletado Endpoint 197 coletado Endpoint 198 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 199 coletado Endpoint 200 coletado Endpoint 201 coletado Endpoint 202 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 203 coletado Endpoint 204 coletado Endpoint 205 coletado Endpoint 206 coletado Endpoint 207 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 208 coletado Endpoint 209 coletado Endpoint 210 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 211 coletado Endpoint 212 coletado Endpoint 213 coletado Endpoint 214 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 215 coletado Endpoint 216 coletado Endpoint 217 coletado Endpoint 218 coletado Endpoint 219 coletado Endpoint 220 coletado Endpoint 221 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 222 coletado Endpoint 223 coletado Endpoint 224 coletado Endpoint 225 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 226 coletado Endpoint 227 coletado Endpoint 228 coletado Endpoint 229 coletado Endpoint 230 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 231 coletado Endpoint 232 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 233 coletado Endpoint 234 coletado Endpoint 235 coletado Endpoint 236 coletado Endpoint 237 coletado Endpoint 238 coletado Falha transitória ao consultar o endpoint; nova tentativa em 1.0 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 1.2 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 5.9 segundos.
+Waiting 6s for retry backoff ■■■■■■                          
+Waiting 6s for retry backoff ■■■■■■■■■■■■                    
+Waiting 6s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■     
+Waiting 6s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 10.1 segundos.
+Waiting 11s for retry backoff ■■■■■■■                         
+Waiting 11s for retry backoff ■■■■■■■■■■■■■■■■                
+Waiting 11s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■       
+Waiting 11s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 19.2 segundos.
+Waiting 20s for retry backoff ■■■                             
+Waiting 20s for retry backoff ■■■■■■■                         
+Waiting 20s for retry backoff ■■■■■■■■■■■■                    
+Waiting 20s for retry backoff ■■■■■■■■■■■■■■■■■               
+Waiting 20s for retry backoff ■■■■■■■■■■■■■■■■■■■■■           
+Waiting 20s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■      
+Waiting 20s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Waiting 20s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 239 coletado Endpoint 240 coletado Endpoint 241 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 242 coletado Endpoint 243 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 1.6 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 1.8 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 5.2 segundos.
+Waiting 6s for retry backoff ■■■■■■■                         
+Waiting 6s for retry backoff ■■■■■■■■■■■■                    
+Waiting 6s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Waiting 6s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 5.8 segundos.
+Waiting 6s for retry backoff ■■■■■■■■■■■■■■                  
+Waiting 6s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Waiting 6s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 29.3 segundos.
+Waiting 30s for retry backoff ■■■■                            
+Waiting 30s for retry backoff ■■■■■■■                         
+Waiting 30s for retry backoff ■■■■■■■■■■                      
+Waiting 30s for retry backoff ■■■■■■■■■■■■■                   
+Waiting 30s for retry backoff ■■■■■■■■■■■■■■■■                
+Waiting 30s for retry backoff ■■■■■■■■■■■■■■■■■■■             
+Waiting 30s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■          
+Waiting 30s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■       
+Waiting 30s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■    
+Waiting 30s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 244 coletado Endpoint 245 coletado Endpoint 246 coletado Endpoint 247 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 248 coletado Endpoint 249 coletado Endpoint 250 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 1.9 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 1.1 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 5.9 segundos.
+Waiting 6s for retry backoff ■■■■■■                          
+Waiting 6s for retry backoff ■■■■■■■■■■■■■■■                 
+Waiting 6s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Waiting 6s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 15.8 segundos.
+Waiting 16s for retry backoff ■■■■■■                          
+Waiting 16s for retry backoff ■■■■■■■■■■■■                    
+Waiting 16s for retry backoff ■■■■■■■■■■■■■■■■■■              
+Waiting 16s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■         
+Waiting 16s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Waiting 16s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 251 coletado Endpoint 252 coletado Endpoint 253 coletado Endpoint 254 coletado Endpoint 255 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 256 coletado Endpoint 257 coletado Endpoint 258 coletado Endpoint 259 coletado Endpoint 260 coletado Endpoint 261 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 1.2 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 2.9 segundos.
+Waiting 3s for retry backoff ■■■■■■■■■■■■■■■■                
+Waiting 3s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Falha transitória ao consultar o endpoint; nova tentativa em 5.7 segundos.
+Waiting 6s for retry backoff ■■■■■■■■■                       
+Waiting 6s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■        
+Waiting 6s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Falha transitória ao consultar o endpoint; nova tentativa em 1.0 segundos.
+Falha transitória ao consultar o endpoint; nova tentativa em 26.3 segundos.
+Waiting 27s for retry backoff ■■                              
+Waiting 27s for retry backoff ■■■■■                           
+Waiting 27s for retry backoff ■■■■■■■■■                       
+Waiting 27s for retry backoff ■■■■■■■■■■■■                    
+Waiting 27s for retry backoff ■■■■■■■■■■■■■■■                 
+Waiting 27s for retry backoff ■■■■■■■■■■■■■■■■■■■             
+Waiting 27s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■          
+Waiting 27s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■      
+Waiting 27s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Waiting 27s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 262 coletado Endpoint 263 coletado Endpoint 264 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 265 coletado Endpoint 266 coletado Endpoint 267 coletado Endpoint 268 coletado Endpoint 269 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 270 coletado Endpoint 271 coletado Salvo o lote até o endpoint número: 271 
+Lotes restantes: 0 

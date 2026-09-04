@@ -104,47 +104,97 @@ paginas_por_modalidade <- data.frame()
 for (i in MODALIDADES) {
   endpoint <- monta_endpoint(PRIMEIRO_DIA, ULTIMO_DIA, i, 1, TAMANHO_PAGINA)
 
-  # Tenta coletar os dados e lança erros caso haja
-  tryCatch(
+  resultado_modalidade <- tryCatch(
     {
       resposta <- coleta_endpoint(endpoint)
-      resposta$erro <- FALSE
-      resposta$codigoModalidade <- i
-      resposta$endpoint <- endpoint
-      # Adiciona a resposta retornada ao dataframe `paginas_por_modalidade`
-      paginas_por_modalidade <- bind_rows(paginas_por_modalidade, resposta)
-    },
-    error = function(e) {
-      # Se houve erro, mostra a mensagem de erro e adiciona aos resultados
-      print(e$message)
-      paginas_por_modalidade <- bind_rows(
-        paginas_por_modalidade,
-        data.frame(
-          erro = TRUE,
+
+      if (nrow(resposta) == 0) {
+        resposta <- data.frame(
+          erro = FALSE,
           codigoModalidade = i,
           endpoint = endpoint,
-          mensagem_erro = as.character(e$message),
+          totalRegistros = 0L,
+          totalPaginas = 0L,
           stringsAsFactors = FALSE
         )
+
+        cat(sprintf("Modalidade %d sem registros (HTTP 204).", i), "\n")
+      } else {
+        resposta$erro <- FALSE
+        resposta$codigoModalidade <- i
+        resposta$endpoint <- endpoint
+
+        cat(
+          sprintf(
+            "Modalidade %d coletada: %d registros em %d páginas.",
+            i,
+            resposta$totalRegistros[[1]],
+            resposta$totalPaginas[[1]]
+          ),
+          "\n"
+        )
+      }
+
+      resposta
+    },
+    error = function(e) {
+      mensagem_erro <- sprintf("Modalidade %d: %s", i, e$message)
+      cat(
+        sprintf(
+          "Modalidade %d falhou após as tentativas: %s",
+          i,
+          e$message
+        ),
+        "\n"
+      )
+
+      data.frame(
+        erro = TRUE,
+        codigoModalidade = i,
+        endpoint = endpoint,
+        mensagem_erro = mensagem_erro,
+        stringsAsFactors = FALSE
       )
     }
   )
 
-  # Acompanhamento das consultas
-  cat(sprintf("Modalidade %d coletada", i), "\r")
+  paginas_por_modalidade <- bind_rows(
+    paginas_por_modalidade,
+    resultado_modalidade
+  )
   flush.console()
 }
 
 # Salva um arquivo com as consultas que deram erro
-if (nrow(paginas_por_modalidade %>% filter(erro == TRUE)) > 0) {
+modalidades_com_erro <- paginas_por_modalidade %>% filter(erro == TRUE)
+
+if (nrow(modalidades_com_erro) > 0) {
   if (!dir.exists(PATH_OUTPUT_DIR)) {
-    dir.create(output_dir, recursive = TRUE)
+    dir.create(PATH_OUTPUT_DIR, recursive = TRUE)
   }
 
-  paginas_por_modalidade %>%
-    filter(erro == TRUE) %>%
+  path_erros <- here(PATH_OUTPUT_DIR, "erros.csv")
+
+  modalidades_com_erro %>%
     select(endpoint, mensagem_erro) %>%
-    write_csv(here(PATH_OUTPUT_DIR, "erros.csv"))
+    write_csv(path_erros)
+
+  total_modalidades_com_erro <- n_distinct(
+    modalidades_com_erro$codigoModalidade
+  )
+
+  stop(
+    sprintf(
+      paste0(
+        "A descoberta de páginas falhou em %d de %d modalidades. ",
+        "Consulte %s. Nenhuma página será coletada."
+      ),
+      total_modalidades_com_erro,
+      length(MODALIDADES),
+      path_erros
+    ),
+    call. = FALSE
+  )
 }
 
 # Sumariza o dataframe para saber quantas páginas e registros temos por modalidade
@@ -153,17 +203,16 @@ paginas_por_modalidade <- paginas_por_modalidade %>%
   distinct() %>%
   arrange(codigoModalidade)
 
-  cat(sprintf("Total de páginas a coletar: %d", sum(paginas_por_modalidade$totalPaginas)), "\n\r")
-  cat(sprintf("Total de registros a coletar: %d", sum(paginas_por_modalidade$totalRegistros)), "\n\r")
+cat(sprintf("Total de páginas a coletar: %d", sum(paginas_por_modalidade$totalPaginas)), "\n\r")
+cat(sprintf("Total de registros a coletar: %d", sum(paginas_por_modalidade$totalRegistros)), "\n\r")
 
 
 # LISTA DE ENDPOINTS A COLETAR --------------------------------------------
 
 # Cria um endpoint para cada página a consultar para cada modalidade
 paginas_por_modalidade <- paginas_por_modalidade %>%
-  rowwise() %>%
-  mutate(pagina = list(1:totalPaginas)) %>% # Cria uma lista de páginas para cada modalidade
-  unnest(pagina) %>% # Expande a lista em várias linhas
+  filter(totalPaginas > 0) %>%
+  uncount(weights = totalPaginas, .id = "pagina") %>%
   mutate(endpoint = monta_endpoint(PRIMEIRO_DIA, ULTIMO_DIA, codigoModalidade, pagina, TAMANHO_PAGINA))
 
 # Extrai só a coluna de endpoints
