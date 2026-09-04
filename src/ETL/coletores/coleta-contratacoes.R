@@ -211,9 +211,8 @@ cat(sprintf("Total de registros a coletar: %d", sum(paginas_por_modalidade$total
 
 # Cria um endpoint para cada página a consultar para cada modalidade
 paginas_por_modalidade <- paginas_por_modalidade %>%
-  rowwise() %>%
-  mutate(pagina = list(1:totalPaginas)) %>% # Cria uma lista de páginas para cada modalidade
-  unnest(pagina) %>% # Expande a lista em várias linhas
+  filter(totalPaginas > 0) %>%
+  uncount(weights = totalPaginas, .id = "pagina") %>%
   mutate(endpoint = monta_endpoint(PRIMEIRO_DIA, ULTIMO_DIA, codigoModalidade, pagina, TAMANHO_PAGINA))
 
 # Extrai só a coluna de endpoints
