@@ -16,35 +16,65 @@ suppressPackageStartupMessages(library(data.table))
 #'
 #' @param endpoint Uma string contendo a URL do endpoint a ser consultado.
 #' @param timeout_segundos Tempo máximo, em segundos, para cada tentativa de requisição.
-#' @param tentativas_timeout Número de novas tentativas em caso de timeout/falha de conexão.
+#' @param tentativas_timeout Número de novas tentativas em caso de falha transitória.
 #'
-#' @return Um dataframe contendo os dados retornados pelo endpoint, acrescido da coluna `endpoint`.
+#' @return Um dataframe contendo os dados retornados pelo endpoint, acrescido da
+#' coluna `endpoint`. Respostas HTTP 204 retornam um dataframe com zero linhas.
 #'
 #' @import httr2 jsonlite
 #' @export
-coleta_endpoint <- function(endpoint, timeout_segundos = 30, tentativas_timeout = 5) {
+coleta_endpoint <- function(endpoint, timeout_segundos = 30, tentativas_timeout = 15) {
+  intervalo_requisicoes <- suppressWarnings(as.numeric(
+    Sys.getenv("PNCP_INTERVALO_REQUISICOES_SEGUNDOS", unset = "2")
+  ))
+
+  if (!is.finite(intervalo_requisicoes) || intervalo_requisicoes <= 0) {
+    stop(
+      paste0(
+        "A variável PNCP_INTERVALO_REQUISICOES_SEGUNDOS deve conter ",
+        "um número maior que zero."
+      ),
+      call. = FALSE
+    )
+  }
+
   resposta <- request(endpoint) %>%
     req_method("GET") %>%
     req_headers(accept = "*/*") %>%
+    req_throttle(
+      capacity = 1,
+      fill_time_s = intervalo_requisicoes,
+      realm = "pncp.gov.br"
+    ) %>%
     req_timeout(timeout_segundos) %>%
     req_retry(
       max_tries = tentativas_timeout + 1,
       retry_on_failure = TRUE,
-      backoff = function(n_tentativa) {
-        cat(
-          "Falha ou timeout ao consultar o endpoint. ",
-          "Fazendo nova tentativa ",
-          n_tentativa,
-          " de ",
-          tentativas_timeout,
-          ".\r"
-        )
-        # tempo de espera antes da próxima tentativa, em segundos
-        1
+      backoff = function(n_falhas) {
+        limite_espera <- min(60, 2^n_falhas)
+        tempo_espera <- stats::runif(1, min = 1, max = limite_espera)
+
+        if (n_falhas <= tentativas_timeout) {
+          message(
+            sprintf(
+              paste0(
+                "Falha transitória ao consultar o endpoint; ",
+                "nova tentativa em %.1f segundos."
+              ),
+              tempo_espera
+            )
+          )
+        }
+
+        tempo_espera
       }
     ) %>%
     req_error() %>%
     req_perform()
+
+  if (resp_status(resposta) == 204) {
+    return(data.frame(endpoint = character(), stringsAsFactors = FALSE))
+  }
 
   df_itens <- resp_body_string(resposta) %>%
     fromJSON(flatten = TRUE) %>%
