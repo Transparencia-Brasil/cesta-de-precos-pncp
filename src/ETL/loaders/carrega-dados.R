@@ -43,10 +43,15 @@ CAMINHO_CONTRATACOES <- args[1]
 CAMINHO_MEDICAMENTOS <- args[2]
 CAMINHO_RESULTADOS <- args[3]
 
+CAMINHO_CONTRATACOES <- here::here("coleta/data-package/2026/6 - Junho/QUINZENA-2/DATA/contratacoes.csv")
+CAMINHO_MEDICAMENTOS <- here::here("coleta/data-package/2026/6 - Junho/QUINZENA-2/DATA/itens-medicamentos.csv")
+CAMINHO_RESULTADOS <- here::here("coleta/data-package/2026/6 - Junho/QUINZENA-2/DATA/itens-medicamentos-resultados.csv")
+
+
 # Lê os arquivos de dados
-contratacoes <- read_csv(CAMINHO_CONTRATACOES, show_col_types = FALSE)
-medicamentos <- read_csv(CAMINHO_MEDICAMENTOS, show_col_types = FALSE)
-resultados <- read_csv(CAMINHO_RESULTADOS, show_col_types = FALSE)
+contratacoes <- le_csv_pncp(CAMINHO_CONTRATACOES, "contratacoes")
+medicamentos <- le_csv_pncp(CAMINHO_MEDICAMENTOS, "medicamentos")
+resultados <- le_csv_pncp(CAMINHO_RESULTADOS, "resultados")
 
 list(
   nrow(contratacoes),
@@ -54,7 +59,15 @@ list(
   nrow(resultados)
 ) %>% walk(~ message("Linhas lidas: ", .x))
 
+
 # TRANSFORMA DADOS --------------------------------------------------------
+
+# Converte códigos inteiros e representa os demais valores como NA.
+if ("tipoBeneficio" %in% names(medicamentos)) {
+  tipo_beneficio <- suppressWarnings(as.numeric(medicamentos$tipoBeneficio))
+  tipo_beneficio[!is.na(tipo_beneficio) & tipo_beneficio != trunc(tipo_beneficio)] <- NA_real_
+  medicamentos$tipoBeneficio <- suppressWarnings(as.integer(tipo_beneficio))
+}
 
 # Remove linhas onde 'endpoint' é NA.
 # Idealmente nenhuma linha seria removida. Mas pode haver má formatação do dado
@@ -218,7 +231,8 @@ linhas_historico <- montar_linhas_historico(
   rotina = "carga_dados",
   contagens_antes = contagens_historico_antes,
   contagens_depois = contagens_historico_depois,
-  caminhos_origem = c(CAMINHO_CONTRATACOES, CAMINHO_MEDICAMENTOS, CAMINHO_RESULTADOS)
+  caminhos_origem = c(CAMINHO_CONTRATACOES, CAMINHO_MEDICAMENTOS, CAMINHO_RESULTADOS),
+  observacao = "Inserção feita manualmente"
 )
 
 registrar_historico_cargas(linhas_historico)

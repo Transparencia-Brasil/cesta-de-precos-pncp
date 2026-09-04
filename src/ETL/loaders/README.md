@@ -75,6 +75,15 @@ coleta/data-package/<ANO>/<MÊS>/<QUINZENA>/LOG/run-carrega-dados-<ANO>-<MM>-<QU
 2. Itens classificados como medicamentos (`itens-medicamentos.csv`)
 3. Resultados dos itens de medicamentos (`itens-medicamentos-resultados.csv`)
 
+Os três arquivos são lidos por `le_csv_pncp()`, definida em `utils.R`. Os
+templates versionados em `src/ETL/template/templates/` são a fonte de verdade
+para os tipos dos campos da API; campos operacionais e campos criados pelo
+classificador possuem tipos complementares definidos pelo loader. Colunas novas
+que ainda não estejam no template são preservadas como texto e geram aviso.
+Valores incompatíveis com um tipo conhecido interrompem a execução antes da
+conexão com o PostgreSQL, com indicação de linha, coluna, tipo esperado e valor
+recebido.
+
 Durante a transformação, o script:
 
 - remove linhas sem `endpoint`;
