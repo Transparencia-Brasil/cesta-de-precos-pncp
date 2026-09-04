@@ -166,15 +166,35 @@ for (i in MODALIDADES) {
 }
 
 # Salva um arquivo com as consultas que deram erro
-if (nrow(paginas_por_modalidade %>% filter(erro == TRUE)) > 0) {
+modalidades_com_erro <- paginas_por_modalidade %>% filter(erro == TRUE)
+
+if (nrow(modalidades_com_erro) > 0) {
   if (!dir.exists(PATH_OUTPUT_DIR)) {
-    dir.create(output_dir, recursive = TRUE)
+    dir.create(PATH_OUTPUT_DIR, recursive = TRUE)
   }
 
-  paginas_por_modalidade %>%
-    filter(erro == TRUE) %>%
+  path_erros <- here(PATH_OUTPUT_DIR, "erros.csv")
+
+  modalidades_com_erro %>%
     select(endpoint, mensagem_erro) %>%
-    write_csv(here(PATH_OUTPUT_DIR, "erros.csv"))
+    write_csv(path_erros)
+
+  total_modalidades_com_erro <- n_distinct(
+    modalidades_com_erro$codigoModalidade
+  )
+
+  stop(
+    sprintf(
+      paste0(
+        "A descoberta de páginas falhou em %d de %d modalidades. ",
+        "Consulte %s. Nenhuma página será coletada."
+      ),
+      total_modalidades_com_erro,
+      length(MODALIDADES),
+      path_erros
+    ),
+    call. = FALSE
+  )
 }
 
 # Sumariza o dataframe para saber quantas páginas e registros temos por modalidade
