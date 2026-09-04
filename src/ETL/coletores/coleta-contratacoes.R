@@ -203,8 +203,8 @@ paginas_por_modalidade <- paginas_por_modalidade %>%
   distinct() %>%
   arrange(codigoModalidade)
 
-  cat(sprintf("Total de páginas a coletar: %d", sum(paginas_por_modalidade$totalPaginas)), "\n\r")
-  cat(sprintf("Total de registros a coletar: %d", sum(paginas_por_modalidade$totalRegistros)), "\n\r")
+cat(sprintf("Total de páginas a coletar: %d", sum(paginas_por_modalidade$totalPaginas)), "\n\r")
+cat(sprintf("Total de registros a coletar: %d", sum(paginas_por_modalidade$totalRegistros)), "\n\r")
 
 
 # LISTA DE ENDPOINTS A COLETAR --------------------------------------------
