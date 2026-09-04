@@ -181,3 +181,10 @@ Este diretorio mantem os templates versionados usados pelos coletores do PNCP. A
 | dataResultado | 2026-05-20 | ativo | Data do resultado homologado para o item no PNCP |
 | dataCancelamento | 2026-05-20 | ativo | Data de cancelamento do resultado do item (se houver) |
 | motivoCancelamento | 2026-05-20 | ativo | Motivo do cancelamento do resultado do item (quando cancelado) |
+| reservaRemanescente.codigo | 2026-08-14 | ativo | INCLUIR DESCRIÇÃO EM dicionario-dados.py |
+| reservaRemanescente.nome | 2026-08-14 | ativo | INCLUIR DESCRIÇÃO EM dicionario-dados.py |
+| localidadeExterior | 2026-08-14 | ativo | INCLUIR DESCRIÇÃO EM dicionario-dados.py |
+| localidadeFornecedor.ufNome | 2026-08-14 | ativo | INCLUIR DESCRIÇÃO EM dicionario-dados.py |
+| localidadeFornecedor.uf | 2026-08-14 | ativo | INCLUIR DESCRIÇÃO EM dicionario-dados.py |
+| localidadeFornecedor.nomeMunicipio | 2026-08-14 | ativo | INCLUIR DESCRIÇÃO EM dicionario-dados.py |
+| localidadeFornecedor.codigoIbge | 2026-08-14 | ativo | INCLUIR DESCRIÇÃO EM dicionario-dados.py |
