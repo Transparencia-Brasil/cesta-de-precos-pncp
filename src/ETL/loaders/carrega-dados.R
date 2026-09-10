@@ -43,21 +43,14 @@ CAMINHO_CONTRATACOES <- args[1]
 CAMINHO_MEDICAMENTOS <- args[2]
 CAMINHO_RESULTADOS <- args[3]
 
-CAMINHO_CONTRATACOES <- here::here("coleta/data-package/2026/6 - Junho/QUINZENA-2/DATA/contratacoes.csv")
-CAMINHO_MEDICAMENTOS <- here::here("coleta/data-package/2026/6 - Junho/QUINZENA-2/DATA/itens-medicamentos.csv")
-CAMINHO_RESULTADOS <- here::here("coleta/data-package/2026/6 - Junho/QUINZENA-2/DATA/itens-medicamentos-resultados.csv")
-
-
 # Lê os arquivos de dados
 contratacoes <- le_csv_pncp(CAMINHO_CONTRATACOES, "contratacoes")
 medicamentos <- le_csv_pncp(CAMINHO_MEDICAMENTOS, "medicamentos")
 resultados <- le_csv_pncp(CAMINHO_RESULTADOS, "resultados")
 
-list(
-  nrow(contratacoes),
-  nrow(medicamentos),
-  nrow(resultados)
-) %>% walk(~ message("Linhas lidas: ", .x))
+list(contratacoes, medicamentos, resultados) |>
+  map(nrow) |>
+  walk(~ message("- linhas lidas: ", .x))
 
 
 # TRANSFORMA DADOS --------------------------------------------------------
@@ -72,19 +65,17 @@ if ("tipoBeneficio" %in% names(medicamentos)) {
 # Remove linhas onde 'endpoint' é NA.
 # Idealmente nenhuma linha seria removida. Mas pode haver má formatação do dado
 # durante a coleta.
-contratacoes <- contratacoes %>% filter(!is.na(endpoint))
-medicamentos <- medicamentos %>% filter(!is.na(endpoint))
-resultados <- resultados %>% filter(!is.na(endpoint))
+contratacoes <- contratacoes |> filter(!is.na(endpoint))
+medicamentos <- medicamentos |> filter(!is.na(endpoint))
+resultados <- resultados |> filter(!is.na(endpoint))
 
 
-list(
-  nrow(contratacoes),
-  nrow(medicamentos),
-  nrow(resultados)
-) %>% walk(~ message("Linhas lidas (após remover NA's): ", .x))
+list(contratacoes, medicamentos, resultados) |>
+  map(nrow) |>
+  walk(~ message("Linhas lidas (após remover NA's): ", .x))
 
 # Cria chaves para fazer joins e adiciona a url do item na API
-medicamentos <- medicamentos %>%
+medicamentos <- medicamentos |>
   mutate(
     endpointResultado = paste0(endpoint, "/", numeroItem, "/resultados"),
     endpointContratacao = sub("/itens$", "", endpoint),
@@ -92,7 +83,7 @@ medicamentos <- medicamentos %>%
   )
 
 # Cria chaves para fazer joins e adiciona a url da contratacao no PNCP
-contratacoes <- contratacoes %>%
+contratacoes <- contratacoes |>
   mutate(
     endpoint = paste0(
       "https://pncp.gov.br/api/pncp/v1/orgaos/",
@@ -113,11 +104,11 @@ contratacoes <- contratacoes %>%
   )
 
 # Filtra somente as contratações de medicamentos
-contratacoes <- contratacoes %>%
+contratacoes <- contratacoes |>
   semi_join(medicamentos, by = join_by(endpoint == endpointContratacao))
 
 # Calcula a classificação de compras judiciais a partir do objeto da compra
-contratacoes <- contratacoes %>%
+contratacoes <- contratacoes |>
   mutate(
     compra_judicial = vapply(
       data.objetoCompra,
@@ -132,11 +123,11 @@ contratacoes <- contratacoes %>%
 # Cria a tabela "contratante"
 {
   # Todos os contratantes coletados
-  tb_contratante <- contratacoes %>% select(all_of(COLUNAS_CONTRATANTE))
+  tb_contratante <- contratacoes |> select(all_of(COLUNAS_CONTRATANTE))
 
   # Todos os contratantes subrogados coletados
-  tb_contratante_subrogado <- contratacoes %>%
-    select(all_of(COLUNAS_CONTRATANTE_SUBROGADO)) %>%
+  tb_contratante_subrogado <- contratacoes |>
+    select(all_of(COLUNAS_CONTRATANTE_SUBROGADO)) |>
     filter(!is.na(data.orgaoSubRogado.cnpj) &
              !is.na(data.unidadeSubRogada.codigoUnidade))
 
@@ -147,7 +138,7 @@ contratacoes <- contratacoes %>%
   tb_contratante_subrogado <- map2_dfr(tb_contratante_subrogado, tb_contratante, ~ as(.x, class(.y)))
 
   # Une os dataframes em uma única tabela de contratantes
-  tb_contratante <- bind_rows(tb_contratante, tb_contratante_subrogado) %>%
+  tb_contratante <- bind_rows(tb_contratante, tb_contratante_subrogado) |>
     distinct(data.orgaoEntidade.cnpj,
              data.unidadeOrgao.codigoUnidade,
              .keep_all = TRUE)
@@ -155,15 +146,15 @@ contratacoes <- contratacoes %>%
 
 # Cria a tabela "contratacao"
 {
-  tb_contratacao <- contratacoes %>%
-    select(all_of(COLUNAS_CONTRATACAO)) %>%
+  tb_contratacao <- contratacoes |>
+    select(all_of(COLUNAS_CONTRATACAO)) |>
     distinct(data.numeroControlePNCP, .keep_all = TRUE)
 }
 
 # Cria a tabela "fornecedor"
 {
-  tb_fornecedor <- resultados %>%
-    select(all_of(COLUNAS_FORNECEDOR)) %>%
+  tb_fornecedor <- resultados |>
+    select(all_of(COLUNAS_FORNECEDOR)) |>
     distinct(niFornecedor, .keep_all = TRUE)
 }
 
@@ -179,8 +170,8 @@ contratacoes <- contratacoes %>%
 # Cria a tabela "item_licitado" (item sem resultado)
 {
   # Seleciona apenas os itens que não possuem resultado
-  tb_item_licitado <- medicamentos %>%
-    anti_join(resultados, by = join_by(endpointResultado == endpoint)) %>%
+  tb_item_licitado <- medicamentos |>
+    anti_join(resultados, by = join_by(endpointResultado == endpoint)) |>
     inner_join(
       contratacoes,
       by = join_by(endpointContratacao == endpoint),
@@ -188,7 +179,7 @@ contratacoes <- contratacoes %>%
     )
 
   # Seleciona apenas as colunas que serão inseridas no banco de dados
-  tb_item_licitado <- tb_item_licitado %>% select(any_of(COLUNAS_ITEM_LICITADO))
+  tb_item_licitado <- tb_item_licitado |> select(any_of(COLUNAS_ITEM_LICITADO))
 
   # Se houver colunas faltantes, elas são preenchidas como NA
   colunas_faltantes <- setdiff(COLUNAS_ITEM_LICITADO, names(tb_item_licitado))
