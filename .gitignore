@@ -84,6 +84,7 @@ tasks/mapeamento-ocds-/output/**/zip/*
 tasks/experimento-LLM/inputs/demais-items.csv
 tasks/experimento-LLM/inputs/medicamentos-baixa-similaridade.csv
 /.venv-pncp
+/venv/
 src/ETL/instruções para rodar.txt
 tasks/mapeamento-ocds/output.old/.gitkeep
 tasks/mapeamento-ocds/output.old/2025-1/log-2025-01.log
@@ -270,3 +271,6 @@ tasks/api-compras/inputs/item-homologado.rds
 tasks/api-compras/inputs/contratacoes.rds
 tasks/alteracoes-no-banco-de-dados/sistemas-de-contratacao/inputs/contratacoes-db.rds
 tasks/alteracoes-no-banco-de-dados/sistemas-de-contratacao/inputs/contratacoes-drive.rds
+
+/venv
+/tasks/analise-unidades-compradoras/tmp/*
