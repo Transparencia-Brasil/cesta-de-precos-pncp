@@ -49,6 +49,7 @@ coletas_25_26 <- all_files |>
   filter(!str_detect(name, "III$")) |>
   # coleta ano/
   select(coleta = name, coleta_id = id) |>
+  filter(coleta != "Sanidade de colunas") |>
   mutate(files = map(coleta_id, drive_ls)) |>
   unnest(files) |>
   select(-drive_resource) |>
