@@ -1,7 +1,7 @@
 # TODO
 
-1. baixar todos os dados com script R em `/src`
-2. Refatorar notebook python
+1. baixar todos os dados com script R em `/src` - ok
+2. Refatorar notebook python - ok
 
 Regra geral:
 
