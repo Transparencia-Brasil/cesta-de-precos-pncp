@@ -274,3 +274,4 @@ tasks/alteracoes-no-banco-de-dados/sistemas-de-contratacao/inputs/contratacoes-d
 
 /venv
 /tasks/analise-unidades-compradoras/tmp/*
+/tasks/analise-unidades-compradoras/output/*
