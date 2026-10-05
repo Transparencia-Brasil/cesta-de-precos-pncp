@@ -16,6 +16,10 @@ DEST_PATH <- "https://drive.google.com/drive/folders/1lTEahEebtKeGG2Zjn7tn0Iu1pR
 
 # lista diretórios de coletas do drive
 # 🔓 : pra fazer o login basta rodar o comando abaixo e seguir as instruções no navegador
+drive_auth(
+  email = "glacerda@transparencia.org.br",
+  scopes = "https://www.googleapis.com/auth/drive.readonly"
+)
 all_files <- drive_ls(DEST_PATH)
 
 
@@ -56,7 +60,8 @@ coletas_25_26 <- all_files |>
     file = name,
     file_id = id
   ) |>
-  filter(!str_detect(file, "monitoramento|erros"))
+  # ignora arquivos que não são csv (ex.: planilhas google convertidas, que não baixam)
+  filter(str_detect(file, "\\.csv$"), !str_detect(file, "monitoramento|erros"))
 
 
 # :: TEMP DIRS -----------------------------------------------------------------
