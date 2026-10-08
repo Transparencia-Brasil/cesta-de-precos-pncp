@@ -8,35 +8,19 @@ library(googledrive)
 # :: FILEPATHS -----------------------------------------------------------------
 
 # origem dos dados para exportar
-LOCAL_PATH <- "tasks/unifica-dados/output"
-TMP_PATH <- "tasks/indicadores-MEL/tmp"
+TASK <- "analise-unidades-compradoras"
+TMP_PATH <- here("tasks", TASK, "tmp")
 
 # Destino dos dados no googledrive
 DEST_PATH <- "https://drive.google.com/drive/folders/1lTEahEebtKeGG2Zjn7tn0Iu1pRkxi4OY"
 
 # lista diretórios de coletas do drive
 # 🔓 : pra fazer o login basta rodar o comando abaixo e seguir as instruções no navegador
+drive_auth(
+  email = "glacerda@transparencia.org.br",
+  scopes = "https://www.googleapis.com/auth/drive.readonly"
+)
 all_files <- drive_ls(DEST_PATH)
-
-
-# :: LOAD - COLETAS I-II-III ---------------------------------------------------
-
-message("Listando dados das coletas I, II e III no drive...")
-
-# seleciona arquivos das coletas I, II e III no drive
-# precisa ir descendo a hierarquia de pastas para chegar nos arquivos csv
-coletas_i_ii_iii <- all_files |>
-  filter(str_detect(name, "III$")) |>
-  select(coleta = name, coleta_id = id) |>
-  mutate(files = map(coleta_id, drive_ls)) |>
-  unnest(files) |>
-  select(-drive_resource) |>
-  transmute(
-    # coleta I-II-III/arquivo.csv
-    path = here(TMP_PATH, coleta),
-    file = name,
-    file_id = id
-  )
 
 
 ## :: LOAD - COLETAS 2025-2026 ----*--------------------------------------------
@@ -76,15 +60,13 @@ coletas_25_26 <- all_files |>
     file = name,
     file_id = id
   ) |>
-  filter(!str_detect(file, "monitoramento|erros"))
+  # ignora arquivos que não são csv (ex.: planilhas google convertidas, que não baixam)
+  filter(str_detect(file, "\\.csv$"), !str_detect(file, "monitoramento|erros"))
 
 
 # :: TEMP DIRS -----------------------------------------------------------------
 
 message("Criando diretórios temporários para download dos dados...")
-
-# cria temp dir para receber dados do drive
-dir.create(unique(coletas_i_ii_iii$path))
 
 # cria temp dir para receber dados do drive
 walk(
@@ -97,15 +79,6 @@ walk(
 # :: DOWNLOAD ------------------------------------------------------------------
 
 message("Realizando download dos dados do drive em /tmp...")
-
-# realiza o donwload - COLETAS I-II-III
-coletas_i_ii_iii <- coletas_i_ii_iii |>
-  mutate(files = map2(file_id, here(path, file),
-    ~ drive_download(
-      file = .x,
-      path = .y,
-      overwrite = TRUE
-  )))
 
 # realiza o donwload - COLETAS 2025-2026
 coletas_25_26 <- coletas_25_26 |>
