@@ -253,7 +253,9 @@ contratantes_banco <- consulta_em(
     item_licitado$data.orgaoEntidade.cnpj, item_licitado$data.orgaoSubRogado.cnpj
   )
 )
-chaves_contratantes <- paste(contratantes_banco$cnpj, contratantes_banco$codigo_unidade)
+# contratante.cnpj é BIGINT: o banco devolve o CNPJ sem zeros à esquerda.
+sem_zeros <- function(cnpj) sub("^0+", "", as.character(cnpj))
+chaves_contratantes <- paste(sem_zeros(contratantes_banco$cnpj), contratantes_banco$codigo_unidade)
 
 classifica <- function(tabela, existentes, nome) {
   chaves_existentes <- paste(existentes$numero_controle_pncp, existentes$numero_item)
@@ -263,10 +265,10 @@ classifica <- function(tabela, existentes, nome) {
         paste(data.numeroControlePNCP, numeroItem) %in% chaves_existentes ~ "já existe no banco (não alterado)",
         !(data.numeroControlePNCP %in% contratacoes_banco) ~ "pendente: contratação ausente no banco",
         !is.na(codigo_br) & !(as.character(codigo_br) %in% catalogo_banco) ~ "pendente: código de catálogo ausente no banco",
-        !(paste(data.orgaoEntidade.cnpj, data.unidadeOrgao.codigoUnidade) %in% chaves_contratantes) ~
+        !(paste(sem_zeros(data.orgaoEntidade.cnpj), data.unidadeOrgao.codigoUnidade) %in% chaves_contratantes) ~
           "pendente: contratante ausente no banco",
         !is.na(data.orgaoSubRogado.cnpj) &
-          !(paste(data.orgaoSubRogado.cnpj, data.unidadeSubRogada.codigoUnidade) %in% chaves_contratantes) ~
+          !(paste(sem_zeros(data.orgaoSubRogado.cnpj), data.unidadeSubRogada.codigoUnidade) %in% chaves_contratantes) ~
           "pendente: contratante sub-rogado ausente no banco",
         TRUE ~ "inserir"
       ),
