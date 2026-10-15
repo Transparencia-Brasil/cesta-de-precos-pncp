@@ -92,12 +92,14 @@ SQL/PostgreSQL:
 
 ## Dados e artefatos
 
-Trate dados coletados, logs e outputs volumosos como artefatos operacionais. Não inclua em commits sem solicitação explícita.
+Trate dados coletados e outputs volumosos como artefatos operacionais. Não inclua em commits sem solicitação explícita.
+
+Os logs de execução de cada coleta são versionados no commit da coleta para preservar a rastreabilidade: `src/ETL/log/run-coletores-*.log`, `coleta/<etapa>/<ALIAS_COLETA>/*.log` e `coleta/data-package/**/LOG/*.log`.
 
 Evite versionar:
 
 - `.env` e qualquer segredo.
-- `coleta/**/*.csv`, logs de execução e `coleta/data-package/**`.
+- `coleta/**/*.csv`, incluindo os CSVs de `coleta/data-package/**/DATA/`.
 - Caches como `catalogo-vetorizado.csv`.
 - ZIPs, JSONs e CSVs volumosos de `tasks/mapeamento-ocds/output/**`.
 - Outputs de análises em `tasks/**/outputs` quando forem gerados localmente.
