@@ -123,6 +123,11 @@ MES_PAD=$(printf "%02d" "$MES")
 LOG_FILE="${LOG_DIR}/upload-zips-s3-${ANO}-${MES_PAD}.log"
 
 PYTHON_BIN="./.venv/Scripts/python.exe"
+
+# Força a saída do python.exe (Windows) em UTF-8 quando redirecionada para o log;
+# sem isso ela sai em cp1252. WSLENV repassa a variável do WSL para o executável do Windows.
+export PYTHONIOENCODING=utf-8
+export WSLENV="${WSLENV:+${WSLENV}:}PYTHONIOENCODING"
 PYTHON_SCRIPT="./tasks/mapeamento-ocds/src/upload-zips-s3.py"
 
 

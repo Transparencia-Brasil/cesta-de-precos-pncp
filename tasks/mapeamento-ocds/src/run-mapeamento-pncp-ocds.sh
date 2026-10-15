@@ -113,6 +113,11 @@ LOG_FILE="${LOG_DIR}/mapeamento-${ANO}-${MES}.log"
 # Usa sempre o Python do ambiente virtual local (.venv) na raiz do repo.
 PYTHON_BIN="./.venv/Scripts/python.exe"
 
+# Força a saída do python.exe (Windows) em UTF-8 quando redirecionada para o log;
+# sem isso ela sai em cp1252. WSLENV repassa a variável do WSL para o executável do Windows.
+export PYTHONIOENCODING=utf-8
+export WSLENV="${WSLENV:+${WSLENV}:}PYTHONIOENCODING"
+
 # Script Python que realiza o mapeamento PNCP -> OCDS.
 PYTHON_SCRIPT="./tasks/mapeamento-ocds/src/mapeamento-pncp-ocds.py"
 
