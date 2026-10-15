@@ -19,6 +19,7 @@ Use este diretório para duas cargas principais:
 | [`utils-historico.R`](utils-historico.R) | Conta registros antes/depois da carga e registra o histórico em [`historico-cargas.csv`](historico-cargas.csv). |
 | [`historico-cargas.csv`](historico-cargas.csv) | Trilha versionada de execuções de `carrega-dados.R`, com período, tabela, contagens e delta. |
 | [`historico.sql`](historico.sql) | Consultas manuais de apoio para inspeção e sanity check do banco. |
+| [`upload-datapackages.R`](upload-datapackages.R) | Envia o data-package de um mês ao Google Drive, arquivo por arquivo (ver [Envio ao Google Drive](#envio-ao-google-drive)). |
 
 ## Pré-requisitos
 
@@ -181,3 +182,33 @@ Campos importantes do histórico:
 | `diretorio_data_package` | Diretório `DATA` usado como origem, quando inferido. |
 
 Use [`historico.sql`](historico.sql) para consultas exploratórias e validações manuais no banco. Ele não substitui o histórico em CSV, mas ajuda a verificar contagens e registros recentes.
+
+## Envio ao Google Drive
+
+`upload-datapackages.R` envia o data-package de um mês para a pasta
+`Coletas - <ANO>/<N - Mês>/<intervalo>/{DATA,LOG}` no Drive compartilhado da
+equipe. O período é informado explicitamente:
+
+```bash
+# Lista o que seria feito, sem criar nem enviar nada
+Rscript.exe src/ETL/loaders/upload-datapackages.R 2026 7 --dry-run
+
+# Envia
+Rscript.exe src/ETL/loaders/upload-datapackages.R 2026 7
+```
+
+A comparação é feita arquivo por arquivo:
+
+- `ENVIA`: o arquivo não existe no Drive;
+- `PULA`: o arquivo existe com o mesmo tamanho;
+- `ATUALIZA`: o arquivo existe com tamanho diferente (por exemplo, um log que
+  ganhou uma nota); o conteúdo é substituído e o id é mantido;
+- `DUPLICADO`: há mais de um arquivo com o mesmo nome no Drive; nada é feito.
+
+Pastas ausentes são criadas. Reexecutar é seguro e não duplica arquivos, o que
+permite enviar a QUINZENA-1 e depois a QUINZENA-2 do mesmo mês, ou reenviar um
+mês antigo cujos logs mudaram.
+
+A autenticação usa a service account em `drive-datapackage-upload.json` (raiz do
+projeto, fora do git). Para usar a conta pessoal via OAuth, defina
+`DRIVE_AUTH_EMAIL` antes de rodar.

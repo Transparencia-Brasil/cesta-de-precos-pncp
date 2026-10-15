@@ -49,4 +49,6 @@ contratações `dados.csv` → itens (`coleta-itens.R` recebe o `dados.csv` de c
 
 **Empacotamento e carga**: após resultados, `run-coletores.sh` copia CSVs/logs para `coleta/data-package/<ANO>/<N - Mês>/<QUINZENA-N>/{DATA,LOG}` com nomes renomeados (`contratacoes.csv`, `itens-medicamentos.csv`, `itens-medicamentos-resultados.csv`, ...). Se escolhido, roda `Rscript.exe src/ETL/loaders/carrega-dados.R <contratacoes> <medicamentos> <resultados>`, que lê com tipagem via `le_csv_pncp()` (`loaders/utils.R`), monta chaves a partir de `endpoint`, insere no PostgreSQL e registra contagens antes/depois em `loaders/historico-cargas.csv` (`utils-historico.R`).
 
+**Envio ao Drive**: manual e por período, `Rscript.exe src/ETL/loaders/upload-datapackages.R <ANO> <MES> [--dry-run]`; compara arquivo por arquivo (envia, pula ou atualiza), então pode ser reexecutado a cada quinzena.
+
 **`tasks/`** são análises e pipelines auxiliares independentes (cada um com seu README), p.ex. `tasks/mapeamento-ocds/` (PNCP → OCDS, ZIP, upload S3). Não fazem parte do fluxo de `run-coletores.sh`.
