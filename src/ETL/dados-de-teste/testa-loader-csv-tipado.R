@@ -180,15 +180,15 @@ espera_erro(
   c("Valores numericos invalidos", "quantidade")
 )
 
-# ncmNbsCodigo não numérico (o PNCP já enviou "false") vira NA, sem afetar
-# códigos válidos.
+# ncmNbsCodigo não numérico (o PNCP já enviou "false" e "NS") vira NA; códigos
+# gravados como decimal nos pacotes de 2025 ("30041012.0") viram inteiros.
 ncm <- normaliza_medicamentos_carga(data.frame(
-  ncmNbsCodigo = c("30049099", "false", NA),
-  ncmNbsDescricao = c("Medicamentos", "false", NA)
+  ncmNbsCodigo = c("30049099", "30041012.0", "false", "NS", NA),
+  ncmNbsDescricao = c("Medicamentos", "Medicamentos", "false", "Outros", NA)
 ))
 stopifnot(
-  identical(ncm$ncmNbsCodigo, c("30049099", NA, NA)),
-  identical(ncm$ncmNbsDescricao, c("Medicamentos", NA, NA))
+  identical(ncm$ncmNbsCodigo, c("30049099", "30041012", NA, NA, NA)),
+  identical(ncm$ncmNbsDescricao, c("Medicamentos", "Medicamentos", NA, "Outros", NA))
 )
 
 message("Testes da leitura tipada dos CSVs do loader: OK")

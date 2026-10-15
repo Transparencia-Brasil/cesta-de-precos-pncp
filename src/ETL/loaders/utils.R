@@ -667,8 +667,10 @@ monta_item_homologado <- function(medicamentos, resultados, contratacoes) {
 #' Normaliza campos dos itens que o banco grava como INTEGER
 #'
 #' - `tipoBeneficio`: codigos inteiros sao mantidos; os demais valores viram NA.
-#' - `ncmNbsCodigo`: valores nao numericos (o PNCP ja enviou o literal "false")
-#'   viram NA, assim como a descricao "false" correspondente.
+#' - `ncmNbsCodigo`: codigos inteiros sao mantidos, inclusive os gravados como
+#'   decimal pelos pacotes de 2025 ("30041012.0" -> "30041012"); valores nao
+#'   numericos (o PNCP ja enviou "false" e "NS") viram NA, assim como a
+#'   descricao "false" correspondente.
 #'
 #' @param medicamentos Itens classificados como medicamentos.
 #' @return Dataframe com os campos normalizados.
@@ -681,7 +683,12 @@ normaliza_medicamentos_carga <- function(medicamentos) {
 
   if ("ncmNbsCodigo" %in% names(medicamentos)) {
     ncm <- normaliza_nulo_pncp(medicamentos$ncmNbsCodigo)
-    ncm_invalido <- !is.na(ncm) & !grepl("^[0-9]+$", ncm)
+    numero <- suppressWarnings(as.numeric(ncm))
+    ncm_valido <- !is.na(numero) & numero == trunc(numero)
+    ncm_invalido <- !is.na(ncm) & !ncm_valido
+    ncm_decimal <- ncm_valido & !grepl("^[0-9]+$", ncm)
+
+    medicamentos$ncmNbsCodigo[ncm_decimal] <- format(numero[ncm_decimal], scientific = FALSE, trim = TRUE)
     medicamentos$ncmNbsCodigo[ncm_invalido] <- NA
 
     if ("ncmNbsDescricao" %in% names(medicamentos)) {
