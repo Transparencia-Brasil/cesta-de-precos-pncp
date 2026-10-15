@@ -93,6 +93,11 @@ Durante a transformação, o script:
 - calcula `compra_judicial` a partir de `data.objetoCompra`;
 - inclui contratantes principais e, quando existirem, contratantes sub-rogados;
 - separa itens com resultado em `item_homologado` e itens sem resultado em `item_licitado`;
+- trunca quantidades fracionárias (`quantidade`, `quantidadeHomologada`) para
+  inteiro com `trunca_quantidade_pncp()`: 3.5 vira 3 e 0.23 vira 0. É a mesma
+  regra do `int()` dos pacotes OCDS. A quantidade original permanece nos CSVs
+  do data-package;
+- converte para `NA` o `ncmNbsCodigo` não numérico (por exemplo, o literal `"false"`);
 - preenche como `NA` colunas opcionais ausentes nos CSVs de entrada.
 
 Na construção de `item_homologado`, o loader também combina oito campos de

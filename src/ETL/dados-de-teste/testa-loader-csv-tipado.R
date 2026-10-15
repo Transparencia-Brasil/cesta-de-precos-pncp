@@ -169,4 +169,26 @@ espera_erro(
   )
 )
 
+# Quantidades fracionárias são truncadas, como no int() dos pacotes OCDS, e a
+# notação científica da recoleta de resultados é aceita.
+stopifnot(identical(
+  trunca_quantidade_pncp(c("3.5", "0.23", "1e+05", NA, "36.909999999999997"), "quantidade"),
+  c(3L, 0L, 100000L, NA, 36L)
+))
+espera_erro(
+  trunca_quantidade_pncp("abc", "quantidade"),
+  c("Valores numericos invalidos", "quantidade")
+)
+
+# ncmNbsCodigo não numérico (o PNCP já enviou "false") vira NA, sem afetar
+# códigos válidos.
+ncm <- normaliza_medicamentos_carga(data.frame(
+  ncmNbsCodigo = c("30049099", "false", NA),
+  ncmNbsDescricao = c("Medicamentos", "false", NA)
+))
+stopifnot(
+  identical(ncm$ncmNbsCodigo, c("30049099", NA, NA)),
+  identical(ncm$ncmNbsDescricao, c("Medicamentos", NA, NA))
+)
+
 message("Testes da leitura tipada dos CSVs do loader: OK")

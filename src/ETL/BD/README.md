@@ -197,12 +197,12 @@ Itens de medicamentos que já receberam resultado de adjudicação ou cancelamen
 | `orcamento_sigiloso` | BOOLEAN | — | Indica orçamento sigiloso |
 | `valor_unitario_estimado` | NUMERIC | — | Valor unitário estimado |
 | `valor_total_estimado` | NUMERIC | — | Valor total estimado |
-| `quantidade_estimada` | INTEGER | — | Quantidade estimada |
+| `quantidade_estimada` | INTEGER | — | Quantidade estimada; frações do PNCP são truncadas na carga (3.5 → 3), como nos pacotes OCDS |
 | `codigo_situacao_resultado` | SMALLINT | — | Código do resultado (homologado, cancelado, etc.) |
 | `nome_situacao_resultado` | VARCHAR(100) | — | Descrição do resultado |
 | `valor_unitario_homologado` | NUMERIC | — | **Preço unitário final homologado** |
 | `valor_total_homologado` | NUMERIC | — | Valor total homologado |
-| `quantidade_homologada` | INTEGER | — | Quantidade efetivamente homologada |
+| `quantidade_homologada` | INTEGER | — | Quantidade efetivamente homologada; frações do PNCP são truncadas na carga (3.5 → 3), como nos pacotes OCDS |
 | `moeda_estrangeira` | CHAR(3) | — | Código ISO da moeda estrangeira (quando aplicável) |
 | `valor_nominal_moeda_estrangeira` | NUMERIC | — | Valor em moeda estrangeira |
 | `data_resultado` | TIMESTAMP | — | Data do resultado |

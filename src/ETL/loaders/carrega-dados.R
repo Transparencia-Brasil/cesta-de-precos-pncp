@@ -55,12 +55,9 @@ list(contratacoes, medicamentos, resultados) |>
 
 # TRANSFORMA DADOS --------------------------------------------------------
 
-# Converte códigos inteiros e representa os demais valores como NA.
-if ("tipoBeneficio" %in% names(medicamentos)) {
-  tipo_beneficio <- suppressWarnings(as.numeric(medicamentos$tipoBeneficio))
-  tipo_beneficio[!is.na(tipo_beneficio) & tipo_beneficio != trunc(tipo_beneficio)] <- NA_real_
-  medicamentos$tipoBeneficio <- suppressWarnings(as.integer(tipo_beneficio))
-}
+# Converte códigos inteiros (tipoBeneficio, ncmNbsCodigo) e representa os
+# demais valores como NA.
+medicamentos <- normaliza_medicamentos_carga(medicamentos)
 
 # Remove linhas onde 'endpoint' é NA.
 # Idealmente nenhuma linha seria removida. Mas pode haver má formatação do dado
@@ -75,33 +72,10 @@ list(contratacoes, medicamentos, resultados) |>
   walk(~ message("Linhas lidas (após remover NA's): ", .x))
 
 # Cria chaves para fazer joins e adiciona a url do item na API
-medicamentos <- medicamentos |>
-  mutate(
-    endpointResultado = paste0(endpoint, "/", numeroItem, "/resultados"),
-    endpointContratacao = sub("/itens$", "", endpoint),
-    urlAPI = paste0(endpoint, "/", numeroItem)
-  )
+medicamentos <- adiciona_chaves_medicamentos(medicamentos)
 
 # Cria chaves para fazer joins e adiciona a url da contratacao no PNCP
-contratacoes <- contratacoes |>
-  mutate(
-    endpoint = paste0(
-      "https://pncp.gov.br/api/pncp/v1/orgaos/",
-      data.orgaoEntidade.cnpj,
-      "/compras/",
-      data.anoCompra,
-      "/",
-      data.sequencialCompra
-    ),
-    urlPNCP = paste0(
-      "https://pncp.gov.br/app/editais/",
-      data.orgaoEntidade.cnpj,
-      "/",
-      data.anoCompra,
-      "/",
-      data.sequencialCompra
-    )
-  )
+contratacoes <- adiciona_chaves_contratacoes(contratacoes)
 
 # Filtra somente as contratações de medicamentos
 contratacoes <- contratacoes |>
@@ -169,26 +143,11 @@ contratacoes <- contratacoes |>
 
 # Cria a tabela "item_licitado" (item sem resultado)
 {
-  # Seleciona apenas os itens que não possuem resultado
-  tb_item_licitado <- medicamentos |>
-    anti_join(resultados, by = join_by(endpointResultado == endpoint)) |>
-    inner_join(
-      contratacoes,
-      by = join_by(endpointContratacao == endpoint),
-      suffix = c("", "Contratacao")
-    )
-
-  # Seleciona apenas as colunas que serão inseridas no banco de dados
-  tb_item_licitado <- tb_item_licitado |> select(any_of(COLUNAS_ITEM_LICITADO))
-
-  # Se houver colunas faltantes, elas são preenchidas como NA
-  colunas_faltantes <- setdiff(COLUNAS_ITEM_LICITADO, names(tb_item_licitado))
-  for (col in colunas_faltantes) {
-    tb_item_licitado[col] <- NA
-  }
-
-  # Organiza as colunas na ordem correta de inserção
-  tb_item_licitado <- tb_item_licitado[COLUNAS_ITEM_LICITADO]
+  tb_item_licitado <- monta_item_licitado(
+    medicamentos,
+    resultados,
+    contratacoes
+  )
 }
 
 

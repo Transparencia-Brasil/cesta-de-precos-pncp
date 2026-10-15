@@ -547,6 +547,32 @@ converte_numerico_pncp <- function(x, coluna) {
   convertido
 }
 
+#' Converte uma quantidade recebida do PNCP para inteiro, truncando a fracao
+#'
+#' O PNCP envia quantidades fracionarias (3.5, 0.23), mas as colunas de
+#' quantidade do banco sao INTEGER. A fracao e descartada (3.5 -> 3, 0.23 -> 0),
+#' a mesma regra do `int()` usado nos pacotes OCDS
+#' (`tasks/mapeamento-ocds/src/mapeamento-pncp-ocds.py`). Aceita notacao
+#' cientifica ("1e+05"), comum na recoleta de resultados.
+#'
+#' @param x Vetor a converter.
+#' @param coluna Nome do campo, usado em mensagens de erro.
+#' @return Vetor de inteiros.
+trunca_quantidade_pncp <- function(x, coluna) {
+  truncado <- trunc(converte_numerico_pncp(x, coluna))
+  fora_da_faixa <- unique(truncado[!is.na(truncado) & abs(truncado) > .Machine$integer.max])
+
+  if (length(fora_da_faixa) > 0) {
+    stop(sprintf(
+      "Quantidades fora da faixa de INTEGER na coluna '%s': %s.",
+      coluna,
+      paste(fora_da_faixa, collapse = ", ")
+    ))
+  }
+
+  as.integer(truncado)
+}
+
 #' Completa e normaliza os campos de descontos de item_homologado
 #'
 #' @param tabela Dataframe resultante dos joins do loader.
@@ -609,6 +635,10 @@ seleciona_colunas_item_homologado <- function(tabela, colunas) {
     tabela[[coluna]] <- rep(NA, nrow(tabela))
   }
 
+  for (coluna in intersect(c("quantidade", "quantidade_estimada", "quantidadeHomologada"), colunas)) {
+    tabela[[coluna]] <- trunca_quantidade_pncp(tabela[[coluna]], coluna)
+  }
+
   tabela[colunas]
 }
 
@@ -632,6 +662,105 @@ monta_item_homologado <- function(medicamentos, resultados, contratacoes) {
       suffix = c("", "Contratacao")
     ) |>
     seleciona_colunas_item_homologado(COLUNAS_ITEM_HOMOLOGADO)
+}
+
+#' Normaliza campos dos itens que o banco grava como INTEGER
+#'
+#' - `tipoBeneficio`: codigos inteiros sao mantidos; os demais valores viram NA.
+#' - `ncmNbsCodigo`: valores nao numericos (o PNCP ja enviou o literal "false")
+#'   viram NA, assim como a descricao "false" correspondente.
+#'
+#' @param medicamentos Itens classificados como medicamentos.
+#' @return Dataframe com os campos normalizados.
+normaliza_medicamentos_carga <- function(medicamentos) {
+  if ("tipoBeneficio" %in% names(medicamentos)) {
+    tipo_beneficio <- suppressWarnings(as.numeric(medicamentos$tipoBeneficio))
+    tipo_beneficio[!is.na(tipo_beneficio) & tipo_beneficio != trunc(tipo_beneficio)] <- NA_real_
+    medicamentos$tipoBeneficio <- suppressWarnings(as.integer(tipo_beneficio))
+  }
+
+  if ("ncmNbsCodigo" %in% names(medicamentos)) {
+    ncm <- normaliza_nulo_pncp(medicamentos$ncmNbsCodigo)
+    ncm_invalido <- !is.na(ncm) & !grepl("^[0-9]+$", ncm)
+    medicamentos$ncmNbsCodigo[ncm_invalido] <- NA
+
+    if ("ncmNbsDescricao" %in% names(medicamentos)) {
+      descricao_invalida <- ncm_invalido & medicamentos$ncmNbsDescricao %in% "false"
+      medicamentos$ncmNbsDescricao[descricao_invalida] <- NA
+    }
+  }
+
+  medicamentos
+}
+
+#' Cria as chaves de join dos itens e a url do item na API
+#'
+#' @param medicamentos Itens classificados como medicamentos.
+#' @return Dataframe com `endpointResultado`, `endpointContratacao` e `urlAPI`.
+adiciona_chaves_medicamentos <- function(medicamentos) {
+  medicamentos |>
+    dplyr::mutate(
+      endpointResultado = paste0(endpoint, "/", numeroItem, "/resultados"),
+      endpointContratacao = sub("/itens$", "", endpoint),
+      urlAPI = paste0(endpoint, "/", numeroItem)
+    )
+}
+
+#' Cria a chave de join das contratacoes e a url da contratacao no PNCP
+#'
+#' @param contratacoes Contratacoes de origem.
+#' @return Dataframe com `endpoint` reescrito e `urlPNCP`.
+adiciona_chaves_contratacoes <- function(contratacoes) {
+  contratacoes |>
+    dplyr::mutate(
+      endpoint = paste0(
+        "https://pncp.gov.br/api/pncp/v1/orgaos/",
+        data.orgaoEntidade.cnpj,
+        "/compras/",
+        data.anoCompra,
+        "/",
+        data.sequencialCompra
+      ),
+      urlPNCP = paste0(
+        "https://pncp.gov.br/app/editais/",
+        data.orgaoEntidade.cnpj,
+        "/",
+        data.anoCompra,
+        "/",
+        data.sequencialCompra
+      )
+    )
+}
+
+#' Constroi item_licitado (itens sem resultado) para a carga regular
+#'
+#' @param medicamentos Itens classificados como medicamentos.
+#' @param resultados Resultados coletados do PNCP.
+#' @param contratacoes Contratacoes de origem.
+#' @return Dataframe pronto para `CONSULTA_INSERIR_ITEM_LICITADO`.
+monta_item_licitado <- function(medicamentos, resultados, contratacoes) {
+  # Seleciona apenas os itens que não possuem resultado
+  tabela <- medicamentos |>
+    dplyr::anti_join(resultados, by = dplyr::join_by(endpointResultado == endpoint)) |>
+    dplyr::inner_join(
+      contratacoes,
+      by = dplyr::join_by(endpointContratacao == endpoint),
+      suffix = c("", "Contratacao")
+    )
+
+  # Seleciona apenas as colunas que serão inseridas no banco de dados
+  tabela <- tabela |> dplyr::select(dplyr::any_of(COLUNAS_ITEM_LICITADO))
+
+  # Se houver colunas faltantes, elas são preenchidas como NA
+  colunas_faltantes <- setdiff(COLUNAS_ITEM_LICITADO, names(tabela))
+  for (col in colunas_faltantes) {
+    tabela[col] <- NA
+  }
+
+  tabela$quantidade <- trunca_quantidade_pncp(tabela$quantidade, "quantidade")
+
+  # Organiza as colunas na ordem correta de inserção
+  tabela[COLUNAS_ITEM_LICITADO]
 }
 
 #' Constroi item_homologado durante a recoleta de resultados
