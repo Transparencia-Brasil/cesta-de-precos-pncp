@@ -53,7 +53,8 @@ Se faltarem campos obrigatorios, solicitar apenas o minimo necessario antes de e
 - branch base padrao: `coleta-orquestrada`
 - prefira nomes de branch com prefixo: `feat/`, `fix/`, `docs/`, `chore/`
 - commits em PT-BR no formato: `feat: ...`, `fix: ...`, `docs: ...`, `refactor: ...`, `chore: ...`
-- evitar incluir artefatos gerados sem pedido explicito (ex.: `coleta/**`, `coleta/data-package/**`, logs e CSVs de execucao)
+- evitar incluir artefatos gerados sem pedido explicito (ex.: CSVs de `coleta/**`, incluindo `coleta/data-package/**/DATA/`)
+- logs de execucao da coleta sao versionados no commit da coleta: `src/ETL/log/run-coletores-*.log`, `coleta/<etapa>/<ALIAS_COLETA>/*.log` e `coleta/data-package/**/LOG/*.log`
 - se houver alteracoes nao relacionadas na arvore de trabalho, commitar apenas o escopo autorizado
 
 ## Procedimento passo a passo

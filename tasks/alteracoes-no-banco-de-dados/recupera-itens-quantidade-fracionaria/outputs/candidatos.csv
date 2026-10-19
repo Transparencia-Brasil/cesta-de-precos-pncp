@@ -1,0 +1,146 @@
+pacote,leitura_tipada,numero_controle_pncp,numero_item,endpoint,motivo,valor_original
+2025/1 - Janeiro/QUINZENA-2,ok,45289329000152-1-000029/2024,3,https://pncp.gov.br/api/pncp/v1/orgaos/45289329000152/compras/2024/29/itens,quantidade fracionária,3.5
+2025/1 - Janeiro/QUINZENA-2,ok,11800731000138-1-000207/2024,3,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2024/207/itens,quantidade fracionária,0.6
+2025/1 - Janeiro/QUINZENA-2,ok,01738780000134-1-000006/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/01738780000134/compras/2025/6/itens,quantidade fracionária,2536.5
+2025/1 - Janeiro/QUINZENA-2,ok,01738780000134-1-000006/2025,3,https://pncp.gov.br/api/pncp/v1/orgaos/01738780000134/compras/2025/6/itens,quantidade fracionária,1676.1
+2025/2 - Fevereiro/QUINZENA-1,falha: contratacoes,11800731000138-1-000215/2024,4,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2024/215/itens,quantidade fracionária,9.5
+2025/2 - Fevereiro/QUINZENA-1,falha: contratacoes,11800731000138-1-000220/2024,2,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2024/220/itens,quantidade fracionária,1.35
+2025/2 - Fevereiro/QUINZENA-1,falha: contratacoes,11800731000138-1-000220/2024,5,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2024/220/itens,quantidade fracionária,1.1
+2025/2 - Fevereiro/QUINZENA-2,falha: contratacoes,11479560000197-1-000006/2025,4,https://pncp.gov.br/api/pncp/v1/orgaos/11479560000197/compras/2025/6/itens,quantidade fracionária,0.1553
+2025/2 - Fevereiro/QUINZENA-2,falha: contratacoes,,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/6/itens,quantidade fracionária,0.18
+2025/2 - Fevereiro/QUINZENA-2,falha: contratacoes,,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/6/itens,quantidadeHomologada fracionária,0.18
+2025/3 - Março/QUINZENA-1,falha: contratacoes,11800731000138-1-000177/2024,3,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2024/177/itens,quantidade fracionária,0.8
+2025/3 - Março/QUINZENA-1,falha: contratacoes,,2,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2024/243/itens,quantidade fracionária,0.27
+2025/3 - Março/QUINZENA-1,falha: contratacoes,,1,https://pncp.gov.br/api/pncp/v1/orgaos/01738780000134/compras/2025/19/itens,quantidade fracionária,2536.5
+2025/3 - Março/QUINZENA-1,falha: contratacoes,,3,https://pncp.gov.br/api/pncp/v1/orgaos/01738780000134/compras/2025/19/itens,quantidade fracionária,1676.1
+2025/3 - Março/QUINZENA-1,falha: contratacoes,,2,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2024/243/itens,quantidadeHomologada fracionária,0.27
+2025/3 - Março/QUINZENA-2,falha: contratacoes,52397791000139-1-000011/2025,4,https://pncp.gov.br/api/pncp/v1/orgaos/52397791000139/compras/2025/11/itens,quantidade fracionária,0.5
+2025/3 - Março/QUINZENA-2,falha: contratacoes,88368386000130-1-000039/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/88368386000130/compras/2025/39/itens,quantidade fracionária,2.5
+2025/3 - Março/QUINZENA-2,falha: contratacoes,11318061000118-1-000009/2024,1,https://pncp.gov.br/api/pncp/v1/orgaos/11318061000118/compras/2024/9/itens,ncmNbsCodigo inválido,false
+2025/3 - Março/QUINZENA-2,falha: contratacoes,11318061000118-1-000009/2024,2,https://pncp.gov.br/api/pncp/v1/orgaos/11318061000118/compras/2024/9/itens,ncmNbsCodigo inválido,false
+2025/3 - Março/QUINZENA-2,falha: contratacoes,11318061000118-1-000009/2024,3,https://pncp.gov.br/api/pncp/v1/orgaos/11318061000118/compras/2024/9/itens,ncmNbsCodigo inválido,false
+2025/3 - Março/QUINZENA-2,falha: contratacoes,11318061000118-1-000009/2024,4,https://pncp.gov.br/api/pncp/v1/orgaos/11318061000118/compras/2024/9/itens,ncmNbsCodigo inválido,false
+2025/3 - Março/QUINZENA-2,falha: contratacoes,11318061000118-1-000009/2024,5,https://pncp.gov.br/api/pncp/v1/orgaos/11318061000118/compras/2024/9/itens,ncmNbsCodigo inválido,false
+2025/3 - Março/QUINZENA-2,falha: contratacoes,11318061000118-1-000009/2024,6,https://pncp.gov.br/api/pncp/v1/orgaos/11318061000118/compras/2024/9/itens,ncmNbsCodigo inválido,false
+2025/3 - Março/QUINZENA-2,falha: contratacoes,11318061000118-1-000009/2024,7,https://pncp.gov.br/api/pncp/v1/orgaos/11318061000118/compras/2024/9/itens,ncmNbsCodigo inválido,false
+2025/3 - Março/QUINZENA-2,falha: contratacoes,11318061000118-1-000009/2024,10,https://pncp.gov.br/api/pncp/v1/orgaos/11318061000118/compras/2024/9/itens,ncmNbsCodigo inválido,false
+2025/3 - Março/QUINZENA-2,falha: contratacoes,52397791000139-1-000011/2025,4,https://pncp.gov.br/api/pncp/v1/orgaos/52397791000139/compras/2025/11/itens,quantidadeHomologada fracionária,0.5
+2025/3 - Março/QUINZENA-2,falha: contratacoes,88368386000130-1-000039/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/88368386000130/compras/2025/39/itens,quantidadeHomologada fracionária,2.5
+2025/4 - Abril/QUINZENA-1,ok,11800731000138-1-000220/2024,2,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2024/220/itens,quantidade fracionária,1.35
+2025/4 - Abril/QUINZENA-1,ok,11800731000138-1-000220/2024,5,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2024/220/itens,quantidade fracionária,1.1
+2025/4 - Abril/QUINZENA-1,ok,13982640000196-1-000057/2025,7,https://pncp.gov.br/api/pncp/v1/orgaos/13982640000196/compras/2025/57/itens,ncmNbsCodigo inválido,false
+2025/4 - Abril/QUINZENA-1,ok,11800731000138-1-000220/2024,5,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2024/220/itens,quantidadeHomologada fracionária,1.1
+2025/4 - Abril/QUINZENA-2,ok,11800731000138-1-000215/2024,4,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2024/215/itens,quantidade fracionária,9.5
+2025/4 - Abril/QUINZENA-2,ok,11800731000138-1-000177/2024,3,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2024/177/itens,quantidade fracionária,0.8
+2025/4 - Abril/QUINZENA-2,ok,11800731000138-1-000215/2024,4,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2024/215/itens,quantidadeHomologada fracionária,9.5
+2025/5 - Maio/QUINZENA-1,ok,11800731000138-1-000207/2024,3,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2024/207/itens,quantidade fracionária,0.6
+2025/5 - Maio/QUINZENA-1,ok,11800731000138-1-000033/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/33/itens,quantidade fracionária,0.72
+2025/5 - Maio/QUINZENA-1,ok,11926843000130-1-000030/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/11926843000130/compras/2025/30/itens,ncmNbsCodigo inválido,false
+2025/5 - Maio/QUINZENA-1,ok,11800731000138-1-000033/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/33/itens,quantidadeHomologada fracionária,0.72
+2025/5 - Maio/QUINZENA-2,falha: contratacoes,11800731000138-1-000041/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/41/itens,quantidade fracionária,0.3
+2025/5 - Maio/QUINZENA-2,falha: contratacoes,11800731000138-1-000041/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/41/itens,quantidadeHomologada fracionária,0.3
+2025/6 - Junho/QUINZENA-1,falha: contratacoes,45289329000152-1-000029/2024,3,https://pncp.gov.br/api/pncp/v1/orgaos/45289329000152/compras/2024/29/itens,quantidade fracionária,3.5
+2025/6 - Junho/QUINZENA-2,ok,01738780000134-1-000019/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/01738780000134/compras/2025/19/itens,quantidade fracionária,2536.5
+2025/6 - Junho/QUINZENA-2,ok,01738780000134-1-000019/2025,3,https://pncp.gov.br/api/pncp/v1/orgaos/01738780000134/compras/2025/19/itens,quantidade fracionária,1676.1
+2025/6 - Junho/QUINZENA-2,ok,01738780000134-1-000019/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/01738780000134/compras/2025/19/itens,quantidadeHomologada fracionária,2536.5
+2025/6 - Junho/QUINZENA-2,ok,01738780000134-1-000019/2025,3,https://pncp.gov.br/api/pncp/v1/orgaos/01738780000134/compras/2025/19/itens,quantidadeHomologada fracionária,1676.1
+2025/7 - Julho/QUINZENA-1,falha: medicamentos,13830336000123-1-000131/2025,9,https://pncp.gov.br/api/pncp/v1/orgaos/13830336000123/compras/2025/131/itens,quantidade fracionária,0.49
+2025/7 - Julho/QUINZENA-2,falha: medicamentos,36901264000163-1-000325/2024,10946,https://pncp.gov.br/api/pncp/v1/orgaos/36901264000163/compras/2024/325/itens,quantidade fracionária,0.72
+2025/7 - Julho/QUINZENA-2,falha: medicamentos,11718406000120-1-000122/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/11718406000120/compras/2025/122/itens,quantidade fracionária,2832.02
+2025/7 - Julho/QUINZENA-2,falha: medicamentos,05816630000152-1-005971/2025,27090,https://pncp.gov.br/api/pncp/v1/orgaos/05816630000152/compras/2025/5971/itens,quantidade fracionária,0.23
+2025/8 - Agosto/QUINZENA-2,falha: medicamentos,11800731000138-1-000129/2025,7,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/129/itens,quantidade fracionária,0.6
+2025/9 - Setembro/QUINZENA-1,falha: medicamentos,01020881000175-1-000026/2025,6395859,https://pncp.gov.br/api/pncp/v1/orgaos/01020881000175/compras/2025/26/itens,quantidade fracionária,2.021
+2025/9 - Setembro/QUINZENA-1,falha: medicamentos,01020881000175-1-000026/2025,6395860,https://pncp.gov.br/api/pncp/v1/orgaos/01020881000175/compras/2025/26/itens,quantidade fracionária,3.527
+2025/9 - Setembro/QUINZENA-1,falha: medicamentos,45289329000152-1-000147/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/45289329000152/compras/2025/147/itens,quantidade fracionária,3.5
+2025/9 - Setembro/QUINZENA-1,falha: medicamentos,11800731000138-1-000148/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/148/itens,quantidade fracionária,0.4
+2025/9 - Setembro/QUINZENA-1,falha: medicamentos,11800731000138-1-000148/2025,2,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/148/itens,quantidade fracionária,0.4
+2025/9 - Setembro/QUINZENA-1,falha: medicamentos,11800731000138-1-000148/2025,3,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/148/itens,quantidade fracionária,0.4
+2025/9 - Setembro/QUINZENA-1,falha: medicamentos,11800731000138-1-000149/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/149/itens,quantidade fracionária,0.18
+2025/9 - Setembro/QUINZENA-1,falha: medicamentos,92871532000112-1-000455/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/92871532000112/compras/2025/455/itens,quantidade fracionária,35242.5
+2025/9 - Setembro/QUINZENA-1,falha: medicamentos,92871532000112-1-000455/2025,2,https://pncp.gov.br/api/pncp/v1/orgaos/92871532000112/compras/2025/455/itens,quantidade fracionária,35242.5
+2025/9 - Setembro/QUINZENA-1,falha: medicamentos,45289329000152-1-000147/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/45289329000152/compras/2025/147/itens,quantidadeHomologada fracionária,3.5
+2025/9 - Setembro/QUINZENA-1,falha: medicamentos,11800731000138-1-000148/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/148/itens,quantidadeHomologada fracionária,0.4
+2025/9 - Setembro/QUINZENA-1,falha: medicamentos,11800731000138-1-000148/2025,2,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/148/itens,quantidadeHomologada fracionária,0.4
+2025/9 - Setembro/QUINZENA-1,falha: medicamentos,11800731000138-1-000148/2025,3,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/148/itens,quantidadeHomologada fracionária,0.4
+2025/9 - Setembro/QUINZENA-1,falha: medicamentos,11800731000138-1-000149/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/149/itens,quantidadeHomologada fracionária,0.18
+2025/9 - Setembro/QUINZENA-1,falha: medicamentos,92871532000112-1-000455/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/92871532000112/compras/2025/455/itens,quantidadeHomologada fracionária,35242.5
+2025/9 - Setembro/QUINZENA-1,falha: medicamentos,92871532000112-1-000455/2025,2,https://pncp.gov.br/api/pncp/v1/orgaos/92871532000112/compras/2025/455/itens,quantidadeHomologada fracionária,35242.5
+2025/9 - Setembro/QUINZENA-2,ok,24791154000107-1-000290/2025,2,https://pncp.gov.br/api/pncp/v1/orgaos/24791154000107/compras/2025/290/itens,quantidade fracionária,0.0613
+2025/9 - Setembro/QUINZENA-2,ok,11800731000138-1-000159/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/159/itens,quantidade fracionária,0.5
+2025/9 - Setembro/QUINZENA-2,ok,11800731000138-1-000159/2025,2,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/159/itens,quantidade fracionária,0.4
+2025/9 - Setembro/QUINZENA-2,ok,11800731000138-1-000159/2025,8,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/159/itens,quantidade fracionária,0.8
+2025/9 - Setembro/QUINZENA-2,ok,11800731000138-1-000159/2025,9,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/159/itens,quantidade fracionária,0.4
+2025/9 - Setembro/QUINZENA-2,ok,11800731000138-1-000159/2025,10,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/159/itens,quantidade fracionária,0.5
+2025/9 - Setembro/QUINZENA-2,ok,46177531000155-1-000438/2025,2,https://pncp.gov.br/api/pncp/v1/orgaos/46177531000155/compras/2025/438/itens,quantidade fracionária,7.2
+2025/9 - Setembro/QUINZENA-2,ok,11800731000138-1-000159/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/159/itens,quantidadeHomologada fracionária,0.5
+2025/9 - Setembro/QUINZENA-2,ok,11800731000138-1-000159/2025,2,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/159/itens,quantidadeHomologada fracionária,0.4
+2025/9 - Setembro/QUINZENA-2,ok,11800731000138-1-000159/2025,8,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/159/itens,quantidadeHomologada fracionária,0.8
+2025/9 - Setembro/QUINZENA-2,ok,11800731000138-1-000159/2025,9,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/159/itens,quantidadeHomologada fracionária,0.4
+2025/9 - Setembro/QUINZENA-2,ok,11800731000138-1-000159/2025,10,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/159/itens,quantidadeHomologada fracionária,0.5
+2025/9 - Setembro/QUINZENA-2,ok,46177531000155-1-000438/2025,2,https://pncp.gov.br/api/pncp/v1/orgaos/46177531000155/compras/2025/438/itens,quantidadeHomologada fracionária,7.2
+2025/10 - Outubro/QUINZENA-1,falha: medicamentos,11800731000138-1-000188/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/188/itens,quantidade fracionária,0.36
+2025/10 - Outubro/QUINZENA-1,falha: medicamentos,11800731000138-1-000188/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/188/itens,quantidadeHomologada fracionária,0.36
+2025/10 - Outubro/QUINZENA-2,ok,11318061000118-1-000009/2024,1,https://pncp.gov.br/api/pncp/v1/orgaos/11318061000118/compras/2024/9/itens,ncmNbsCodigo inválido,false
+2025/10 - Outubro/QUINZENA-2,ok,11318061000118-1-000009/2024,2,https://pncp.gov.br/api/pncp/v1/orgaos/11318061000118/compras/2024/9/itens,ncmNbsCodigo inválido,false
+2025/10 - Outubro/QUINZENA-2,ok,11318061000118-1-000009/2024,3,https://pncp.gov.br/api/pncp/v1/orgaos/11318061000118/compras/2024/9/itens,ncmNbsCodigo inválido,false
+2025/10 - Outubro/QUINZENA-2,ok,11318061000118-1-000009/2024,4,https://pncp.gov.br/api/pncp/v1/orgaos/11318061000118/compras/2024/9/itens,ncmNbsCodigo inválido,false
+2025/10 - Outubro/QUINZENA-2,ok,11318061000118-1-000009/2024,5,https://pncp.gov.br/api/pncp/v1/orgaos/11318061000118/compras/2024/9/itens,ncmNbsCodigo inválido,false
+2025/10 - Outubro/QUINZENA-2,ok,11318061000118-1-000009/2024,6,https://pncp.gov.br/api/pncp/v1/orgaos/11318061000118/compras/2024/9/itens,ncmNbsCodigo inválido,false
+2025/10 - Outubro/QUINZENA-2,ok,11318061000118-1-000009/2024,7,https://pncp.gov.br/api/pncp/v1/orgaos/11318061000118/compras/2024/9/itens,ncmNbsCodigo inválido,false
+2025/10 - Outubro/QUINZENA-2,ok,11318061000118-1-000009/2024,10,https://pncp.gov.br/api/pncp/v1/orgaos/11318061000118/compras/2024/9/itens,ncmNbsCodigo inválido,false
+2025/10 - Outubro/QUINZENA-2,ok,05054929000117-1-000371/2025,9,https://pncp.gov.br/api/pncp/v1/orgaos/05054929000117/compras/2025/371/itens,ncmNbsCodigo inválido,NS
+2025/10 - Outubro/QUINZENA-2,ok,05054929000117-1-000371/2025,10,https://pncp.gov.br/api/pncp/v1/orgaos/05054929000117/compras/2025/371/itens,ncmNbsCodigo inválido,NS
+2025/11 - Novembro/QUINZENA-1,ok,11800731000138-1-000129/2025,7,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/129/itens,quantidade fracionária,0.6
+2025/11 - Novembro/QUINZENA-1,ok,01814099000128-1-000435/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/01814099000128/compras/2025/435/itens,quantidade fracionária,267.245
+2025/11 - Novembro/QUINZENA-1,ok,05054929000117-1-000411/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/05054929000117/compras/2025/411/itens,ncmNbsCodigo inválido,NS
+2025/11 - Novembro/QUINZENA-1,ok,05054929000117-1-000411/2025,2,https://pncp.gov.br/api/pncp/v1/orgaos/05054929000117/compras/2025/411/itens,ncmNbsCodigo inválido,NS
+2025/11 - Novembro/QUINZENA-1,ok,11800731000138-1-000129/2025,7,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/129/itens,quantidadeHomologada fracionária,0.6
+2025/11 - Novembro/QUINZENA-1,ok,01814099000128-1-000435/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/01814099000128/compras/2025/435/itens,quantidadeHomologada fracionária,267.245
+2025/11 - Novembro/QUINZENA-2,falha: medicamentos,01020881000175-1-000026/2025,6395859,https://pncp.gov.br/api/pncp/v1/orgaos/01020881000175/compras/2025/26/itens,quantidade fracionária,2.021
+2025/11 - Novembro/QUINZENA-2,falha: medicamentos,01020881000175-1-000026/2025,6395860,https://pncp.gov.br/api/pncp/v1/orgaos/01020881000175/compras/2025/26/itens,quantidade fracionária,3.527
+2025/11 - Novembro/QUINZENA-2,falha: medicamentos,13830336000123-1-000131/2025,9,https://pncp.gov.br/api/pncp/v1/orgaos/13830336000123/compras/2025/131/itens,quantidade fracionária,0.49
+2025/11 - Novembro/QUINZENA-2,falha: medicamentos,87738530000110-1-002047/2025,4,https://pncp.gov.br/api/pncp/v1/orgaos/87738530000110/compras/2025/2047/itens,quantidade fracionária,5.5
+2025/11 - Novembro/QUINZENA-2,falha: medicamentos,05816630000152-1-005971/2025,27090,https://pncp.gov.br/api/pncp/v1/orgaos/05816630000152/compras/2025/5971/itens,quantidade fracionária,0.23
+2025/11 - Novembro/QUINZENA-2,falha: medicamentos,91110296000159-1-001442/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/91110296000159/compras/2025/1442/itens,quantidade fracionária,4.7619
+2025/11 - Novembro/QUINZENA-2,falha: medicamentos,91110296000159-1-001442/2025,2,https://pncp.gov.br/api/pncp/v1/orgaos/91110296000159/compras/2025/1442/itens,quantidade fracionária,33.9788
+2025/11 - Novembro/QUINZENA-2,falha: medicamentos,91110296000159-1-001442/2025,3,https://pncp.gov.br/api/pncp/v1/orgaos/91110296000159/compras/2025/1442/itens,quantidade fracionária,981.2593
+2025/11 - Novembro/QUINZENA-2,falha: medicamentos,05054929000117-1-000421/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/05054929000117/compras/2025/421/itens,ncmNbsCodigo inválido,NS
+2025/11 - Novembro/QUINZENA-2,falha: medicamentos,05054929000117-1-000421/2025,2,https://pncp.gov.br/api/pncp/v1/orgaos/05054929000117/compras/2025/421/itens,ncmNbsCodigo inválido,NS
+2025/11 - Novembro/QUINZENA-2,falha: medicamentos,05054929000117-1-000423/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/05054929000117/compras/2025/423/itens,ncmNbsCodigo inválido,NS
+2025/11 - Novembro/QUINZENA-2,falha: medicamentos,05054929000117-1-000423/2025,2,https://pncp.gov.br/api/pncp/v1/orgaos/05054929000117/compras/2025/423/itens,ncmNbsCodigo inválido,NS
+2025/11 - Novembro/QUINZENA-2,falha: medicamentos,87738530000110-1-002047/2025,4,https://pncp.gov.br/api/pncp/v1/orgaos/87738530000110/compras/2025/2047/itens,quantidadeHomologada fracionária,5.5
+2025/11 - Novembro/QUINZENA-2,falha: medicamentos,91110296000159-1-001442/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/91110296000159/compras/2025/1442/itens,quantidadeHomologada fracionária,4.7619
+2025/11 - Novembro/QUINZENA-2,falha: medicamentos,91110296000159-1-001442/2025,2,https://pncp.gov.br/api/pncp/v1/orgaos/91110296000159/compras/2025/1442/itens,quantidadeHomologada fracionária,33.9788
+2025/11 - Novembro/QUINZENA-2,falha: medicamentos,91110296000159-1-001442/2025,3,https://pncp.gov.br/api/pncp/v1/orgaos/91110296000159/compras/2025/1442/itens,quantidadeHomologada fracionária,981.2593
+2025/12 - Dezembro/QUINZENA-2,falha: medicamentos,11800731000138-1-000255/2025,2,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/255/itens,quantidade fracionária,0.8
+2025/12 - Dezembro/QUINZENA-2,falha: medicamentos,05816630000152-1-005149/2024,1131273,https://pncp.gov.br/api/pncp/v1/orgaos/05816630000152/compras/2024/5149/itens,quantidade fracionária,1.58
+2025/12 - Dezembro/QUINZENA-2,falha: medicamentos,11800731000138-1-000255/2025,2,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2025/255/itens,quantidadeHomologada fracionária,0.8
+2026/1 - Janeiro/QUINZENA-1,ok,11144137000136-1-000039/2025,6745945,https://pncp.gov.br/api/pncp/v1/orgaos/11144137000136/compras/2025/39/itens,quantidade fracionária,2.64
+2026/1 - Janeiro/QUINZENA-1,ok,11144137000136-1-000039/2025,6745945,https://pncp.gov.br/api/pncp/v1/orgaos/11144137000136/compras/2025/39/itens,quantidadeHomologada fracionária,2.64
+2026/2 - Fevereiro/QUINZENA-1,falha: medicamentos,94704277000149-1-000003/2026,1,https://pncp.gov.br/api/pncp/v1/orgaos/94704277000149/compras/2026/3/itens,quantidade fracionária,78.75
+2026/2 - Fevereiro/QUINZENA-1,falha: medicamentos,11294402000162-1-000275/2025,1,https://pncp.gov.br/api/pncp/v1/orgaos/11294402000162/compras/2025/275/itens,quantidade fracionária,13193.97
+2026/2 - Fevereiro/QUINZENA-1,falha: medicamentos,03439239000150-1-000134/2024,8,https://pncp.gov.br/api/pncp/v1/orgaos/03439239000150/compras/2024/134/itens,quantidade fracionária,586.8
+2026/2 - Fevereiro/QUINZENA-1,falha: medicamentos,94704277000149-1-000003/2026,1,https://pncp.gov.br/api/pncp/v1/orgaos/94704277000149/compras/2026/3/itens,quantidadeHomologada fracionária,78.75
+2026/2 - Fevereiro/QUINZENA-1,falha: medicamentos,03439239000150-1-000134/2024,8,https://pncp.gov.br/api/pncp/v1/orgaos/03439239000150/compras/2024/134/itens,quantidadeHomologada fracionária,586.8
+2026/3 - Março/QUINZENA-2,falha: medicamentos,11800731000138-1-000013/2026,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2026/13/itens,quantidade fracionária,0.4
+2026/3 - Março/QUINZENA-2,falha: medicamentos,11800731000138-1-000015/2026,2,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2026/15/itens,quantidade fracionária,0.4
+2026/3 - Março/QUINZENA-2,falha: medicamentos,11800731000138-1-000015/2026,3,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2026/15/itens,quantidade fracionária,0.8
+2026/3 - Março/QUINZENA-2,falha: medicamentos,11800731000138-1-000013/2026,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2026/13/itens,quantidadeHomologada fracionária,0.4
+2026/3 - Março/QUINZENA-2,falha: medicamentos,11800731000138-1-000015/2026,2,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2026/15/itens,quantidadeHomologada fracionária,0.4
+2026/3 - Março/QUINZENA-2,falha: medicamentos,11800731000138-1-000015/2026,3,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2026/15/itens,quantidadeHomologada fracionária,0.8
+2026/4 - Abril/QUINZENA-1,ok,11144137000136-1-000039/2025,6745945,https://pncp.gov.br/api/pncp/v1/orgaos/11144137000136/compras/2025/39/itens,quantidade fracionária,2.64
+2026/4 - Abril/QUINZENA-1,ok,01814099000128-1-000099/2026,2,https://pncp.gov.br/api/pncp/v1/orgaos/01814099000128/compras/2026/99/itens,quantidade fracionária,807.5
+2026/4 - Abril/QUINZENA-1,ok,13797188000192-1-000073/2026,3,https://pncp.gov.br/api/pncp/v1/orgaos/13797188000192/compras/2026/73/itens,ncmNbsCodigo inválido,false
+2026/4 - Abril/QUINZENA-1,ok,13797188000192-1-000091/2026,3,https://pncp.gov.br/api/pncp/v1/orgaos/13797188000192/compras/2026/91/itens,ncmNbsCodigo inválido,false
+2026/4 - Abril/QUINZENA-1,ok,11144137000136-1-000039/2025,6745945,https://pncp.gov.br/api/pncp/v1/orgaos/11144137000136/compras/2025/39/itens,quantidadeHomologada fracionária,2.64
+2026/4 - Abril/QUINZENA-1,ok,01814099000128-1-000099/2026,2,https://pncp.gov.br/api/pncp/v1/orgaos/01814099000128/compras/2026/99/itens,quantidadeHomologada fracionária,807.5
+2026/4 - Abril/DIAS-16-A-25,ok,18457192000125-1-000006/2026,7303762,https://pncp.gov.br/api/pncp/v1/orgaos/18457192000125/compras/2026/6/itens,quantidade fracionária,128.12
+2026/4 - Abril/DIAS-26-A-30,ok,05816630000152-1-005971/2025,27090,https://pncp.gov.br/api/pncp/v1/orgaos/05816630000152/compras/2025/5971/itens,quantidade fracionária,0.23
+2026/5 - Maio/DIA-16-ATE-31,ok,11800731000138-1-000049/2026,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2026/49/itens,quantidade fracionária,0.4
+2026/5 - Maio/DIA-16-ATE-31,ok,11800731000138-1-000049/2026,1,https://pncp.gov.br/api/pncp/v1/orgaos/11800731000138/compras/2026/49/itens,quantidadeHomologada fracionária,0.4
+2026/6 - Junho/QUINZENA-1,ok,11144137000136-1-000039/2025,6745945,https://pncp.gov.br/api/pncp/v1/orgaos/11144137000136/compras/2025/39/itens,quantidade fracionária,2.64
+2026/6 - Junho/QUINZENA-1,ok,11144137000136-1-000039/2025,6745945,https://pncp.gov.br/api/pncp/v1/orgaos/11144137000136/compras/2025/39/itens,quantidadeHomologada fracionária,2.64
+2026/7 - Julho/QUINZENA-1,ok,45289329000152-1-000029/2024,3,https://pncp.gov.br/api/pncp/v1/orgaos/45289329000152/compras/2024/29/itens,quantidade fracionária,3.5
+2026/7 - Julho/QUINZENA-1,ok,24859332000194-1-000376/2026,1,https://pncp.gov.br/api/pncp/v1/orgaos/24859332000194/compras/2026/376/itens,quantidade fracionária,36.91
+2026/7 - Julho/QUINZENA-1,ok,45289329000152-1-000029/2024,3,https://pncp.gov.br/api/pncp/v1/orgaos/45289329000152/compras/2024/29/itens,quantidadeHomologada fracionária,3.5
+2026/7 - Julho/QUINZENA-1,ok,24859332000194-1-000376/2026,1,https://pncp.gov.br/api/pncp/v1/orgaos/24859332000194/compras/2026/376/itens,quantidadeHomologada fracionária,36.91

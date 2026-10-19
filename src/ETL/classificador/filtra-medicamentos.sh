@@ -129,6 +129,12 @@ if [ -n "$CATALOGO_VETORIZADO_PATH" ]; then
   ENV_PREFIX="CATALOGO_VETORIZADO_PATH=\"$CATALOGO_VETORIZADO_PATH\" $ENV_PREFIX"
 fi
 
+# Força a saída do python.exe (Windows) em UTF-8 quando redirecionada para o log;
+# sem isso ela sai em cp1252 e o log mistura codificações.
+# WSLENV repassa a variável do WSL para o executável do Windows.
+export PYTHONIOENCODING=utf-8
+export WSLENV="${WSLENV:+$WSLENV:}PYTHONIOENCODING"
+
 # Registra no log os valores efetivos e executa o script Python do .venv
 screen -dmS "$SCREEN_NAME" bash -c "{ echo \"EMBEDDING_MODEL=${EMBEDDING_MODEL:-<não definido>}\"; echo \"CATALOGO_VETORIZADO_PATH=${CATALOGO_VETORIZADO_PATH:-<padrão>}\"; echo \"PYTHON_BIN=$PYTHON_BIN\"; } > \"$LOG_FILE\"; ${ENV_PREFIX}$PYTHON_BIN \"$SCRIPT_PY_FILTRA_MEDICAMENTOS\" \"$ITENS\" \"$CATALOGO\" >> \"$LOG_FILE\" 2>&1"
 

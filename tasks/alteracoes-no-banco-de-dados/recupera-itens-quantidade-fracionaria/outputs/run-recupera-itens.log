@@ -1,0 +1,60 @@
+Montando linhas de 77 itens candidatos em 30 pacotes...
+- 2025/1 - Janeiro/QUINZENA-2: 4 item(ns)
+- 2025/2 - Fevereiro/QUINZENA-1: 3 item(ns)
+  leitura tolerante: contratacoes.csv como texto, com validação das chaves
+- 2025/2 - Fevereiro/QUINZENA-2: 2 item(ns)
+  leitura tolerante: contratacoes.csv como texto, com validação das chaves
+- 2025/3 - Março/QUINZENA-1: 4 item(ns)
+  leitura tolerante: contratacoes.csv como texto, com validação das chaves
+- 2025/3 - Março/QUINZENA-2: 10 item(ns)
+  leitura tolerante: contratacoes.csv como texto, com validação das chaves
+- 2025/4 - Abril/QUINZENA-1: 3 item(ns)
+- 2025/4 - Abril/QUINZENA-2: 2 item(ns)
+- 2025/5 - Maio/QUINZENA-1: 3 item(ns)
+- 2025/5 - Maio/QUINZENA-2: 1 item(ns)
+  leitura tolerante: contratacoes.csv como texto, com validação das chaves
+- 2025/6 - Junho/QUINZENA-1: 1 item(ns)
+  leitura tolerante: contratacoes.csv como texto, com validação das chaves
+- 2025/6 - Junho/QUINZENA-2: 2 item(ns)
+- 2025/7 - Julho/QUINZENA-1: 1 item(ns)
+  leitura tolerante: itens-medicamentos.csv (exigenciaConteudoNacional)
+- 2025/7 - Julho/QUINZENA-2: 3 item(ns)
+  leitura tolerante: itens-medicamentos.csv (exigenciaConteudoNacional)
+- 2025/8 - Agosto/QUINZENA-2: 1 item(ns)
+  leitura tolerante: itens-medicamentos.csv (exigenciaConteudoNacional)
+- 2025/9 - Setembro/QUINZENA-1: 9 item(ns)
+  leitura tolerante: itens-medicamentos.csv (exigenciaConteudoNacional)
+- 2025/9 - Setembro/QUINZENA-2: 7 item(ns)
+- 2025/10 - Outubro/QUINZENA-1: 1 item(ns)
+  leitura tolerante: itens-medicamentos.csv (exigenciaConteudoNacional)
+- 2025/10 - Outubro/QUINZENA-2: 10 item(ns)
+- 2025/11 - Novembro/QUINZENA-1: 4 item(ns)
+- 2025/11 - Novembro/QUINZENA-2: 12 item(ns)
+  leitura tolerante: itens-medicamentos.csv (exigenciaConteudoNacional)
+- 2025/12 - Dezembro/QUINZENA-2: 2 item(ns)
+  leitura tolerante: itens-medicamentos.csv (exigenciaConteudoNacional)
+- 2026/1 - Janeiro/QUINZENA-1: 1 item(ns)
+- 2026/2 - Fevereiro/QUINZENA-1: 3 item(ns)
+  leitura tolerante: itens-medicamentos.csv (exigenciaConteudoNacional)
+- 2026/3 - Março/QUINZENA-2: 3 item(ns)
+  leitura tolerante: itens-medicamentos.csv (exigenciaConteudoNacional)
+- 2026/4 - Abril/QUINZENA-1: 4 item(ns)
+- 2026/4 - Abril/DIAS-16-A-25: 1 item(ns)
+- 2026/4 - Abril/DIAS-26-A-30: 1 item(ns)
+- 2026/5 - Maio/DIA-16-ATE-31: 1 item(ns)
+- 2026/6 - Junho/QUINZENA-1: 1 item(ns)
+- 2026/7 - Julho/QUINZENA-1: 2 item(ns)
+Linhas montadas: item_homologado=51, item_licitado=28; pendentes na montagem=4.
+Verificação salva em 'C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tasks/alteracoes-no-banco-de-dados/recupera-itens-quantidade-fracionaria/outputs/verificacao-banco.csv':
+# A tibble: 5 × 3
+  tabela          status                                                       n
+  <chr>           <chr>                                                    <int>
+1 item_homologado inserir                                                     41
+2 item_homologado já existe no banco (não alterado)                           10
+3 item_licitado   inserir                                                     22
+4 item_licitado   já existe no banco (não alterado)                            6
+5 <NA>            pendente: contratação ausente ou com linha desalinhada …     4
+Historico de cargas atualizado em 'C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/src/ETL/loaders/historico-cargas.csv' (5 linhas anexadas).
+    contratante      fornecedor     contratacao item_homologado   item_licitado 
+              0               0               0              41              22 
+Recuperação concluída: 41 item_homologado e 22 item_licitado inseridos.

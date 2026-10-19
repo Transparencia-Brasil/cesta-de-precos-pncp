@@ -1,0 +1,710 @@
+---
+# COLETORES
+---
+
+INÍCIO DA COLETA ÀS '08-Sep-2026 13:41:54'
+
+Diretório: ENTRADA
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/src/ETL
+
+
+Diretório:
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp
+
+PARÂMETROS: 
+ - PRIMEIRO_DIA='2026-07-01' - é a data de início da coleta
+ - ULTIMO_DIA='2026-07-15' - é a data final da coleta
+ - ALIAS_COLETA='2026-07/QUINZENA-1' - é um alias para identificar a coleta e apontar um destino no diretório de /coletas
+
+---
+## VALIDADOR DE TEMPLATES
+
+---
+# VALIDADOR DE TEMPLATES PNCP
+---
+Script:
+ - 'src/ETL/template/src/python/atualiza-templates.py'
+Python:
+ - './.venv/Scripts/python.exe'
+
+---
+Atualizando template: contratacoes
+Resumo contratacoes: 62 campos no template, 0 novos, 0 legados.
+---
+Atualizando template: itens
+Resumo itens: 49 campos no template, 0 novos, 0 legados.
+---
+Atualizando template: resultados_itens
+Resumo resultados_itens: 51 campos no template, 0 novos, 0 legados.
+---
+Templates atualizados em: C:\Users\rdurl\OneDrive\Documentos\cesta-de-precos-pncp\src\ETL\template\templates
+Campos novos: 0
+Campos legados preservados: 0
+
+Validação de templates concluída!
+
+Resposta: S
+
+Resposta: N
+
+---
+## CONTRATAÇÃO
+
+Script:
+ - 'src/ETL/coletores/coleta-contratacoes.R'
+
+Diretório de saída:
+ - 'coleta/contratacoes/2026-07/QUINZENA-1'
+
+Screen criada para coletar contratações:
+ - 'coletor-contratacoes-2026-07-01-ate-2026-07-15'
+
+Saída sendo registrada em:
+ - 'coleta/contratacoes/2026-07/QUINZENA-1/run-coletor-contratacoes-2026-07-01-ate-2026-07-15.log'.
+
+Parâmetros do coletor: 
+ - PATH_OUTPUT_DIR="coleta/contratacoes/2026-07/QUINZENA-1"
+ - PRIMEIRO_DIA="2026-07-01"
+ - ULTIMO_DIA="2026-07-15"
+
+Coleta de CONTRATAÇÕES em execução...
+
+There are screens on:
+	1083.coletor-contratacoes-2026-07-01-ate-2026-07-15	(09/08/26 13:42:06)	(Detached)
+	998.coletor-contratacoes-2026-07-01-ate-2026-07-15	(09/08/26 13:38:56)	(Detached)
+2 Sockets in /run/screen/S-rdurl0.
+
+
+Aguardando a screen 'coletor-contratacoes-2026-07-01-ate-2026-07-15' encerrar...
+Screen coletor-contratacoes-2026-07-01-ate-2026-07-15 encerrada
+
+Coleta de CONTRATAÇÕES concluída!
+
+---
+## ITENS
+
+Script:
+ - 'src/ETL/coletores/coleta-itens.R'
+
+Diretório de saída:
+ - 'coleta/itens/2026-07/QUINZENA-1'
+
+Screen criada para coletar itens:
+ - 'coletor-itens-2026-07-01-ate-2026-07-15'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2026-07/QUINZENA-1/run-coletor-itens-2026-07-01-ate-2026-07-15.log'.
+
+Parâmetro do coletor:
+ - CONTRATACOES='coleta/contratacoes/2026-07/QUINZENA-1/dados.csv'
+
+Coleta de ITENS em execução...
+
+There is a screen on:
+	5396.coletor-itens-2026-07-01-ate-2026-07-15	(09/08/26 17:47:14)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+Aguardando a screen 'coletor-itens-2026-07-01-ate-2026-07-15' encerrar...
+
+---
+# RETOMADA DA COLETA 2026-07/QUINZENA-1
+---
+
+INÍCIO DA RETOMADA ÀS '10-Sep-2026 10:28:18'
+Diretório: '/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp'
+Resposta: carga no banco = S
+Resposta: recoleta de resultados = N
+Upload para o Google Drive = N
+
+Validando a retomada de '2026-07/QUINZENA-1'...
+Contratações/endpoints: 74503.
+Itens no checkpoint: 200304 linhas.
+Erros no checkpoint: 50 linhas.
+Lotes registrados: 49.
+Checkpoint inicial confirmado: 49000 endpoints persistidos.
+A retomada repetirá os 50 erros anteriores e os 25503 endpoints posteriores ao checkpoint.
+Catálogo fixado: 'data/catmat/catmat-1.csv'.
+Cache de embeddings: 'data/catmat/catalogo-vetorizado.csv'.
+Carga no banco: S.
+Recoleta de resultados: N.
+Upload para o Google Drive: N.
+Preflight concluído.
+
+---
+## RETOMADA: ITENS
+
+
+---
+# RETOMADA DA COLETA DE ITENS 2026-07/QUINZENA-1
+---
+
+INÍCIO DA RETOMADA ÀS '10-Sep-2026 10:28:32'
+Último checkpoint íntegro: lote 49, com 49000 endpoints persistidos.
+A execução anterior foi interrompida no endpoint 49386.
+O trecho parcial 49001-49386 será refeito porque ainda não havia sido salvo.
+Os 50 endpoints com erro serão tentados novamente.
+
+
+Aguardando a screen 'coletor-itens-2026-07-01-ate-2026-07-15' encerrar...
+
+---
+# REVERSÃO DA RETOMADA MALSUCESSIDA
+---
+
+CHECKPOINT RESTAURADO ÀS '10-Sep-2026 12:19:28'
+Foram removidos somente os dois lotes anexados pela retomada malsucedida.
+Estado restaurado: 200304 itens, 50 erros e 49 lotes.
+Backup e hashes: '/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tmp/retomada-coleta-2026-07-quinzena-1/backup-retomada-mal-sucedida'.
+A coleta não foi reiniciada.
+
+---
+# RETIFICAÇÃO DA REVERSÃO
+---
+
+A nota anterior mencionou dois lotes; o estado final estabilizado continha três lotes anexados.
+Foram removidos exatamente os três lotes da retomada malsucedida.
+As contagens restauradas permanecem: 200304 itens, 50 erros e 49 lotes.
+
+---
+# RETOMADA DA COLETA 2026-07/QUINZENA-1
+---
+
+INÍCIO DA RETOMADA ÀS '10-Sep-2026 13:04:21'
+Diretório: '/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp'
+Resposta: carga no banco = S
+Resposta: recoleta de resultados = N
+Upload para o Google Drive = N
+
+Validando a retomada de '2026-07/QUINZENA-1'...
+Contratações/endpoints: 74503.
+Itens no checkpoint: 200304 linhas.
+Erros no checkpoint: 50 linhas.
+Lotes registrados: 49.
+contratacoes=74503
+endpoints_coletados=48950
+endpoints_pendentes=25553
+lotes_pendentes=26
+Checkpoint inicial confirmado: 49000 endpoints processados, dos quais 48950 produziram dados.
+A retomada tentará os 50 erros anteriores e os 25503 endpoints posteriores ao checkpoint.
+Catálogo fixado: 'data/catmat/catmat-1.csv'.
+Cache de embeddings: 'data/catmat/catalogo-vetorizado.csv'.
+Carga no banco: S.
+Recoleta de resultados: N.
+Upload para o Google Drive: N.
+Preflight concluído.
+
+---
+## RETOMADA: ITENS
+
+contratacoes=74503
+endpoints_coletados=48950
+endpoints_pendentes=25553
+lotes_pendentes=26
+arquivo_pendentes=/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tmp/retomada-coleta-2026-07-quinzena-1/estado/contratacoes-pendentes.csv
+
+---
+# RETOMADA DA COLETA DE ITENS 2026-07/QUINZENA-1
+---
+
+INÍCIO DA RETOMADA ÀS '10-Sep-2026 13:04:46'
+Último checkpoint íntegro: lote 49, com 49000 endpoints persistidos.
+A execução anterior foi interrompida no endpoint 49386.
+O trecho parcial 49001-49386 será refeito porque ainda não havia sido salvo.
+Os 50 endpoints com erro serão tentados novamente.
+
+
+A nota anterior mencionou dois lotes; o estado final estabilizado continha três lotes anexados.
+Foram removidos exatamente os três lotes da retomada malsucedida.
+As contagens restauradas permanecem: 200304 itens, 50 erros e 49 lotes.
+
+---
+# RETOMADA DA COLETA DE ITENS 2026-07/QUINZENA-1
+---
+
+INÍCIO DA RETOMADA ÀS '10-Sep-2026 13:04:46'
+Último checkpoint íntegro: lote 49, com 49000 endpoints persistidos.
+A execução anterior foi interrompida no endpoint 49386.
+O trecho parcial 49001-49386 será refeito porque ainda não havia sido salvo.
+Os 50 endpoints com erro serão tentados novamente.
+
+Mensagen de aviso:
+pacote 'httr2' foi compilado no R versão 4.6.1 
+Error:
+! '/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tmp/retomada-coleta-2026-07-quinzena-1/estado/contratacoes-pendentes.csv' does
+  not exist.
+Backtrace:
+    ▆
+ 1. ├─readr::read_csv(PATH_CONTRATACOES)
+ 2. │ └─vroom::vroom(...)
+ 3. │   └─vroom:::vroom_(...)
+ 4. └─vroom (local) `<fn>`("/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tmp/retomada-coleta-2026-07-quinzena-1/estado/contratacoes-pendentes.csv")
+ 5.   └─vroom:::check_path(path)
+ 6.     └─cli::cli_abort(msg, call = call)
+ 7.       └─rlang::abort(...)
+Execução interrompida
+Erro: o coletor de itens não iniciou corretamente.
+
+Aguardando a screen 'coletor-itens-2026-07-01-ate-2026-07-15' encerrar...
+Screen 'coletor-itens-2026-07-01-ate-2026-07-15' encerrada.
+Erro: arquivo obrigatório ausente ou vazio: 'coleta/itens/2026-07/QUINZENA-1/dados.csv'.
+head: cannot open 'coleta/itens/2026-07/QUINZENA-1/dados.csv' for reading: No such file or directory
+Erro: o CSV 'coleta/itens/2026-07/QUINZENA-1/dados.csv' não contém a coluna esperada 'endpoint'.
+Erro: arquivo obrigatório ausente ou vazio: 'coleta/itens/2026-07/QUINZENA-1/erros.csv'.
+head: cannot open 'coleta/itens/2026-07/QUINZENA-1/erros.csv' for reading: No such file or directory
+Erro: o CSV 'coleta/itens/2026-07/QUINZENA-1/erros.csv' não contém a coluna esperada 'endpoint'.
+Erro: arquivo obrigatório ausente ou vazio: 'coleta/itens/2026-07/QUINZENA-1/monitoramento.csv'.
+head: cannot open 'coleta/itens/2026-07/QUINZENA-1/monitoramento.csv' for reading: No such file or directory
+Erro: o CSV 'coleta/itens/2026-07/QUINZENA-1/monitoramento.csv' não contém a coluna esperada 'lote'.
+Erro: o checkpoint 'coleta/itens/2026-07/QUINZENA-1/temp' ainda existe; a etapa não terminou.
+Traceback (most recent call last):
+  File "<string>", line 5, in <module>
+FileNotFoundError: [Errno 2] No such file or directory: 'coleta/itens/2026-07/QUINZENA-1/dados.csv'
+Erro: não foi possível contar as linhas finais de itens.
+./tmp/retomada-coleta-2026-07-quinzena-1/retomar-coleta.sh: line 459: [: : integer expression expected
+Erro: a saída final contém apenas  itens.
+Coleta de itens concluída com  linhas.
+
+---
+## CLASSIFICADOR - FILTRA MEDICAMENTOS
+
+Script:
+ - 'src/ETL/classificador/filtra-medicamentos.py'
+
+Diretório de saída:
+ - 'coleta/itens/2026-07/QUINZENA-1'
+
+Screen criada para coletar contratações:
+ - 'classificador-2026-07-01-ate-2026-07-15'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2026-07/QUINZENA-1/run-classificador-2026-07-01-ate-2026-07-15.log'.
+
+Parâmetros do classificador:
+ITENS='coleta/itens/2026-07/QUINZENA-1/dados.csv'
+CATALOGO='data/catmat/catmat-1.csv'
+
+Python a ser utilizado:
+ - './.venv/Scripts/python.exe'
+
+Filtragem e classificação de MEDICAMENTOS em execução...
+
+There are screens on:
+	3386.classificador-2026-07-01-ate-2026-07-15	(09/10/26 13:04:49)	(Detached)
+	3273.retomar-coleta-2026-07-q1	(09/10/26 13:04:24)	(Detached)
+2 Sockets in /run/screen/S-rdurl0.
+
+
+Aguardando a screen 'classificador-2026-07-01-ate-2026-07-15' encerrar...
+
+---
+# RETOMADA DA COLETA 2026-07/QUINZENA-1
+---
+
+INÍCIO DA RETOMADA ÀS '10-Sep-2026 13:23:05'
+Diretório: '/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp'
+Resposta: carga no banco = S
+Resposta: recoleta de resultados = N
+Upload para o Google Drive = N
+
+Validando a retomada de '2026-07/QUINZENA-1'...
+Contratações/endpoints: 74503.
+Itens no checkpoint: 200304 linhas.
+Erros no checkpoint: 50 linhas.
+Lotes registrados: 49.
+contratacoes=74503
+endpoints_coletados=48950
+endpoints_pendentes=25553
+lotes_pendentes=26
+Checkpoint inicial confirmado: 49000 endpoints processados, dos quais 48950 produziram dados.
+A retomada tentará os 50 erros anteriores e os 25503 endpoints posteriores ao checkpoint.
+Catálogo fixado: 'data/catmat/catmat-1.csv'.
+Cache de embeddings: 'data/catmat/catalogo-vetorizado.csv'.
+Carga no banco: S.
+Recoleta de resultados: N.
+Upload para o Google Drive: N.
+Preflight concluído.
+
+---
+## RETOMADA: ITENS
+
+contratacoes=74503
+endpoints_coletados=48950
+endpoints_pendentes=25553
+lotes_pendentes=26
+arquivo_pendentes=/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tmp/retomada-coleta-2026-07-quinzena-1/estado/contratacoes-pendentes.csv
+
+---
+# RETOMADA DA COLETA DE ITENS 2026-07/QUINZENA-1
+---
+
+INÍCIO DA RETOMADA ÀS '10-Sep-2026 13:23:38'
+Último checkpoint íntegro: lote 49, com 49000 endpoints persistidos.
+A execução anterior foi interrompida no endpoint 49386.
+O trecho parcial 49001-49386 será refeito porque ainda não havia sido salvo.
+Os 50 endpoints com erro serão tentados novamente.
+
+
+Aguardando a screen 'coletor-itens-2026-07-01-ate-2026-07-15' encerrar...
+Screen 'coletor-itens-2026-07-01-ate-2026-07-15' encerrada.
+Erro: arquivo obrigatório ausente ou vazio: 'coleta/itens/2026-07/QUINZENA-1/dados.csv'.
+A retomada falhou com status 1. Consulte 'src/ETL/log/run-coletores-2026-07-QUINZENA-1.log'.
+
+---
+# RETOMADA DA COLETA 2026-07/QUINZENA-1
+---
+
+INÍCIO DA RETOMADA ÀS '10-Sep-2026 17:04:18'
+Diretório: '/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp'
+Resposta: carga no banco = S
+Resposta: recoleta de resultados = N
+Upload para o Google Drive = N
+
+Validando a retomada de '2026-07/QUINZENA-1'...
+Contratações/endpoints: 74503.
+Itens no checkpoint: 205495 linhas.
+Erros no checkpoint: 64 linhas.
+Lotes registrados: 51.
+contratacoes=74503
+endpoints_coletados=50936
+endpoints_pendentes=23567
+lotes_pendentes=24
+Checkpoint posterior ao estado inicial detectado; a lista filtrada será regenerada antes da retomada.
+Catálogo fixado: 'data/catmat/catmat-1.csv'.
+Cache de embeddings: 'data/catmat/catalogo-vetorizado.csv'.
+Carga no banco: S.
+Recoleta de resultados: N.
+Upload para o Google Drive: N.
+Preflight concluído.
+
+---
+## RETOMADA: ITENS
+
+contratacoes=74503
+endpoints_coletados=50936
+endpoints_pendentes=23567
+lotes_pendentes=24
+arquivo_pendentes=/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tmp/retomada-coleta-2026-07-quinzena-1/estado/contratacoes-pendentes.csv
+
+---
+# RETOMADA DA COLETA DE ITENS 2026-07/QUINZENA-1
+---
+
+INÍCIO DA RETOMADA ÀS '10-Sep-2026 17:04:46'
+Último checkpoint íntegro: lote 49, com 49000 endpoints persistidos.
+A execução anterior foi interrompida no endpoint 49386.
+O trecho parcial 49001-49386 será refeito porque ainda não havia sido salvo.
+Os 50 endpoints com erro serão tentados novamente.
+
+
+Aguardando a screen 'coletor-itens-2026-07-01-ate-2026-07-15' encerrar...
+
+---
+# RETOMADA DA COLETA 2026-07/QUINZENA-1
+---
+
+INÍCIO DA RETOMADA ÀS '10-Sep-2026 20:51:18'
+Diretório: '/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp'
+Resposta: carga no banco = S
+Resposta: recoleta de resultados = N
+Upload para o Google Drive = N
+
+Validando a retomada de '2026-07/QUINZENA-1'...
+Contratações/endpoints: 74503.
+Itens no checkpoint: 221638 linhas.
+Erros no checkpoint: 65 linhas.
+Lotes registrados: 57.
+contratacoes=74503
+endpoints_coletados=56935
+endpoints_pendentes=17568
+lotes_pendentes=18
+Checkpoint posterior ao estado inicial detectado; a lista filtrada será regenerada antes da retomada.
+Catálogo fixado: 'data/catmat/catmat-1.csv'.
+Cache de embeddings: 'data/catmat/catalogo-vetorizado.csv'.
+Carga no banco: S.
+Recoleta de resultados: N.
+Upload para o Google Drive: N.
+Preflight concluído.
+
+---
+## RETOMADA: ITENS
+
+contratacoes=74503
+endpoints_coletados=56935
+endpoints_pendentes=17568
+lotes_pendentes=18
+arquivo_pendentes=/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tmp/retomada-coleta-2026-07-quinzena-1/estado/contratacoes-pendentes.csv
+
+---
+# RETOMADA DA COLETA DE ITENS 2026-07/QUINZENA-1
+---
+
+INÍCIO DA RETOMADA ÀS '10-Sep-2026 20:51:45'
+Último checkpoint íntegro: lote 49, com 49000 endpoints persistidos.
+A execução anterior foi interrompida no endpoint 49386.
+O trecho parcial 49001-49386 será refeito porque ainda não havia sido salvo.
+Os 50 endpoints com erro serão tentados novamente.
+
+
+Aguardando a screen 'coletor-itens-2026-07-01-ate-2026-07-15' encerrar...
+Screen 'coletor-itens-2026-07-01-ate-2026-07-15' encerrada.
+Coleta de itens concluída com 252918 linhas.
+
+---
+## CLASSIFICADOR - FILTRA MEDICAMENTOS
+
+Script:
+ - 'src/ETL/classificador/filtra-medicamentos.py'
+
+Diretório de saída:
+ - 'coleta/itens/2026-07/QUINZENA-1'
+
+Screen criada para coletar contratações:
+ - 'classificador-2026-07-01-ate-2026-07-15'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2026-07/QUINZENA-1/run-classificador-2026-07-01-ate-2026-07-15.log'.
+
+Parâmetros do classificador:
+ITENS='coleta/itens/2026-07/QUINZENA-1/dados.csv'
+CATALOGO='data/catmat/catmat-1.csv'
+
+Python a ser utilizado:
+ - './.venv/Scripts/python.exe'
+
+Filtragem e classificação de MEDICAMENTOS em execução...
+
+There are screens on:
+	14254.classificador-2026-07-01-ate-2026-07-15	(09/11/26 08:10:29)	(Detached)
+	691.retomar-coleta-2026-07-q1	(09/10/26 21:47:33)	(Detached)
+2 Sockets in /run/screen/S-rdurl0.
+
+
+Aguardando a screen 'classificador-2026-07-01-ate-2026-07-15' encerrar...
+Screen 'classificador-2026-07-01-ate-2026-07-15' encerrada.
+Erro: o classificador encerrou sem registrar conclusão em 'coleta/itens/2026-07/QUINZENA-1/run-classificador-2026-07-01-ate-2026-07-15.log'.
+A retomada falhou com status 1. Consulte 'src/ETL/log/run-coletores-2026-07-QUINZENA-1.log'.
+
+---
+# RETOMADA DA COLETA 2026-07/QUINZENA-1
+---
+
+INÍCIO DA RETOMADA ÀS '14-Oct-2026 16:59:28'
+Diretório: '/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp'
+Resposta: carga no banco = S
+Resposta: recoleta de resultados = N
+Upload para o Google Drive = N
+
+Validando a retomada de '2026-07/QUINZENA-1'...
+Contratações/endpoints: 74503.
+Itens: saída final já concluída; a etapa poderá ser reutilizada.
+Classificador: concluído; será reutilizado (não será refeito).
+Codificação dos logs existentes (os que não forem UTF-8 serão convertidos):
+UTF-8 válido: coleta/contratacoes/2026-07/QUINZENA-1/run-coletor-contratacoes-2026-07-01-ate-2026-07-15.log
+NÃO é UTF-8 válido: coleta/itens/2026-07/QUINZENA-1/run-classificador-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/itens/2026-07/QUINZENA-1/run-coletor-itens-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: src/ETL/log/run-coletores-2026-07-QUINZENA-1.log
+Catálogo fixado: 'data/catmat/catmat-1.csv'.
+Cache de embeddings: 'data/catmat/catalogo-vetorizado.csv'.
+Carga no banco: S.
+Recoleta de resultados: N.
+Upload para o Google Drive: N.
+Preflight concluído.
+
+---
+## RETOMADA: ITENS
+
+Coleta de itens já concluída; etapa reutilizada.
+
+---
+## CLASSIFICADOR - FILTRA MEDICAMENTOS
+
+Convertido para UTF-8: coleta/itens/2026-07/QUINZENA-1/run-classificador-2026-07-01-ate-2026-07-15.log (original em /mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/tmp/retomada-coleta-2026-07-quinzena-1/estado/run-classificador-2026-07-01-ate-2026-07-15.log.original)
+Classificador já concluído; etapa reutilizada.
+
+---
+## RESULTADOS
+
+
+Aguardando a screen 'coletor-resultados-2026-07-01-ate-2026-07-15' encerrar...
+Screen 'coletor-resultados-2026-07-01-ate-2026-07-15' encerrada.
+Coleta de resultados de medicamentos concluída.
+
+---
+## PACOTE DE DADOS
+
+UTF-8 válido: coleta/contratacoes/2026-07/QUINZENA-1/run-coletor-contratacoes-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/itens/2026-07/QUINZENA-1/run-classificador-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/itens/2026-07/QUINZENA-1/run-coletor-itens-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/resultados/2026-07/QUINZENA-1/run-coletor-resultados-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/data-package/2026/7 - Julho/QUINZENA-1/LOG/run-classificador-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/data-package/2026/7 - Julho/QUINZENA-1/LOG/run-coletor-contratacoes-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/data-package/2026/7 - Julho/QUINZENA-1/LOG/run-coletor-itens-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/data-package/2026/7 - Julho/QUINZENA-1/LOG/run-coletor-resultados-2026-07-01-ate-2026-07-15.log
+Os 10 CSVs esperados foram copiados para 'coleta/data-package/2026/7 - Julho/QUINZENA-1/DATA'.
+
+---
+## CARGA NO BANCO
+
+Executando carga automática com os três CSVs de julho.
+UTF-8 válido: coleta/data-package/2026/7 - Julho/QUINZENA-1/LOG/run-carrega-dados-2026-07-QUINZENA-1.log
+- linhas lidas: 74503
+- linhas lidas: 8703
+- linhas lidas: 5676
+Linhas lidas (após remover NA's): 74503
+Linhas lidas (após remover NA's): 8703
+Linhas lidas (após remover NA's): 5676
+Erro ao inserir a linha 909 da tabela tabela: Failed to fetch row : ERROR:  invalid input syntax for type integer: "3.5"
+CONTEXT:  unnamed portal parameter $30 = '...'
+
+Erro ao inserir a linha 3328 da tabela tabela: Failed to fetch row : ERROR:  invalid input syntax for type integer: "36.909999999999997"
+CONTEXT:  unnamed portal parameter $30 = '...'
+
+Mensagens de aviso:
+1: Closing open result set, cancelling previous query 
+2: Closing open result set, cancelling previous query 
+Historico de cargas atualizado em 'C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/src/ETL/loaders/historico-cargas.csv' (5 linhas anexadas).
+Erro: a carga terminou com erros de inserção; consulte 'coleta/data-package/2026/7 - Julho/QUINZENA-1/LOG/run-carrega-dados-2026-07-QUINZENA-1.log'.
+A retomada falhou com status 1. Consulte 'src/ETL/log/run-coletores-2026-07-QUINZENA-1.log'.
+
+---
+# CARGA ACEITA COM 2 LINHAS REJEITADAS (quantidade fracionária em INTEGER)
+Registrado em 15-Oct-2026 14:14:36. Detalhes: tmp/retomada-coleta-2026-07-quinzena-1/estado/carga-concluida.ok
+
+
+---
+# RETOMADA DA COLETA 2026-07/QUINZENA-1
+---
+
+INÍCIO DA RETOMADA ÀS '15-Oct-2026 14:14:40'
+Diretório: '/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp'
+Resposta: carga no banco = S
+Resposta: recoleta de resultados = N
+Upload para o Google Drive = N
+
+Validando a retomada de '2026-07/QUINZENA-1'...
+Contratações/endpoints: 74503.
+Itens: saída final já concluída; a etapa poderá ser reutilizada.
+Classificador: concluído; será reutilizado (não será refeito).
+Codificação dos logs existentes (os que não forem UTF-8 serão convertidos):
+UTF-8 válido: coleta/contratacoes/2026-07/QUINZENA-1/run-coletor-contratacoes-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/itens/2026-07/QUINZENA-1/run-classificador-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/itens/2026-07/QUINZENA-1/run-coletor-itens-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: src/ETL/log/run-coletores-2026-07-QUINZENA-1.log
+Catálogo fixado: 'data/catmat/catmat-1.csv'.
+Cache de embeddings: 'data/catmat/catalogo-vetorizado.csv'.
+Carga no banco: S.
+Recoleta de resultados: N.
+Upload para o Google Drive: N.
+Preflight concluído.
+
+---
+## RETOMADA: ITENS
+
+Coleta de itens já concluída; etapa reutilizada.
+
+---
+## CLASSIFICADOR - FILTRA MEDICAMENTOS
+
+UTF-8 válido: coleta/itens/2026-07/QUINZENA-1/run-classificador-2026-07-01-ate-2026-07-15.log
+Classificador já concluído; etapa reutilizada.
+
+---
+## RESULTADOS
+
+Coleta de resultados já concluída; etapa reutilizada.
+
+---
+## PACOTE DE DADOS
+
+UTF-8 válido: coleta/contratacoes/2026-07/QUINZENA-1/run-coletor-contratacoes-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/itens/2026-07/QUINZENA-1/run-classificador-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/itens/2026-07/QUINZENA-1/run-coletor-itens-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/resultados/2026-07/QUINZENA-1/run-coletor-resultados-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/data-package/2026/7 - Julho/QUINZENA-1/LOG/run-carrega-dados-2026-07-QUINZENA-1.log
+UTF-8 válido: coleta/data-package/2026/7 - Julho/QUINZENA-1/LOG/run-classificador-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/data-package/2026/7 - Julho/QUINZENA-1/LOG/run-coletor-contratacoes-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/data-package/2026/7 - Julho/QUINZENA-1/LOG/run-coletor-itens-2026-07-01-ate-2026-07-15.log
+UTF-8 válido: coleta/data-package/2026/7 - Julho/QUINZENA-1/LOG/run-coletor-resultados-2026-07-01-ate-2026-07-15.log
+Os 10 CSVs esperados foram copiados para 'coleta/data-package/2026/7 - Julho/QUINZENA-1/DATA'.
+
+---
+## CARGA NO BANCO
+
+Carga já marcada como concluída; etapa reutilizada.
+
+---
+## RECOLETA DE RESULTADOS
+
+Recoleta de resultados não executada, conforme escolha fixada para esta retomada.
+
+COLETA ENCERRADA ÀS '15-Oct-2026 14:14:50'!
+Fim da retomada.
+Log contínuo atualizado em 'src/ETL/log/run-coletores-2026-07-QUINZENA-1.log'.
+Pacote concluído em 'coleta/data-package/2026/7 - Julho/QUINZENA-1'.
+
+---
+# NOTA DE FECHAMENTO - RESUMO DA COLETA 2026-07/QUINZENA-1
+---
+
+Registrado às '15-Oct-2026 14:20:17'. Consolida o histórico acima, que foi preservado sem edição.
+
+Período: 2026-07-01 a 2026-07-15.
+Situação final: CONCLUÍDA (contratações, itens, classificador, resultados, pacote e carga).
+
+Contagens finais:
+ - Contratações: 74503.
+ - Itens: 252918 linhas de 74491 contratações; 12 contratações sem itens (lista abaixo).
+ - Medicamentos (classificador): 8703 itens em 2247 contratações.
+ - Resultados: 5676 linhas de 5141 itens; 10 itens com HTTP 404 (sem resultado publicado).
+ - Pacote: 10 CSVs em DATA/ e 7 logs em LOG/, todos em UTF-8.
+
+Linha do tempo:
+ - 08-Sep-2026 13:41: início; contratações concluídas às 17:46.
+ - Coleta de itens interrompida no endpoint 49386; último checkpoint íntegro no lote 49
+   (49000 endpoints, 200304 itens, 50 erros).
+ - 10-Sep 10:28: a primeira retomada anexou 3 lotes indevidos ao checkpoint. Às 12:19 o checkpoint
+   foi revertido por truncamento exato para o estado do lote 49. A nota que fala em "dois lotes"
+   foi retificada para três.
+ - 10-Sep 13:04, 13:23, 17:04 e 20:51: retomadas usando apenas as contratações ainda sem itens.
+   A de 13:04 não iniciou (caminho WSL x Windows da lista filtrada), e os "Erro:" que aparecem logo
+   depois dela são consequência disso, não perda de dados. As de 13:23 e 17:04 foram interrompidas
+   e retomadas a partir do checkpoint.
+ - 11-Sep 08:10: itens concluídos. 11:00: classificador concluído. O script de retomada não
+   reconheceu a conclusão (log em cp1252) e encerrou com erro, sem refazer nada.
+ - 14-Oct 16:59: retomada final. O log do classificador foi convertido para UTF-8 (só a
+   codificação, sem mudar o conteúdo). Resultados concluídos às 21:52, pacote montado e carga às 21:59.
+ - 15-Oct 14:14: carga aceita (ver abaixo) e execução encerrada, sem nova coleta nem nova carga.
+
+Carga no banco (historico-cargas.csv, id 2026_10_14_21_59_19_0300_carga_dados_2026_07_QUINZENA_1):
+ - contratante 13533 -> 13634 (+101); fornecedor 11717 -> 11853 (+136);
+   contratacao 107653 -> 109482 (+1829); item_homologado 216856 -> 221605 (+4749);
+   item_licitado 178419 -> 181377 (+2958).
+ - 2 linhas de item_homologado rejeitadas: quantidade_estimada fracionária em coluna INTEGER
+   (o mesmo ocorreu nas cargas de abril/2026):
+     45289329000152/compras/2024/29 item 3 (3.5 TN, carvão ativado)
+     24859332000194/compras/2026/376 item 1 (36.91 frascos, ampicilina)
+ - A carga foi aceita assim. Mudar a coluna de quantidade para NUMERIC fica para uma decisão à parte.
+
+Contratações sem itens (erro persistente após todas as retomadas):
+ - 81140303000101/compras/2026/283 (HTTP 404)
+ - 75904524000106/compras/2026/289 (HTTP 502)
+ - 19607632000146/compras/2026/12 (HTTP 502)
+ - 00530279000115/compras/2026/226 (HTTP 502)
+ - 75927582000155/compras/2026/180 (HTTP 502)
+ - 01596018000160/compras/2026/11 (HTTP 502)
+ - 07911696000157/compras/2027/4 (HTTP 502)
+ - 01789551000149/compras/2025/174 (HTTP 502)
+ - 08303182000181/compras/2026/5 (HTTP 502)
+ - 30173207000129/compras/2026/5 (HTTP 502)
+ - 02311972000122/compras/2026/101 (HTTP 502)
+ - 07598659000130/compras/2027/7 (HTTP 502)
+
+Notas de leitura:
+ - No log de itens e em itens-monitoramento.csv, a numeração de endpoints e de lotes reinicia a
+   cada retomada, porque cada uma processou só as pendências. O total é de 75 lotes.
+ - itens-erros.csv acumula 77 registros de 76 endpoints. Desses, 64 foram recuperados em
+   retomadas posteriores e estão em itens.csv.
+ - As referências a 'tmp/retomada-coleta-2026-07-quinzena-1/' apontam para o diretório de trabalho
+   temporário da retomada, que não é publicado. O que importa dele está neste resumo.
+ - Não houve recoleta de resultados.
+

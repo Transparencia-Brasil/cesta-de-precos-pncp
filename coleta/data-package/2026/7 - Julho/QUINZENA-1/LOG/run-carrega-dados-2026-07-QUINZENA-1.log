@@ -1,0 +1,29 @@
+- linhas lidas: 74503
+- linhas lidas: 8703
+- linhas lidas: 5676
+Linhas lidas (após remover NA's): 74503
+Linhas lidas (após remover NA's): 8703
+Linhas lidas (após remover NA's): 5676
+Erro ao inserir a linha 909 da tabela tabela: Failed to fetch row : ERROR:  invalid input syntax for type integer: "3.5"
+CONTEXT:  unnamed portal parameter $30 = '...'
+
+Erro ao inserir a linha 3328 da tabela tabela: Failed to fetch row : ERROR:  invalid input syntax for type integer: "36.909999999999997"
+CONTEXT:  unnamed portal parameter $30 = '...'
+
+Mensagens de aviso:
+1: Closing open result set, cancelling previous query 
+2: Closing open result set, cancelling previous query 
+Historico de cargas atualizado em 'C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/src/ETL/loaders/historico-cargas.csv' (5 linhas anexadas).
+
+---
+# NOTA DE FECHAMENTO
+---
+
+Registrado às '15-Oct-2026 14:20:17'.
+Os 2 erros acima são de item_homologado (parâmetro $30 = quantidade_estimada, coluna INTEGER),
+em itens com quantidade fracionária:
+  45289329000152/compras/2024/29 item 3 (3.5 TN, carvão ativado)
+  24859332000194/compras/2026/376 item 1 (36.91 frascos, ampicilina)
+Todas as demais linhas foram inseridas. A carga foi aceita assim em 15-Oct-2026.
+Contagens antes/depois em historico-cargas.csv
+(id 2026_10_14_21_59_19_0300_carga_dados_2026_07_QUINZENA_1).

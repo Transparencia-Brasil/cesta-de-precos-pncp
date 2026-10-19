@@ -4,4 +4,4 @@ PYTHON_BIN=./.venv/Scripts/python.exe
 [nltk_data] Downloading package stopwords to
 [nltk_data]     C:\Users\rdurl\AppData\Roaming\nltk_data...
 Validando os argumentos.[nltk_data]   Package stopwords is already up-to-date!
-Detectando nomes PDM nos itens.Carregando o modelo.Usando modelo de embedding: Snowflake/snowflake-arctic-embed-l-v2.0Dimensão do cache compatível com o modelo (1024); usando cache.Calculando os vetores das descrições dos itens do PNCP.Identificando os medicamentosFim da execução. Medicamentos salvos em coleta/itens/2026-02/QUINZENA-2/medicamentos.csv
+Detectando nomes PDM nos itens.Carregando o modelo.Usando modelo de embedding: Snowflake/snowflake-arctic-embed-l-v2.0DimensÃ£o do cache compatÃ­vel com o modelo (1024); usando cache.Calculando os vetores das descriÃ§Ãµes dos itens do PNCP.Identificando os medicamentosFim da execuÃ§Ã£o. Medicamentos salvos em coleta/itens/2026-02/QUINZENA-2/medicamentos.csv

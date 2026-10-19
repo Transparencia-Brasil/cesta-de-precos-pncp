@@ -192,7 +192,14 @@ coleta <- function(endpoints, output_dir = here("coleta"), tamanho_lote = 1000, 
     } else {
       # Verifica se já existe um arquivo com resultados anteriores
       if (file.exists(PATH_DADOS)) {
-        dados_coletados <- read.csv(PATH_DADOS, stringsAsFactors = FALSE)
+        # read.csv interpreta mal campos com aspas e quebras de linha e "esquece"
+        # endpoints já coletados, que seriam coletados de novo; readr lê corretamente.
+        dados_coletados <- read_csv(
+          PATH_DADOS,
+          col_select = "endpoint",
+          col_types = cols(.default = col_character()),
+          progress = FALSE
+        )
 
         # Identifica os endpoints que ainda não foram coletados
         endpoints_coletados <- unique(dados_coletados$endpoint)
