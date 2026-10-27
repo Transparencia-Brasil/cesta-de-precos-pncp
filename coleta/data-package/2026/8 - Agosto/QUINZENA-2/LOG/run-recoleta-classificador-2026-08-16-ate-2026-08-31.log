@@ -1,0 +1,4 @@
+[nltk_data] Downloading package stopwords to
+[nltk_data]     C:\Users\rdurl\AppData\Roaming\nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+Validando os argumentos.Detectando nomes PDM nos itens.Carregando o modelo.Usando modelo de embedding: Snowflake/snowflake-arctic-embed-l-v2.0Calculando os vetores das descrições dos itens do PNCP.Identificando os medicamentosFim da execução. Medicamentos salvos em tmp/recoleta-itens-2026-08-q2/itens/medicamentos.csv

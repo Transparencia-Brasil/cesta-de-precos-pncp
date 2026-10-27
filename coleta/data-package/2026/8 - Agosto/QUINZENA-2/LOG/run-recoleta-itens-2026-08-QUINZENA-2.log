@@ -1,0 +1,76 @@
+
+---
+# RECOLETA DE ITENS COM ERRO 2026-08/QUINZENA-2
+---
+
+INÍCIO ÀS '26-Oct-2026 22:43:58'
+Diretório: '/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp'
+
+## PREFLIGHT
+
+contratacoes=76082
+contratacoes_sem_itens=243
+sem_itens_e_sem_registro_de_erro=0
+
+## SELEÇÃO DAS CONTRATAÇÕES SEM ITENS
+
+Contratações pendentes gravadas em 'tmp/recoleta-itens-2026-08-q2/contratacoes-pendentes.csv': 243 linhas.
+
+## RECOLETA: ITENS
+
+Log: 'tmp/recoleta-itens-2026-08-q2/itens/run-recoleta-coletor-itens-2026-08-16-ate-2026-08-31.log'
+Itens recoletados: 346 linhas. Endpoints com erro novamente: 1.
+
+## RECOLETA: CLASSIFICADOR
+
+Log: 'tmp/recoleta-itens-2026-08-q2/itens/run-recoleta-classificador-2026-08-16-ate-2026-08-31.log'
+CATALOGO='data/catmat/catmat-1.csv'
+Medicamentos identificados: 0.
+
+## RECOLETA: RESULTADOS
+
+Nenhum medicamento novo; coleta de resultados não executada.
+Resultados coletados: 0.
+
+## BACKUP
+
+0f415ca5e377e00dc629004623adf083832343ab66f6ad70f24eeb0686227a31 *itens/dados.csv
+c34f79951c3c4eff6fed3571debe71147e72564c9937773f1baecfff2a8135e7 *itens/medicamentos.csv
+66ae2c0fb25917dd05f54ea422404726935b65131fb99a24b28457dbf70344ab *resultados/dados.csv
+
+## ANEXAÇÃO AOS ARQUIVOS DA QUINZENA
+
+Sem arquivo novo para 'coleta/resultados/2026-08/QUINZENA-2/dados.csv'; nada a anexar.
+'coleta/itens/2026-08/QUINZENA-2/dados.csv': 263716 + 346 = 264062 linhas.
+'coleta/itens/2026-08/QUINZENA-2/medicamentos.csv': 9569 + 0 = 9569 linhas.
+
+## PACOTE DE DADOS
+
+Arquivos atualizados em 'coleta/data-package/2026/8 - Agosto/QUINZENA-2/DATA'.
+
+## CARGA COMPLEMENTAR NO BANCO
+
+Log: 'coleta/data-package/2026/8 - Agosto/QUINZENA-2/LOG/run-carrega-dados-2026-08-QUINZENA-2-complementar.log'
+Histórico (tabela, antes, depois, delta):
+contratante,13988,13988,0
+fornecedor,12272,12272,0
+contratacao,115737,115737,0
+item_homologado,235830,235830,0
+item_licitado,191589,191589,0
+
+## RESUMO
+
+pendentes_recoletados=243
+recuperados_com_itens=242
+erro_novamente=1
+sem_itens_sem_erro=0
+contratacoes_sem_itens_restantes=1
+linhas_anexadas[coleta/itens/2026-08/QUINZENA-2/dados.csv]=346
+linhas_anexadas[coleta/itens/2026-08/QUINZENA-2/medicamentos.csv]=0
+linhas_anexadas[coleta/resultados/2026-08/QUINZENA-2/dados.csv]=0
+linhas_finais[coleta/itens/2026-08/QUINZENA-2/dados.csv]=264062 duplicadas=0
+linhas_finais[coleta/itens/2026-08/QUINZENA-2/medicamentos.csv]=9569 duplicadas=0
+linhas_finais[coleta/resultados/2026-08/QUINZENA-2/dados.csv]=5752 duplicadas=0
+Observação registrada em 'src/ETL/log/run-coletores-2026-08-QUINZENA-2.log'.
+
+RECOLETA ENCERRADA ÀS '26-Oct-2026 22:58:15'!
