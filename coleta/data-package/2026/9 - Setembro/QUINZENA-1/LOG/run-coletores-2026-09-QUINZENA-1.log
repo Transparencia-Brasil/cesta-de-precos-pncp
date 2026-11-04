@@ -1,0 +1,201 @@
+---
+# COLETORES
+---
+
+INÍCIO DA COLETA ÀS '27-Oct-2026 19:09:45'
+
+Diretório: ENTRADA
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp/src/ETL
+
+
+Diretório:
+/mnt/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp
+
+PARÂMETROS: 
+ - PRIMEIRO_DIA='2026-09-01' - é a data de início da coleta
+ - ULTIMO_DIA='2026-09-15' - é a data final da coleta
+ - ALIAS_COLETA='2026-09/QUINZENA-1' - é um alias para identificar a coleta e apontar um destino no diretório de /coletas
+
+---
+## VALIDADOR DE TEMPLATES
+
+---
+# VALIDADOR DE TEMPLATES PNCP
+---
+Script:
+ - 'src/ETL/template/src/python/atualiza-templates.py'
+Python:
+ - './.venv/Scripts/python.exe'
+
+---
+Atualizando template: contratacoes
+Resumo contratacoes: 62 campos no template, 0 novos, 0 legados.
+---
+Atualizando template: itens
+Resumo itens: 49 campos no template, 0 novos, 0 legados.
+---
+Atualizando template: resultados_itens
+Resumo resultados_itens: 51 campos no template, 0 novos, 0 legados.
+---
+Templates atualizados em: C:\Users\rdurl\OneDrive\Documentos\cesta-de-precos-pncp\src\ETL\template\templates
+Campos novos: 0
+Campos legados preservados: 0
+
+Validação de templates concluída!
+
+Resposta: S
+
+Resposta: N
+
+---
+## CONTRATAÇÃO
+
+Script:
+ - 'src/ETL/coletores/coleta-contratacoes.R'
+
+Diretório de saída:
+ - 'coleta/contratacoes/2026-09/QUINZENA-1'
+
+Screen criada para coletar contratações:
+ - 'coletor-contratacoes-2026-09-01-ate-2026-09-15'
+
+Saída sendo registrada em:
+ - 'coleta/contratacoes/2026-09/QUINZENA-1/run-coletor-contratacoes-2026-09-01-ate-2026-09-15.log'.
+
+Parâmetros do coletor: 
+ - PATH_OUTPUT_DIR="coleta/contratacoes/2026-09/QUINZENA-1"
+ - PRIMEIRO_DIA="2026-09-01"
+ - ULTIMO_DIA="2026-09-15"
+
+Coleta de CONTRATAÇÕES em execução...
+
+There is a screen on:
+	927.coletor-contratacoes-2026-09-01-ate-2026-09-15	(10/27/26 19:10:04)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+
+Aguardando a screen 'coletor-contratacoes-2026-09-01-ate-2026-09-15' encerrar...
+Screen coletor-contratacoes-2026-09-01-ate-2026-09-15 encerrada
+
+Coleta de CONTRATAÇÕES concluída!
+
+---
+## ITENS
+
+Script:
+ - 'src/ETL/coletores/coleta-itens.R'
+
+Diretório de saída:
+ - 'coleta/itens/2026-09/QUINZENA-1'
+
+Screen criada para coletar itens:
+ - 'coletor-itens-2026-09-01-ate-2026-09-15'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2026-09/QUINZENA-1/run-coletor-itens-2026-09-01-ate-2026-09-15.log'.
+
+Parâmetro do coletor:
+ - CONTRATACOES='coleta/contratacoes/2026-09/QUINZENA-1/dados.csv'
+
+Coleta de ITENS em execução...
+
+There is a screen on:
+	3138.coletor-itens-2026-09-01-ate-2026-09-15	(10/27/26 20:37:07)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+Aguardando a screen 'coletor-itens-2026-09-01-ate-2026-09-15' encerrar...
+Screen coletor-itens-2026-09-01-ate-2026-09-15 encerrada
+
+Coleta de ITENS concluída!
+
+---
+## CLASSIFICADOR - FILTRA MEDICAMENTOS
+
+Script:
+ - 'src/ETL/classificador/filtra-medicamentos.py'
+
+Diretório de saída:
+ - 'coleta/itens/2026-09/QUINZENA-1'
+
+Screen criada para coletar contratações:
+ - 'classificador-2026-09-01-ate-2026-09-15'
+
+Saída sendo registrada em:
+ - 'coleta/itens/2026-09/QUINZENA-1/run-classificador-2026-09-01-ate-2026-09-15.log'.
+
+Parâmetros do classificador:
+ITENS='coleta/itens/2026-09/QUINZENA-1/dados.csv'
+CATALOGO='data/catmat/catmat-1.csv'
+
+Python a ser utilizado:
+ - './.venv/Scripts/python.exe'
+
+Filtragem e classificação de MEDICAMENTOS em execução...
+
+There is a screen on:
+	53250.classificador-2026-09-01-ate-2026-09-15	(10/29/26 16:15:32)	(Detached)
+1 Socket in /run/screen/S-rdurl0.
+
+
+Aguardando o arquivo 'coleta/itens/2026-09/QUINZENA-1/medicamentos.csv' ser criado...
+
+Arquivo coleta/itens/2026-09/QUINZENA-1/medicamentos.csv criado.
+Classificação e filtragem de MEDICAMENTOS de ITENS concluída!
+
+---
+## RESULTADOS
+
+Script:
+ - 'src/ETL/coletores/coleta-resultados.R'
+
+Diretório de saída:
+ - 'coleta/resultados/2026-09/QUINZENA-1'
+
+Screen criada para coletar resultados:
+ - 'coletor-resultados-2026-09-01-ate-2026-09-15'
+
+Saída sendo registrada em:
+ - 'coleta/resultados/2026-09/QUINZENA-1/run-coletor-resultados-2026-09-01-ate-2026-09-15.log'.
+
+Parâmetro do coletor:
+ - 'coleta/itens/2026-09/QUINZENA-1/medicamentos.csv'
+
+Coleta de RESULTADOS em execução...
+
+There are screens on:
+	55011.coletor-resultados-2026-09-01-ate-2026-09-15	(10/29/26 19:49:44)	(Detached)
+	53250.classificador-2026-09-01-ate-2026-09-15	(10/29/26 16:34:57)	(Detached)
+2 Sockets in /run/screen/S-rdurl0.
+coletando resultados das contratações de medicamentos
+
+Aguardando a screen 'coletor-resultados-2026-09-01-ate-2026-09-15' encerrar...
+Screen coletor-resultados-2026-09-01-ate-2026-09-15 encerrada
+
+Coleta de RESULTADOS de MEDICAMENTOS concluída!
+
+---
+## PACOTE DE DADOS
+
+Diretório 'coleta/data-package/2026/9 - Setembro/QUINZENA-1/DATA' criado.
+Diretório 'coleta/data-package/2026/9 - Setembro/QUINZENA-1/LOG' criado.
+
+Arquivos csv principais copiados para coleta/data-package/2026/9 - Setembro/QUINZENA-1/DATA
+---
+## CARGA NO BANCO
+
+Executando carga no banco com:
+ - CONTRATAÇÕES: 'coleta/data-package/2026/9 - Setembro/QUINZENA-1/DATA/contratacoes.csv'
+ - MEDICAMENTOS: 'coleta/data-package/2026/9 - Setembro/QUINZENA-1/DATA/itens-medicamentos.csv'
+ - RESULTADOS: 'coleta/data-package/2026/9 - Setembro/QUINZENA-1/DATA/itens-medicamentos-resultados.csv'
+ - LOG: 'coleta/data-package/2026/9 - Setembro/QUINZENA-1/LOG/run-carrega-dados-2026-09-QUINZENA-1.log'
+
+Carga no banco concluída!
+
+---
+## RECOLETA DE RESULTADOS
+
+
+Recoleta de RESULTADOS ignorada (usuário optou por não executar).
+
+
+Arquivos csv disponíveis em coleta/data-package/2026/9 - Setembro/QUINZENA-1/DATA

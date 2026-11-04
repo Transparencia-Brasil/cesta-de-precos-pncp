@@ -1,0 +1,18 @@
+EMBEDDING_MODEL=<não definido>
+CATALOGO_VETORIZADO_PATH=<padrão>
+PYTHON_BIN=./.venv/Scripts/python.exe
+[nltk_data] Downloading package stopwords to
+[nltk_data]     C:\Users\rdurl\AppData\Roaming\nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+Validando os argumentos.Detectando nomes PDM nos itens.Carregando o modelo.Usando modelo de embedding: Snowflake/snowflake-arctic-embed-l-v2.0Calculando os vetores das descrições dos itens do PNCP.Identificando os medicamentosFim da execução. Medicamentos salvos em coleta/itens/2026-09/QUINZENA-2/medicamentos.csv
+
+---
+# REPESCAGEM DA INSTABILIDADE (04-nov-2026 00:59:56)
+---
+
+Log original: 'tmp/recoleta-2026-09-q2/itens/run-recoleta-classificador-2026-09-16-ate-2026-09-30.log'
+
+[nltk_data] Downloading package stopwords to
+[nltk_data]     C:\Users\rdurl\AppData\Roaming\nltk_data...
+[nltk_data]   Package stopwords is already up-to-date!
+Validando os argumentos.Detectando nomes PDM nos itens.Carregando o modelo.Usando modelo de embedding: Snowflake/snowflake-arctic-embed-l-v2.0Calculando os vetores das descrições dos itens do PNCP.Identificando os medicamentosFim da execução. Medicamentos salvos em tmp/recoleta-2026-09-q2/itens/medicamentos.csv
