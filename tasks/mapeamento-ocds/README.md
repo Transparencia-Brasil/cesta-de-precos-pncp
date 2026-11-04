@@ -6,11 +6,14 @@ Esta task converte dados de contratações do PNCP para o padrão [OCDS](https:/
 
 ```mermaid
 flowchart TD
-    subgraph entrada["Dados de entrada — coleta/&lt;alias&gt;/"]
-        cont["contratacoes/.../dados.csv"]
-        itens["itens/.../dados.csv"]
-        res["resultados/.../dados.csv"]
+    subgraph entrada["Dados de entrada — coleta/data-package/&lt;ANO&gt;/&lt;N - Mês&gt;/*/DATA/"]
+        cont["contratacoes.csv"]
+        itens["itens-medicamentos.csv"]
+        res["itens-medicamentos-resultados.csv"]
     end
+
+    dic["data/catmat/dicionario-medicamentos-ocds-N.csv\n(versão vigente, conferida em versoes.csv)"]
+    dic -->|"join por codigo_br"| e1
 
     subgraph e1["Etapa 1 · mapeamento-pncp-ocds.py"]
         json["output/&lt;ANO&gt;/&lt;MES&gt;/JSON/\n{uf}-{mes}-{ano}[-{parte}].json"]
@@ -169,6 +172,33 @@ Converte os dados de contratações do PNCP em JSONs no formato OCDS. O script s
 ```bash
 bash tasks/mapeamento-ocds/src/run-mapeamento-pncp-ocds.sh
 ```
+
+### Dicionário de medicamentos
+
+Os campos da extensão Medicine dos itens (`dosageForm`, `administrationRoute`, `activeIngredients`, `attributes`) e a
+`classification.description` vêm do dicionário OCDS de medicamentos, unido aos itens por `codigo_br`. O dicionário é
+versionado junto com o CATMAT pela task [`atualiza-catmat`](../atualiza-catmat/README.md):
+
+- por padrão, o mapeamento usa a versão vigente, o maior N em `data/catmat/dicionario-medicamentos-ocds-N.csv`;
+- antes de mapear, confere o sha256 do arquivo com o registrado em `data/catmat/versoes.csv` e interrompe a execução
+  se ele não estiver registrado ou tiver sido alterado.
+
+O log do mapeamento registra a versão, o hash e quantos itens ficaram sem correspondência no dicionário. Esses itens
+são publicados sem os campos da extensão Medicine:
+
+```text
+Dicionário OCDS de medicamentos:
+ - versão: 1 (data/catmat/dicionario-medicamentos-ocds-1.csv)
+ - sha256: 1cf5fbd1... (confere com data/catmat/versoes.csv)
+ - itens sem correspondência: 0 de 15468 (0.00%), 0 códigos distintos
+```
+
+Para invocar o Python diretamente, por exemplo para reproduzir uma publicação antiga ou em testes, há duas variáveis
+de ambiente opcionais:
+
+- `DICIONARIO_OCDS_VERSAO`: fixa uma versão N, procurada em `data/catmat/` ou em `data/catmat/OLD/N/`. As
+  publicações de 2025/01 a 2026/04 usaram a versão 0.
+- `CATMAT_DIR`: usa outro diretório de versionamento no lugar de `data/catmat`.
 
 ## Etapa 2 — Geração de CSVs/ZIPs a partir dos JSONs OCDS
 

@@ -10,7 +10,8 @@
 #' os slots já existentes, sem criar uma nova versão:
 #'
 #' - v0: o dicionário efetivamente usado nas publicações OCDS de 2025/01 a
-#'   2026/04 (cópia local, idêntica ao upstream no commit 15d5f37).
+#'   2026/04 (cópia local, idêntica ao upstream no commit 15d5f37, de onde
+#'   passou a ser baixado depois que a cópia local foi removida).
 #' - v1: o dicionário do upstream no commit 9b4c3d1, gerado a partir do
 #'   CATMAT v1 (6.740 códigos).
 #'
@@ -36,6 +37,8 @@ COMMIT_DICIONARIO_V0 <- "15d5f37d5306469a0a142fae0f1bdd74129f35cb"
 COMMIT_DICIONARIO_V1 <- "9b4c3d150a605f085611a6359e94382c86bc8ff4"
 COMMIT_DOCUMENTO_V1 <- COMMIT_DICIONARIO_V1  # mesmo commit gerou o documento-ocds.json da v1
 
+# Cópia manual usada até 2026/04; removida do repositório quando o mapeamento
+# passou a ler `data/catmat/`. Se ainda existir, é conferida contra o upstream.
 ORIGEM_DICIONARIO_V0 <- here("tasks/mapeamento-ocds/input/dicionario-medicamentos-ocds.csv")
 
 DESTINO_DICIONARIO_V0 <- here(CATMAT_DIR, "OLD", "0", "dicionario-medicamentos-ocds-0.csv")
@@ -78,21 +81,22 @@ codigos_catmat <- function(caminho_csv) {
 
 message("== v0: dicionário usado nas publicações OCDS até 2026/04")
 
-conteudo_v0_local <- readBin(ORIGEM_DICIONARIO_V0, what = "raw", n = file.size(ORIGEM_DICIONARIO_V0))
-conteudo_v0_upstream <- baixa_arquivo_medicine_extension(
+conteudo_v0 <- baixa_arquivo_medicine_extension(
   MEDICINE_EXTENSION_DICIONARIO_OCDS,
   COMMIT_DICIONARIO_V0
 )
 
-# confirma a proveniência: cópia local == upstream no commit informado
-arquivo_upstream_v0 <- tempfile(fileext = ".csv")
-writeBin(conteudo_v0_upstream, arquivo_upstream_v0)
-if (sha256_normalizado(ORIGEM_DICIONARIO_V0) != sha256_normalizado(arquivo_upstream_v0)) {
-  stop("A cópia local do dicionário não coincide com o upstream no commit ", COMMIT_DICIONARIO_V0)
+# confirma a proveniência: cópia local (se ainda existir) == upstream no commit informado
+if (file.exists(ORIGEM_DICIONARIO_V0)) {
+  arquivo_upstream_v0 <- tempfile(fileext = ".csv")
+  writeBin(conteudo_v0, arquivo_upstream_v0)
+  if (sha256_normalizado(ORIGEM_DICIONARIO_V0) != sha256_normalizado(arquivo_upstream_v0)) {
+    stop("A cópia local do dicionário não coincide com o upstream no commit ", COMMIT_DICIONARIO_V0)
+  }
+  unlink(arquivo_upstream_v0)
 }
-unlink(arquivo_upstream_v0)
 
-grava_se_ausente(conteudo_v0_local, DESTINO_DICIONARIO_V0)
+grava_se_ausente(conteudo_v0, DESTINO_DICIONARIO_V0)
 valida_dicionario_ocds(
   DESTINO_DICIONARIO_V0,
   codigos_catmat(here(CATMAT_DIR, "OLD", "0", "catmat-0.csv"))
