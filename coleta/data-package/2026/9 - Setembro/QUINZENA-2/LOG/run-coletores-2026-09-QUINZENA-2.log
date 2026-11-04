@@ -199,3 +199,144 @@ Recoleta de RESULTADOS ignorada (usuário optou por não executar).
 
 
 Arquivos csv disponíveis em coleta/data-package/2026/9 - Setembro/QUINZENA-2/DATA
+
+Arquivos de log copiados para coleta/data-package/2026/9 - Setembro/QUINZENA-2/LOG
+
+Estrutura do pacote de dados:
+
+[ 512]  coleta/data-package/2026/9 - Setembro/QUINZENA-2
+├── [ 512]  DATA
+│   ├── [1.6K]  contratacoes-erros.csv
+│   ├── [ 205]  contratacoes-monitoramento.csv
+│   ├── [101M]  contratacoes.csv
+│   ├── [ 31K]  itens-erros.csv
+│   ├── [  28]  itens-medicamentos-resultados-erros.csv
+│   ├── [ 934]  itens-medicamentos-resultados-monitoramento.csv
+│   ├── [2.4M]  itens-medicamentos-resultados.csv
+│   ├── [5.0M]  itens-medicamentos.csv
+│   ├── [6.4K]  itens-monitoramento.csv
+│   └── [143M]  itens.csv
+└── [ 512]  LOG
+    ├── [ 344]  run-carrega-dados-2026-09-QUINZENA-2.log
+    ├── [ 595]  run-classificador-2026-09-16-ate-2026-09-30.log
+    ├── [236K]  run-coletor-contratacoes-2026-09-16-ate-2026-09-30.log
+    ├── [ 14M]  run-coletor-itens-2026-09-16-ate-2026-09-30.log
+    ├── [1.6M]  run-coletor-resultados-2026-09-16-ate-2026-09-30.log
+    └── [5.5K]  run-coletores-2026-09-QUINZENA-2.log
+
+3 directories, 16 files
+
+COLETA ENCERRADA ÀS '03-Nov-2026 21:09:58'!
+
+Fim! =)
+
+---
+# REPESCAGEM DA INSTABILIDADE (04-nov-2026 00:59:58)
+---
+
+Log original: 'tmp/recoleta-2026-09-q2/run-recoleta-2026-09-QUINZENA-2.log'
+
+
+---
+# REPESCAGEM DA INSTABILIDADE 2026-09/QUINZENA-2
+---
+
+INÍCIO ÀS '03-nov-2026 22:42:18'
+Diretório: '/c/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp'
+
+## PREFLIGHT
+
+contratacoes=78857
+contratacoes_sem_itens=286
+sem_itens_e_sem_registro_de_erro=0
+endpoints_em_itens_erros=286
+
+## RECOLETA: CONTRATAÇÕES (QUINZENA INTEIRA)
+
+Log: 'tmp/recoleta-2026-09-q2/contratacoes/run-recoleta-coletor-contratacoes-2026-09-16-ate-2026-09-30.log'
+Páginas com erro na recoleta: 0.
+contratacoes_recoletadas=78659
+contratacoes_recoletadas_distintas=78659
+contratacoes_novas=397
+Gravadas em 'tmp/recoleta-2026-09-q2/contratacoes-novas.csv'.
+
+## SELEÇÃO DOS ENDPOINTS DE ITENS
+
+contratacoes=78857
+contratacoes_sem_itens=286
+sem_itens_e_sem_registro_de_erro=0
+endpoints_em_itens_erros=286
+Pendentes gravadas em 'tmp/recoleta-2026-09-q2/contratacoes-pendentes.csv': 286 com erro de itens + 397 contrata��es novas = 683.
+
+## RECOLETA: ITENS
+
+Log: 'tmp/recoleta-2026-09-q2/itens/run-recoleta-coletor-itens-2026-09-16-ate-2026-09-30.log'
+Itens recoletados: 3219 linhas. Endpoints com erro novamente: 1.
+
+## RECOLETA: CLASSIFICADOR
+
+Log: 'tmp/recoleta-2026-09-q2/itens/run-recoleta-classificador-2026-09-16-ate-2026-09-30.log'
+CATALOGO='data/catmat/catmat-1.csv'
+Medicamentos identificados: 124.
+
+## RECOLETA: RESULTADOS
+
+Log: 'tmp/recoleta-2026-09-q2/resultados/run-recoleta-coletor-resultados-2026-09-16-ate-2026-09-30.log'
+Resultados coletados: 62.
+
+## BACKUP
+
+cfdf031bfc87bfbc9b46794af4d45c984845be6227566c838055d34b3e078fdd *contratacoes/dados.csv
+ae350bd7b1168a1cdce9e4cb27f24c781599bad9e0f87f01d1b9e76569326061 *itens/dados.csv
+bbbae6f0231781e5cddec040329247974a17b7a72470e63b6bc7afa585807883 *itens/medicamentos.csv
+5ac1f2db386e104f1359137532eb9290155f3bcb90f010c699e3f341b12a00df *resultados/dados.csv
+
+## ANEXAÇÃO AOS ARQUIVOS DA QUINZENA
+
+'coleta/contratacoes/2026-09/QUINZENA-2/dados.csv': 78857 + 397 = 79254 linhas.
+'coleta/itens/2026-09/QUINZENA-2/dados.csv': 284285 + 3219 = 287504 linhas.
+'coleta/itens/2026-09/QUINZENA-2/medicamentos.csv': 10226 + 124 = 10350 linhas.
+'coleta/resultados/2026-09/QUINZENA-2/dados.csv': 5896 + 62 = 5958 linhas.
+
+## PACOTE DE DADOS
+
+Arquivos atualizados em 'coleta/data-package/2026/9 - Setembro/QUINZENA-2/DATA'.
+
+## CARGA COMPLEMENTAR NO BANCO
+
+Log: 'tmp/recoleta-2026-09-q2/run-carrega-dados-2026-09-QUINZENA-2-complementar.log'
+Histórico (tabela, antes, depois, delta):
+contratante,14196,14197,1
+fornecedor,12554,12554,0
+contratacao,120019,120047,28
+item_homologado,244001,244053,52
+item_licitado,199511,199568,57
+
+## RESUMO
+
+contratacoes_recoletadas=78659
+contratacoes_recoleta_erros=0
+contratacoes_novas=397
+itens_endpoints_recoletados=683
+itens_recuperados_com_itens=682
+itens_erro_novamente=1
+itens_sem_itens_sem_erro=0
+contratacoes_sem_itens_restantes=1
+linhas_anexadas[coleta/contratacoes/2026-09/QUINZENA-2/dados.csv]=397
+linhas_anexadas[coleta/itens/2026-09/QUINZENA-2/dados.csv]=3219
+linhas_anexadas[coleta/itens/2026-09/QUINZENA-2/medicamentos.csv]=124
+linhas_anexadas[coleta/resultados/2026-09/QUINZENA-2/dados.csv]=62
+linhas_finais[coleta/contratacoes/2026-09/QUINZENA-2/dados.csv]=79254 duplicadas=0
+linhas_finais[coleta/itens/2026-09/QUINZENA-2/dados.csv]=287504 duplicadas=0
+linhas_finais[coleta/itens/2026-09/QUINZENA-2/medicamentos.csv]=10350 duplicadas=0
+linhas_finais[coleta/resultados/2026-09/QUINZENA-2/dados.csv]=5958 duplicadas=0
+
+## LOGS DAS ETAPAS (APPEND)
+
+Log 'tmp/recoleta-2026-09-q2/contratacoes/run-recoleta-coletor-contratacoes-2026-09-16-ate-2026-09-30.log' acrescentado ao fim de 'coleta/contratacoes/2026-09/QUINZENA-2/run-coletor-contratacoes-2026-09-16-ate-2026-09-30.log' (prefixo de 241873 bytes preservado).
+Log 'tmp/recoleta-2026-09-q2/itens/run-recoleta-coletor-itens-2026-09-16-ate-2026-09-30.log' acrescentado ao fim de 'coleta/itens/2026-09/QUINZENA-2/run-coletor-itens-2026-09-16-ate-2026-09-30.log' (prefixo de 14732149 bytes preservado).
+Log 'tmp/recoleta-2026-09-q2/itens/run-recoleta-classificador-2026-09-16-ate-2026-09-30.log' acrescentado ao fim de 'coleta/itens/2026-09/QUINZENA-2/run-classificador-2026-09-16-ate-2026-09-30.log' (prefixo de 595 bytes preservado).
+Log 'tmp/recoleta-2026-09-q2/resultados/run-recoleta-coletor-resultados-2026-09-16-ate-2026-09-30.log' acrescentado ao fim de 'coleta/resultados/2026-09/QUINZENA-2/run-coletor-resultados-2026-09-16-ate-2026-09-30.log' (prefixo de 1660957 bytes preservado).
+Log 'tmp/recoleta-2026-09-q2/run-carrega-dados-2026-09-QUINZENA-2-complementar.log' acrescentado ao fim de 'coleta/data-package/2026/9 - Setembro/QUINZENA-2/LOG/run-carrega-dados-2026-09-QUINZENA-2.log' (prefixo de 344 bytes preservado).
+
+REPESCAGEM ENCERRADA ÀS '04-nov-2026 00:59:57'!

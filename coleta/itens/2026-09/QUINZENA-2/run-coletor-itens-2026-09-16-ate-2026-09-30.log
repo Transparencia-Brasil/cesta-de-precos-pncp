@@ -118831,3 +118831,788 @@ Endpoint 78857 coletado Salvo o lote até o endpoint número: 78857
 Lotes restantes: 0 
 convertendo arquivo
 FIM!
+
+---
+# REPESCAGEM DA INSTABILIDADE (04-nov-2026 00:59:56)
+---
+
+Log original: 'tmp/recoleta-2026-09-q2/itens/run-recoleta-coletor-itens-2026-09-16-ate-2026-09-30.log'
+
+Mensagen de aviso:
+pacote 'httr2' foi compilado no R versão 4.6.1 
+Rows: 683 Columns: 68
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (33): data.orgaoEntidade.cnpj, data.orgaoEntidade.razaoSocial, data.org...
+dbl  (17): data.anoCompra, data.sequencialCompra, data.unidadeOrgao.codigoIb...
+lgl  (12): data.srp, data.orgaoEntidade, data.unidadeOrgao, data.amparoLegal...
+dttm  (6): data.dataInclusao, data.dataPublicacaoPncp, data.dataAtualizacao,...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Endpoint 1 falhou após as tentativas e foi registrado em erros.csv: HTTP 404 Not Found. 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 2 coletado Endpoint 3 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 4 coletado Endpoint 5 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 6 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 7 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 8 coletado Endpoint 9 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 10 coletado Endpoint 11 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 12 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 13 coletado Endpoint 14 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 15 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 16 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 17 coletado Endpoint 18 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 19 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 20 coletado Endpoint 21 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 22 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 23 coletado Endpoint 24 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 25 coletado Endpoint 26 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 27 coletado Endpoint 28 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 29 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 30 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 31 coletado Endpoint 32 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 33 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 34 coletado Endpoint 35 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 36 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 37 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 38 coletado Endpoint 39 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 40 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 41 coletado Endpoint 42 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 43 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 44 coletado Endpoint 45 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 46 coletado Endpoint 47 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 48 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 49 coletado Endpoint 50 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 51 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 52 coletado Endpoint 53 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 54 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 55 coletado Endpoint 56 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 57 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 58 coletado Endpoint 59 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 60 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 61 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 62 coletado Endpoint 63 coletado Endpoint 64 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 65 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 66 coletado Endpoint 67 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 68 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 69 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 70 coletado Endpoint 71 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 72 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 73 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 74 coletado Endpoint 75 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 76 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 77 coletado Endpoint 78 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 79 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 80 coletado Endpoint 81 coletado Endpoint 82 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 83 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 84 coletado Endpoint 85 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 86 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 87 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 88 coletado Endpoint 89 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 90 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 91 coletado Endpoint 92 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 93 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 94 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 95 coletado Endpoint 96 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 97 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 98 coletado Endpoint 99 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 100 coletado Endpoint 101 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 102 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 103 coletado Endpoint 104 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 105 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 106 coletado Endpoint 107 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 108 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 109 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 110 coletado Endpoint 111 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 112 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 113 coletado Endpoint 114 coletado Endpoint 115 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 116 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 117 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 118 coletado Endpoint 119 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 120 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 121 coletado Endpoint 122 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 123 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 124 coletado Endpoint 125 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 126 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 127 coletado Endpoint 128 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 129 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 130 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 131 coletado Endpoint 132 coletado Endpoint 133 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 134 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 135 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 136 coletado Endpoint 137 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 138 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 139 coletado Endpoint 140 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 141 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 142 coletado Endpoint 143 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 144 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 145 coletado Endpoint 146 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 147 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 148 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 149 coletado Endpoint 150 coletado Endpoint 151 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 152 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 153 coletado Endpoint 154 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 155 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 156 coletado Endpoint 157 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 158 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 159 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 160 coletado Endpoint 161 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 162 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 163 coletado Endpoint 164 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 165 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 166 coletado Endpoint 167 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 168 coletado Endpoint 169 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 170 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 171 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 172 coletado Endpoint 173 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 174 coletado Endpoint 175 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 176 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 177 coletado Endpoint 178 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 179 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 180 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 181 coletado Endpoint 182 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 183 coletado Endpoint 184 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 185 coletado Endpoint 186 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 187 coletado Endpoint 188 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 189 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 190 coletado Endpoint 191 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 192 coletado Endpoint 193 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 194 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 195 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 196 coletado Endpoint 197 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 198 coletado Endpoint 199 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 200 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 201 coletado Endpoint 202 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 203 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 204 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 205 coletado Endpoint 206 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 207 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 208 coletado Endpoint 209 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 210 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 211 coletado Endpoint 212 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 213 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 214 coletado Endpoint 215 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 216 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 217 coletado Endpoint 218 coletado Endpoint 219 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 220 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 221 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 222 coletado Endpoint 223 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 224 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 225 coletado Endpoint 226 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 227 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 228 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 229 coletado Endpoint 230 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 231 coletado Endpoint 232 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 233 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 234 coletado Endpoint 235 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 236 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 237 coletado Endpoint 238 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 239 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 240 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 241 coletado Endpoint 242 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 243 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 244 coletado Endpoint 245 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 246 coletado Endpoint 247 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 248 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 249 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 250 coletado Endpoint 251 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 252 coletado Endpoint 253 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 254 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 255 coletado Endpoint 256 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 257 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 258 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 259 coletado Endpoint 260 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 261 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 262 coletado Endpoint 263 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 264 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 265 coletado Endpoint 266 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 267 coletado Endpoint 268 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 269 coletado Endpoint 270 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 271 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 272 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 273 coletado Endpoint 274 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 275 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 276 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 277 coletado Endpoint 278 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 279 coletado Endpoint 280 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 281 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 282 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 283 coletado Endpoint 284 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 285 coletado Endpoint 286 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 287 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 288 coletado Endpoint 289 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 290 coletado Endpoint 291 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 292 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 293 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 294 coletado Endpoint 295 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 296 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 297 coletado Endpoint 298 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 299 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 300 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 301 coletado Endpoint 302 coletado Endpoint 303 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 304 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 305 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 306 coletado Endpoint 307 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 308 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 309 coletado Endpoint 310 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 311 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 312 coletado Endpoint 313 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 314 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 315 coletado Endpoint 316 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 317 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 318 coletado Endpoint 319 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 320 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 321 coletado Endpoint 322 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 323 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 324 coletado Endpoint 325 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 326 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 327 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 328 coletado Endpoint 329 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 330 coletado Endpoint 331 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 332 coletado Endpoint 333 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 334 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 335 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 336 coletado Endpoint 337 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 338 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 339 coletado Endpoint 340 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 341 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 342 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 343 coletado Endpoint 344 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 345 coletado Endpoint 346 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 347 coletado Endpoint 348 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 349 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 350 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 351 coletado Endpoint 352 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 353 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 354 coletado Endpoint 355 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 356 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 357 coletado Endpoint 358 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 359 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 360 coletado Endpoint 361 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 362 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 363 coletado Endpoint 364 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 365 coletado Endpoint 366 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 367 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 368 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 369 coletado Endpoint 370 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 371 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 372 coletado Endpoint 373 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 374 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 375 coletado Endpoint 376 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 377 coletado Endpoint 378 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 379 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 380 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 381 coletado Endpoint 382 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 383 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 384 coletado Endpoint 385 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 386 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 387 coletado Endpoint 388 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 389 coletado Endpoint 390 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 391 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 392 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 393 coletado Endpoint 394 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 395 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 396 coletado Endpoint 397 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 398 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 399 coletado Endpoint 400 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 401 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 402 coletado Endpoint 403 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■                  
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 404 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 405 coletado Endpoint 406 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 407 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 408 coletado Endpoint 409 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 410 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 411 coletado Endpoint 412 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 413 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 414 coletado Endpoint 415 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 416 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 417 coletado Endpoint 418 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 419 coletado Endpoint 420 coletado Endpoint 421 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 422 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 423 coletado Endpoint 424 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 425 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 426 coletado Endpoint 427 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 428 coletado Endpoint 429 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 430 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 431 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 432 coletado Endpoint 433 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 434 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 435 coletado Endpoint 436 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 437 coletado Endpoint 438 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 439 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 440 coletado Endpoint 441 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 442 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 443 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 444 coletado Endpoint 445 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 446 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 447 coletado Endpoint 448 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 449 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 450 coletado Endpoint 451 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 452 coletado Endpoint 453 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 454 coletado Endpoint 455 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 456 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 457 coletado Endpoint 458 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 459 coletado Endpoint 460 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 461 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 462 coletado Endpoint 463 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 464 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 465 coletado Endpoint 466 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 467 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 468 coletado Endpoint 469 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 470 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 471 coletado Endpoint 472 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 473 coletado Endpoint 474 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 475 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 476 coletado Endpoint 477 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 478 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 479 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 480 coletado Endpoint 481 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 482 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 483 coletado Endpoint 484 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 485 coletado Endpoint 486 coletado Endpoint 487 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 488 coletado Endpoint 489 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 490 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 491 coletado Endpoint 492 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 493 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 494 coletado Endpoint 495 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 496 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 497 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 498 coletado Endpoint 499 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 500 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 501 coletado Endpoint 502 coletado Endpoint 503 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 504 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 505 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 506 coletado Endpoint 507 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 508 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 509 coletado Endpoint 510 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 511 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 512 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 513 coletado Endpoint 514 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 515 coletado Endpoint 516 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 517 coletado Endpoint 518 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 519 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 520 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 521 coletado Endpoint 522 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 523 coletado Endpoint 524 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 525 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 526 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 527 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 528 coletado Endpoint 529 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 530 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 531 coletado Endpoint 532 coletado Endpoint 533 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 534 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 535 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 536 coletado Endpoint 537 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 538 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 539 coletado Endpoint 540 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 541 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 542 coletado Endpoint 543 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 544 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 545 coletado Endpoint 546 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 547 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 548 coletado Endpoint 549 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 550 coletado Endpoint 551 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 552 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 553 coletado Endpoint 554 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 555 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 556 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 557 coletado Endpoint 558 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 559 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 560 coletado Endpoint 561 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 562 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 563 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 564 coletado Endpoint 565 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 566 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 567 coletado Endpoint 568 coletado Endpoint 569 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 570 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 571 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 572 coletado Endpoint 573 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 574 coletado Endpoint 575 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 576 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 577 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 578 coletado Endpoint 579 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 580 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 581 coletado Endpoint 582 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 583 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 584 coletado Endpoint 585 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 586 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 587 coletado Endpoint 588 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 589 coletado Endpoint 590 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 591 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 592 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 593 coletado Endpoint 594 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 595 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 596 coletado Endpoint 597 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 598 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 599 coletado Endpoint 600 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 601 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 602 coletado Endpoint 603 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 604 coletado Endpoint 605 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 606 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 607 coletado Endpoint 608 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 609 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 610 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 611 coletado Endpoint 612 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 613 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 614 coletado Endpoint 615 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 616 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 617 coletado Endpoint 618 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 619 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 620 coletado Endpoint 621 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 622 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 623 coletado Endpoint 624 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 625 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 626 coletado Endpoint 627 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 628 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 629 coletado Endpoint 630 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■                  
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 631 coletado Endpoint 632 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 633 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 634 coletado Endpoint 635 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 636 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 637 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 638 coletado Endpoint 639 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 640 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 641 coletado Endpoint 642 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 643 coletado Endpoint 644 coletado Endpoint 645 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 646 coletado Endpoint 647 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 648 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 649 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 650 coletado Endpoint 651 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 652 coletado Endpoint 653 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 654 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 655 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 656 coletado Endpoint 657 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 658 coletado Endpoint 659 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 660 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 661 coletado Endpoint 662 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 663 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 664 coletado Endpoint 665 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 666 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 667 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 668 coletado Endpoint 669 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 670 coletado Endpoint 671 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 672 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 673 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 674 coletado Endpoint 675 coletado Endpoint 676 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 677 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 678 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 679 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 680 coletado Endpoint 681 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 682 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 683 coletado Salvo o lote até o endpoint número: 683 
+Lotes restantes: 0 
+convertendo arquivo
+FIM!

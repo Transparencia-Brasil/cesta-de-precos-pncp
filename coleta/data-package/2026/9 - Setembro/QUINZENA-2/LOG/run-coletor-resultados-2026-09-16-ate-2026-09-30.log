@@ -16595,3 +16595,223 @@ Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■
 Endpoint 10226 sem registros (HTTP 204). 
 Salvo o lote até o endpoint número: 10226 
 Lotes restantes: 0 
+
+---
+# REPESCAGEM DA INSTABILIDADE (04-nov-2026 00:59:57)
+---
+
+Log original: 'tmp/recoleta-2026-09-q2/resultados/run-recoleta-coletor-resultados-2026-09-16-ate-2026-09-30.log'
+
+Mensagen de aviso:
+pacote 'httr2' foi compilado no R versão 4.6.1 
+Rows: 124 Columns: 57
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (10): endpoint, descricao, materialOuServico, materialOuServicoNome, un...
+dbl  (13): numeroItem, valorUnitarioEstimado, valorTotal, quantidade, itemCa...
+lgl  (32): orcamentoSigiloso, patrimonio, codigoRegistroImobiliario, incenti...
+dttm  (2): dataInclusao, dataAtualizacao
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Endpoint 1 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 2 sem registros (HTTP 204). 
+Endpoint 3 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 4 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 5 coletado Endpoint 6 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 7 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 8 coletado Endpoint 9 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 10 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 11 coletado Endpoint 12 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 13 coletado Endpoint 14 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 15 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 16 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 17 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 18 coletado Endpoint 19 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 20 coletado Endpoint 21 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 22 coletado Endpoint 23 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 24 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 25 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 26 coletado Endpoint 27 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 28 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 29 coletado Endpoint 30 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 31 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 32 sem registros (HTTP 204). 
+Endpoint 33 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 34 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 35 sem registros (HTTP 204). 
+Endpoint 36 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 37 coletado Endpoint 38 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 39 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 40 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 41 coletado Endpoint 42 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 43 coletado Endpoint 44 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 45 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 46 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 47 coletado Endpoint 48 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 49 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 50 coletado Endpoint 51 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 52 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 53 coletado Endpoint 54 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 55 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 56 sem registros (HTTP 204). 
+Endpoint 57 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 58 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 59 coletado Endpoint 60 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 61 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 62 coletado Endpoint 63 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 64 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 65 sem registros (HTTP 204). 
+Endpoint 66 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 67 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 68 coletado Endpoint 69 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 70 coletado Endpoint 71 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 72 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 73 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 74 sem registros (HTTP 204). 
+Endpoint 75 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 76 coletado Endpoint 77 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 78 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 79 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 80 sem registros (HTTP 204). 
+Endpoint 81 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 82 sem registros (HTTP 204). 
+Endpoint 83 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 84 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 85 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 86 sem registros (HTTP 204). 
+Endpoint 87 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 88 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 89 sem registros (HTTP 204). 
+Endpoint 90 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 91 sem registros (HTTP 204). 
+Endpoint 92 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 93 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 94 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 95 coletado Endpoint 96 coletado Endpoint 97 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 98 sem registros (HTTP 204). 
+Endpoint 99 sem registros (HTTP 204). 
+Endpoint 100 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■                  
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   
+Endpoint 101 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 102 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 103 sem registros (HTTP 204). 
+Endpoint 104 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 105 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 106 sem registros (HTTP 204). 
+Endpoint 107 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 108 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 109 sem registros (HTTP 204). 
+Endpoint 110 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 111 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 112 coletado Endpoint 113 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 114 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 115 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 116 sem registros (HTTP 204). 
+Endpoint 117 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 
+Endpoint 118 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 119 sem registros (HTTP 204). 
+Endpoint 120 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■                 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 121 sem registros (HTTP 204). 
+Endpoint 122 sem registros (HTTP 204). 
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■                
+Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 123 coletado Waiting 2s for throttling delay ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  
+Endpoint 124 sem registros (HTTP 204). 
+Salvo o lote até o endpoint número: 124 
+Lotes restantes: 0 
