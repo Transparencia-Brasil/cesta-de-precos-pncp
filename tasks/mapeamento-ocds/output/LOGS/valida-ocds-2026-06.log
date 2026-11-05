@@ -1,0 +1,61 @@
+==== Inicio: Validacao OCDS (libcoveocds) 2026-11-05T00:08:08-03:00 ====
+Validando 29 JSON(s) de C:\Users\rdurl\OneDrive\Documentos\cesta-de-precos-pncp\tasks\mapeamento-ocds\output\2026\6\JSON
+Relatórios completos em C:\Users\rdurl\OneDrive\Documentos\cesta-de-precos-pncp\tasks\mapeamento-ocds\output\2026\6\VALIDACAO
+
+  ac-6-2026.json: 8 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (9s)
+  al-6-2026.json: 43 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (1s)
+  am-6-2026.json: 31 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (0s)
+  ap-6-2026.json: 4 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (0s)
+  ba-6-2026.json: 131 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (1s)
+  ce-6-2026.json: 134 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (1s)
+  df-6-2026.json: 52 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (1s)
+  es-6-2026.json: 130 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (1s)
+  go-6-2026.json: 167 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (1s)
+  ma-6-2026.json: 40 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (0s)
+  mg-6-2026.json: 411 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (2s)
+  ms-6-2026.json: 102 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (1s)
+  mt-6-2026.json: 57 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (1s)
+  pa-6-2026.json: 81 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (1s)
+  pb-6-2026.json: 63 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (1s)
+  pe-6-2026.json: 90 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (0s)
+  pi-6-2026.json: 31 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (0s)
+  pr-6-2026.json: 231 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (1s)
+  rj-6-2026.json: 266 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (1s)
+  rn-6-2026.json: 75 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (1s)
+  ro-6-2026.json: 73 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (1s)
+  rr-6-2026.json: 4 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (0s)
+  rs-6-2026.json: 345 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (3s)
+  sc-6-2026.json: 86 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (1s)
+  se-6-2026.json: 64 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (1s)
+  sp-6-2026-1.json: 500 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (4s)
+  sp-6-2026-2.json: 500 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (3s)
+  sp-6-2026-3.json: 398 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (2s)
+  to-6-2026.json: 30 releases, 0 erro(s) de schema, 0 valor(es) fora de codelist fechada [ok] (0s)
+
+== Erros de schema (bloqueiam)
+  nenhum
+== Valores fora de codelists fechadas (bloqueiam)
+  nenhum
+== Extensões que não puderam ser carregadas
+  nenhuma
+== Campos adicionais (só registro)
+  15873x /releases/tender/lots/lotsDetails
+  15873x /releases/tender/lots/statusDetails
+  15873x /releases/tender/lots/statusDetailsId
+  10343x /releases/awards/items/status
+  3601x /releases/tender/lots/otherRequirements
+== Valores fora de codelists abertas (só registro)
+  releases/parties/details/classifications/scheme: 5 valor(es): BRA-ESFERA, BRA-NATUREZA-JURIDICA, BRA-PODER, BRA-TIPO-PESSOA, ORDEM DE CLASSIFICACAO SRP
+  releases/parties/roles: 1 valor(es): originalBuyer
+  releases/tender/items/activeIngredients/strength/unit/scheme: 1 valor(es): CATMAT
+  releases/tender/items/administrationRoute: 141 valor(es): 0,9%_ Solução Injetável, Adesivo Transdérmico, Aerosol Oral, Aerosol Tópico, Aerossol Bucal, Aerossol Nasal, Aerossol Oral, Anel Vaginal, Comprimido Sublingual, Comprimido Vaginal ... (+131)
+  releases/tender/items/classification/scheme: 1 valor(es): CATMAT
+  releases/tender/items/dosageForm: 109 valor(es): Absorção Retardada, Aerossol, Aerossol Frasco Dosificador Aerocâmara, Anestésico Inalatório, Ação Prolongada, Blister Calendário, Clister, Colutório, Colírio, Comprimido ... (+99)
+  releases/tender/items/immediateContainer/name: 29 valor(es): C/ Sistema De Aplicacao, ampola, aplicadores, bag in box bico dosador refil, bico dosador, blister, bolsa, bolsa frasco, canetas aplicadoras, conjunto de aplicacao ... (+19)
+  releases/tender/lots/sustainability/strategies: 2 valor(es): reservedParticipationQuota, subcontracting
+== Checagens adicionais (só registro)
+  nenhuma
+
+RESULTADO: OK (29 arquivo(s) sem erros bloqueantes)
+==== Fim: Validacao OCDS (libcoveocds) 2026-11-05T00:08:49-03:00 ====
+
