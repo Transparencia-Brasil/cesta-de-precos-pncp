@@ -4,6 +4,7 @@ Ele processa dados de contratações, itens e resultados e gera arquivos JSON e 
 Comentários explicativos estão distribuídos ao longo do código original.
 """
 
+import hashlib
 import json
 import locale
 import os
@@ -41,7 +42,86 @@ else:
 # Aqui o usuário deverá setar para seu próprio diretório
 base_dir = "C:/Users/rdurl/OneDrive/Documentos/cesta-de-precos-pncp"
 
-INPUT_DATASET_MEDICAMENTOS = "tasks/mapeamento-ocds/input/dicionario-medicamentos-ocds.csv"
+# Dicionário OCDS de medicamentos, versionado com o CATMAT por
+# `tasks/atualiza-catmat` em `data/catmat/` (ver README da task).
+# - CATMAT_DIR: diretório do versionamento (padrão: <base_dir>/data/catmat)
+# - DICIONARIO_OCDS_VERSAO: fixa uma versão N; sem ela, usa a mais recente
+CATMAT_DIR = os.environ.get("CATMAT_DIR") or os.path.join(base_dir, "data", "catmat")
+DICIONARIO_OCDS_VERSAO = os.environ.get("DICIONARIO_OCDS_VERSAO") or None
+
+PADRAO_DICIONARIO_OCDS = re.compile(r"^dicionario-medicamentos-ocds-(\d+)\.csv$")
+
+
+def resolve_dicionario_ocds(catmat_dir, versao=None):
+    """
+    Retorna (versao, caminho) do dicionário OCDS de medicamentos.
+
+    Sem `versao`, usa o maior N entre os `dicionario-medicamentos-ocds-N.csv`
+    de `catmat_dir` (a versão vigente). Com `versao`, procura em `catmat_dir`
+    e em `catmat_dir/OLD/<versao>/`. Encerra a execução se não encontrar.
+    """
+    if versao is None:
+        versoes = [
+            int(m.group(1))
+            for nome in (os.listdir(catmat_dir) if os.path.isdir(catmat_dir) else [])
+            if (m := PADRAO_DICIONARIO_OCDS.match(nome))
+        ]
+        if not versoes:
+            sys.stderr.write(f"Nenhum dicionario-medicamentos-ocds-N.csv encontrado em {catmat_dir}.\n")
+            os._exit(1)
+        versao = max(versoes)
+        return versao, os.path.join(catmat_dir, f"dicionario-medicamentos-ocds-{versao}.csv")
+
+    if not str(versao).isdigit():
+        sys.stderr.write(f"DICIONARIO_OCDS_VERSAO inválida: '{versao}' (esperado um inteiro).\n")
+        os._exit(1)
+    versao = int(versao)
+    nome = f"dicionario-medicamentos-ocds-{versao}.csv"
+    for caminho in (os.path.join(catmat_dir, nome), os.path.join(catmat_dir, "OLD", str(versao), nome)):
+        if os.path.isfile(caminho):
+            return versao, caminho
+    sys.stderr.write(f"Versão {versao} do dicionário OCDS não encontrada em {catmat_dir} nem em OLD/{versao}/.\n")
+    os._exit(1)
+
+
+def sha256_normalizado(caminho):
+    """sha256 do arquivo com CRLF convertido em LF (mesma regra de tasks/atualiza-catmat/src/R/utils.R)."""
+    with open(caminho, "rb") as f:
+        conteudo = f.read()
+    return hashlib.sha256(conteudo.replace(b"\r\n", b"\n")).hexdigest()
+
+
+def confere_versoes(catmat_dir, versao, caminho):
+    """
+    Confere o hash do dicionário com o registrado em `<catmat_dir>/versoes.csv`.
+    Encerra a execução se o arquivo não estiver registrado ou se o hash divergir.
+    Retorna o sha256.
+    """
+    caminho_versoes = os.path.join(catmat_dir, "versoes.csv")
+    if not os.path.isfile(caminho_versoes):
+        sys.stderr.write(f"Histórico de versões não encontrado: {caminho_versoes}.\n")
+        os._exit(1)
+
+    versoes = pd.read_csv(caminho_versoes, dtype=str)
+    arquivo = os.path.basename(caminho)
+    registro = versoes[(versoes["versao"] == str(versao)) & (versoes["arquivo"] == arquivo)]
+    if registro.empty:
+        sys.stderr.write(f"{arquivo} (versão {versao}) não está registrado em {caminho_versoes}.\n")
+        os._exit(1)
+
+    sha256 = sha256_normalizado(caminho)
+    esperado = registro["sha256"].iloc[0]
+    if sha256 != esperado:
+        sys.stderr.write(
+            f"sha256 de {caminho} ({sha256}) difere do registrado em {caminho_versoes} ({esperado}).\n"
+            " -> O dicionário foi alterado fora do versionamento; abortando.\n"
+        )
+        os._exit(1)
+    return sha256
+
+
+VERSAO_DICIONARIO_OCDS, INPUT_DATASET_MEDICAMENTOS = resolve_dicionario_ocds(CATMAT_DIR, DICIONARIO_OCDS_VERSAO)
+SHA256_DICIONARIO_OCDS = confere_versoes(CATMAT_DIR, VERSAO_DICIONARIO_OCDS, INPUT_DATASET_MEDICAMENTOS)
 
 def get_filepaths(base_dir, ano_coleta, mes_coleta):
     """
@@ -110,6 +190,31 @@ itens = carregar_e_concatenar(paths.itens)
 
 # Carregar dicionario ocds unificado
 dicionario_ocds = pd.read_csv(INPUT_DATASET_MEDICAMENTOS)
+
+# Registra no log a versão do dicionário e os itens sem correspondência
+# (que ficam sem os campos da extensão Medicine)
+sem_correspondencia = ~itens["codigo_br"].isin(dicionario_ocds["codigo_br"])
+total_sem_correspondencia = int(sem_correspondencia.sum())
+codigos_sem_correspondencia = sorted(itens.loc[sem_correspondencia, "codigo_br"].dropna().unique())
+percentual_sem_correspondencia = 100 * total_sem_correspondencia / len(itens) if len(itens) else 0
+
+def caminho_para_log(caminho):
+    return os.path.relpath(caminho, base_dir).replace(os.sep, "/")
+
+print("Dicionário OCDS de medicamentos:")
+print(f" - versão: {VERSAO_DICIONARIO_OCDS} ({caminho_para_log(INPUT_DATASET_MEDICAMENTOS)})")
+print(f" - sha256: {SHA256_DICIONARIO_OCDS} (confere com {caminho_para_log(os.path.join(CATMAT_DIR, 'versoes.csv'))})")
+print(
+    f" - itens sem correspondência: {total_sem_correspondencia} de {len(itens)} "
+    f"({percentual_sem_correspondencia:.2f}%), {len(codigos_sem_correspondencia)} códigos distintos"
+)
+if total_sem_correspondencia:
+    exemplos = ", ".join(
+        str(int(c)) if pd.api.types.is_number(c) else str(c)
+        for c in codigos_sem_correspondencia[:10]
+    )
+    print(f"AVISO: itens sem correspondência no dicionário saem sem a extensão Medicine. Exemplos de codigo_br: {exemplos}")
+print("")
 
 # JOIN da tabela itens-medicamentos com o dataset dicionario_ocds (dataset unificado)
 itens = itens.merge(dicionario_ocds, how="left", on="codigo_br")
@@ -265,7 +370,9 @@ def montar_strength(valor, unidade):
     """Monta o objeto strength de activeIngredients.
 
     Inclui value quando a concentracao pode ser convertida para numero e inclui
-    unit quando ha unidade informada, usando o esquema UNCEFACT.
+    unit quando ha unidade informada. A unidade e publicada como aparece no
+    catalogo (scheme "CATMAT", ex.: "MG", "MG/ML"), sem conversao para
+    UN/CEFACT ou QUDT.
     """
     strength = {}
 
@@ -275,7 +382,7 @@ def montar_strength(valor, unidade):
 
     if valor_preenchido(unidade):
         strength["unit"] = {
-            "scheme": "UNCEFACT",
+            "scheme": "CATMAT",
             "id": str(unidade).strip(),
         }
 
@@ -357,7 +464,40 @@ def montar_active_ingredients(item):
     ):
         ingredientes.insert(0, {"name": nome_pdm})
 
-    return ingredientes
+    # O schema exige itens únicos (uniqueItems): remove entradas idênticas,
+    # preservando a ordem
+    unicos = []
+    for ingrediente in ingredientes:
+        if ingrediente not in unicos:
+            unicos.append(ingrediente)
+
+    return unicos
+
+def adicionar_party(parties, party):
+    """Inclui a party na lista do release sem repetir o id (uniqueItems no schema).
+
+    Quando já existe uma party com o mesmo id (ex.: o órgão comprador também é
+    fornecedor na mesma contratação), soma os roles e as classificações, e
+    preenche a escala se ela ainda não existir.
+    """
+    existente = next((p for p in parties if p.get("id") == party.get("id")), None)
+    if existente is None:
+        parties.append(party)
+        return
+
+    for role in party.get("roles", []):
+        if role not in existente.setdefault("roles", []):
+            existente["roles"].append(role)
+
+    detalhes = party.get("details") or {}
+    if detalhes:
+        detalhes_existentes = existente.setdefault("details", {})
+        if "scale" in detalhes and "scale" not in detalhes_existentes:
+            detalhes_existentes["scale"] = detalhes["scale"]
+        for classificacao in detalhes.get("classifications", []):
+            classificacoes = detalhes_existentes.setdefault("classifications", [])
+            if classificacao not in classificacoes:
+                classificacoes.append(classificacao)
 
 def adicionar_attributes(item_json, item_dicionario, proximo_attribute_id):
     """Inclui atributos auditados no item e atualiza o proximo id sequencial.
@@ -592,6 +732,7 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
             **({"dosageForm": primeiro_valor(item['dosageForm'])} if valor_preenchido(item['dosageForm']) else {}),
             **({"administrationRoute": primeiro_valor(item['administrationRoute'])} if valor_preenchido(item['administrationRoute']) else {}),
             **({"activeIngredients": active_ingredients} if active_ingredients else {}),
+            **({"immediateContainer": {"name": primeiro_valor(item['immediateContainer'])}} if primeiro_valor(item['immediateContainer']) else {}),
             "quantity": int(item['quantidade']),
             "unit": unit,
             "relatedLot": 'lot-' + item_id
@@ -670,7 +811,7 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
         "ME": "micro",
         "EPP": "small",
         "Demais": "large",
-        "Não se aplica": "self-employed",
+        "Não se aplica": "selfEmployed",  # código da codelist partyScale
         "Não Informado": None
     }
 
@@ -894,10 +1035,11 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
                 "description": poder_id.get(row['data.orgaoEntidade.poderId'], row['data.orgaoEntidade.poderId']),
             })
 
-        release['parties'].append(original_buyer)
+        adicionar_party(release['parties'], original_buyer)
 
     # Adicionando os suppliers
-    release['parties'] = release['parties'] + suppliers
+    for supplier in suppliers:
+        adicionar_party(release['parties'], supplier)
 
     modalidade = modalidade_contratacao.get(codigo_ocds(row['data.modalidadeId']))
     release['tender'] = {
@@ -1019,8 +1161,8 @@ for estado in releases:
                 "https://raw.githubusercontent.com/open-contracting-extensions/ocds_organizationClassification_extension/master/extension.json",
                 "https://raw.githubusercontent.com/open-contracting-extensions/ocds_sustainability_extension/master/extension.json",
                 "https://gitlab.com/dncp-opendata/ocds_statusdetails_extension/-/raw/master/extension.json",
-                "https://extensions.open-contracting.org/en/extensions/medicine/master/",
-                "https://extensions.open-contracting.org/en/extensions/itemAttributes/master/",
+                "https://raw.githubusercontent.com/open-contracting-extensions/ocds_medicine_extension/master/extension.json",
+                "https://gitlab.com/dncp-opendata/ocds_item_attributes_extension/-/raw/master/extension.json",
             ],
             "releases": lote
         })

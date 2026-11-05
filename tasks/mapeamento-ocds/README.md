@@ -6,14 +6,21 @@ Esta task converte dados de contratações do PNCP para o padrão [OCDS](https:/
 
 ```mermaid
 flowchart TD
-    subgraph entrada["Dados de entrada — coleta/&lt;alias&gt;/"]
-        cont["contratacoes/.../dados.csv"]
-        itens["itens/.../dados.csv"]
-        res["resultados/.../dados.csv"]
+    subgraph entrada["Dados de entrada — coleta/data-package/&lt;ANO&gt;/&lt;N - Mês&gt;/*/DATA/"]
+        cont["contratacoes.csv"]
+        itens["itens-medicamentos.csv"]
+        res["itens-medicamentos-resultados.csv"]
     end
+
+    dic["data/catmat/dicionario-medicamentos-ocds-N.csv\n(versão vigente, conferida em versoes.csv)"]
+    dic -->|"join por codigo_br"| e1
 
     subgraph e1["Etapa 1 · mapeamento-pncp-ocds.py"]
         json["output/&lt;ANO&gt;/&lt;MES&gt;/JSON/\n{uf}-{mes}-{ano}[-{parte}].json"]
+    end
+
+    subgraph val["Validação · valida-ocds.py (libcoveocds)"]
+        rel["output/&lt;ANO&gt;/&lt;MES&gt;/VALIDACAO/\nrelatório por JSON"]
     end
 
     subgraph e2["Etapa 2 · csvs-ocds.py (flattentool)"]
@@ -33,13 +40,14 @@ flowchart TD
         sh2["run-csvs-ocds.sh"]
         sh3["run-upload-\nzips-s3.sh"]
         sh_orch -->|"1º"| sh1
-        sh_orch -->|"2º"| sh2
+        sh_orch -->|"2º validação"| sh2
         sh_orch -->|"3º"| sh3
     end
 
     entrada --> e1
     e1 --> json
-    json --> e2
+    json --> val
+    val -->|"sem erros bloqueantes"| e2
     e2 --> csv
     e2 --> zipcsv
     e2 --> zipjson
@@ -58,7 +66,7 @@ Os scripts `.sh` residem em `src/` e são a camada de entrada do pipeline. Todos
 
 | Script | Modo | Responsabilidade |
 | --- | --- | --- |
-| `run-dados-abertos-ocds.sh` | **Orquestrador** | Aceita `--ano`/`--mes` por flag ou interativamente. Executa as três etapas em sequência; com `--smoke-test`, roda apenas mapeamento e CSVs/ZIPs locais. **Use este para o pipeline completo.** |
+| `run-dados-abertos-ocds.sh` | **Orquestrador** | Aceita `--ano`/`--mes` por flag ou interativamente. Executa mapeamento, validação (`valida-ocds.py`), CSVs/ZIPs e upload em sequência e para se a validação falhar; com `--smoke-test`, roda tudo menos o upload. **Use este para o pipeline completo.** |
 | `run-mapeamento-pncp-ocds.sh` | Runner individual | Solicita `ANO` e `MES` via stdin, valida entradas e invoca `mapeamento-pncp-ocds.py`. |
 | `run-csvs-ocds.sh` | Runner individual | Solicita `ANO` e `MES` via stdin, valida entradas e invoca `csvs-ocds.py` para gerar CSVs/ZIPs locais. Não executa upload para S3. |
 | `run-upload-zips-s3.sh` | Runner individual | Solicita `ANO` e `MES` via stdin, carrega `.env` e invoca `upload-zips-s3.py`. Aceita `--overwrite`. |
@@ -68,17 +76,19 @@ Os scripts `.sh` residem em `src/` e são a camada de entrada do pipeline. Todos
 ```text
 tasks/mapeamento-ocds/
 ├── src/
-│   ├── run-dados-abertos-ocds.sh      # Orquestrador mensal: mapeamento + CSVs/ZIPs + upload
+│   ├── run-dados-abertos-ocds.sh      # Orquestrador mensal: mapeamento + validação + CSVs/ZIPs + upload
 │   ├── run-mapeamento-pncp-ocds.sh    # Runner interativo do mapeamento
 │   ├── run-csvs-ocds.sh               # Runner interativo da geração de CSVs/ZIPs
 │   ├── run-upload-zips-s3.sh          # Runner interativo do upload para S3
 │   ├── mapeamento-pncp-ocds.py       # Script Python: mapeamento PNCP → JSON OCDS
+│   ├── valida-ocds.py                 # Script Python: valida os JSONs OCDS com libcoveocds
 │   ├── csvs-ocds.py                   # Script Python: JSON OCDS → CSVs/ZIPs
 │   └── upload-zips-s3.py              # Script Python: ZIPs locais → AWS S3
 ├── output/
 │   ├── LOGS/                          # Logs de execução
 │   └── <ANO>/<MES>/
 │       ├── JSON/                      # JSONs OCDS gerados pelo mapeamento
+│       ├── VALIDACAO/                 # Relatórios completos do libcoveocds, um por JSON
 │       ├── CSV/                       # CSVs gerados pelo flattentool
 │       └── ZIP/
 │           ├── CSV/                   # ZIPs com os CSVs agrupados por UF
@@ -149,7 +159,7 @@ done
 
 ### Smoke test local sem upload
 
-Use `--smoke-test` para rodar a etapa 1 e a etapa 2, gerar os pacotes localmente e pular completamente o upload para S3. Esse modo não cria cliente S3, não chama `upload-zips-s3.py` e não afeta o armazenamento remoto.
+Use `--smoke-test` para rodar o mapeamento, a validação e a etapa 2, gerar os pacotes localmente e pular completamente o upload para S3. Esse modo não cria cliente S3, não chama `upload-zips-s3.py` e não afeta o armazenamento remoto.
 
 ```bash
 # Se estiver usando WSL, exporte as variáveis primeiro:
@@ -169,6 +179,62 @@ Converte os dados de contratações do PNCP em JSONs no formato OCDS. O script s
 ```bash
 bash tasks/mapeamento-ocds/src/run-mapeamento-pncp-ocds.sh
 ```
+
+### Dicionário de medicamentos
+
+Os campos da extensão Medicine dos itens (`dosageForm`, `administrationRoute`, `activeIngredients`, `attributes`) e a
+`classification.description` vêm do dicionário OCDS de medicamentos, unido aos itens por `codigo_br`. O dicionário é
+versionado junto com o CATMAT pela task [`atualiza-catmat`](../atualiza-catmat/README.md):
+
+- por padrão, o mapeamento usa a versão vigente, o maior N em `data/catmat/dicionario-medicamentos-ocds-N.csv`;
+- antes de mapear, confere o sha256 do arquivo com o registrado em `data/catmat/versoes.csv` e interrompe a execução
+  se ele não estiver registrado ou tiver sido alterado.
+
+O log do mapeamento registra a versão, o hash e quantos itens ficaram sem correspondência no dicionário. Esses itens
+são publicados sem os campos da extensão Medicine:
+
+```text
+Dicionário OCDS de medicamentos:
+ - versão: 1 (data/catmat/dicionario-medicamentos-ocds-1.csv)
+ - sha256: 1cf5fbd1... (confere com data/catmat/versoes.csv)
+ - itens sem correspondência: 0 de 15468 (0.00%), 0 códigos distintos
+```
+
+Para invocar o Python diretamente, por exemplo para reproduzir uma publicação antiga ou em testes, há duas variáveis
+de ambiente opcionais:
+
+- `DICIONARIO_OCDS_VERSAO`: fixa uma versão N, procurada em `data/catmat/` ou em `data/catmat/OLD/N/`. As
+  publicações de 2025/01 a 2026/04 usaram a versão 0.
+- `CATMAT_DIR`: usa outro diretório de versionamento no lugar de `data/catmat`.
+
+Por que a cobertura é de 100%: o classificador (`src/ETL/classificador/filtra-medicamentos.sh`) só atribui códigos do
+`data/catmat/catmat-N.csv` vigente, e o dicionário da mesma versão tem exatamente os mesmos códigos (o versionamento
+interrompe a execução se divergirem). A exceção é a troca de catálogo: um mês classificado com o `catmat-N` e mapeado
+depois que a versão `N+1` já estiver em `data/catmat/` deve ser mapeado com `DICIONARIO_OCDS_VERSAO=N`. Se a versão
+nova tiver removido códigos usados no mês, o log mostra esses itens como sem correspondência.
+
+### Unidades de concentração
+
+Em `activeIngredients[].strength`, a unidade é publicada como aparece no catálogo, com `scheme: "CATMAT"` (ex.:
+`{"scheme": "CATMAT", "id": "MG/ML"}`), sem conversão para UN/CEFACT ou QUDT.
+
+## Validação — `valida-ocds.py` (libcoveocds)
+
+Valida cada JSON do mês com o [`libcoveocds`](https://github.com/open-contracting/lib-cove-ocds), a mesma biblioteca do
+[OCDS Data Review Tool](https://review.standard.open-contracting.org/). O schema usado é o OCDS 1.1 mais as extensões
+declaradas no pacote, baixadas da internet a cada execução. O orquestrador roda a validação entre o mapeamento e a
+etapa 2, com log em `output/LOGS/valida-ocds-<ANO>-<MM>.log`:
+
+```bash
+.venv/Scripts/python.exe tasks/mapeamento-ocds/src/valida-ocds.py --ano 2026 --mes 5
+```
+
+- **Bloqueiam o pipeline (exit code 1):** erros de schema, valores fora de codelists fechadas e extensões que não puderam
+  ser carregadas.
+- **Só são registrados:** campos adicionais (fora do schema e das extensões), valores fora de codelists abertas (ex.:
+  formas farmacêuticas em português, `scheme: "CATMAT"`) e checagens adicionais.
+
+O relatório completo de cada arquivo fica em `output/<ANO>/<MES>/VALIDACAO/<arquivo>.json`.
 
 ## Etapa 2 — Geração de CSVs/ZIPs a partir dos JSONs OCDS
 

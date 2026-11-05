@@ -7,7 +7,7 @@
 #' https://cnbs.estaleiro.serpro.gov.br/cnbs-api/swagger-ui/index.html#/
 #'
 #' Utilizando o seguinte script:
-#' https://github.com/Transparencia-Brasil/cesta-de-precos-pncp/tasks/atualiza-catmat/src/R/00-coleta-catmat-com-cnbs.R
+#' https://github.com/Transparencia-Brasil/cesta-de-precos-pncp/blob/coleta-orquestrada/tasks/atualiza-catmat/src/R/00-coleta-catmat-com-cnbsr.R
 #'
 
 library(tidyverse)
@@ -21,7 +21,8 @@ source(here("tasks/atualiza-catmat/src/R/utils.R"))
 # LÊ ARQUIVOS  ------------------------------------------------------------
 
 # Lê os argumentos
-CAMINHO_CATALOGO <- here("tasks/atualiza-catmat/outputs/catalogo-atualizado.rds")
+# catálogo atualizado gerado por `00-coleta-catmat-com-cnbsr.R`
+CAMINHO_CATALOGO <- here("tasks/atualiza-catmat/outputs/catmat.rds")
 
 # Lê os arquivos de dados
 catalogo <- readRDS(CAMINHO_CATALOGO) |>

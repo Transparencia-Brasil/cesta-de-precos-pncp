@@ -1,0 +1,9 @@
+versao,arquivo,sha256,linhas,origem_repo,origem_caminho,origem_commit,registrado_em
+0,catmat-0.csv,29ceabda9f2d48f68f3075603ff103675b002e223b46465a581f7dca64107afc,5771,,,,2026-11-04T17:28:45-0300
+0,catmat-0.rds,d307331cd1043325423b8c8135314fbc74ef2f1645445d708ac4913c53888cbd,5771,,,,2026-11-04T17:28:44-0300
+0,dicionario-medicamentos-ocds-0.csv,30ce93241d4cd7085c056dc1b3305f66ee63dd50bc0384e20a7453fbc82cc094,5771,Transparencia-Brasil/medicine-extension-ocds,tasks/dicionario-ocds/outputs/dicionario-ocds.csv,15d5f37d5306469a0a142fae0f1bdd74129f35cb,2026-11-04T17:28:45-0300
+0,tabela-mapeamento-ocds-0.csv,185bcc37ec4f77c810613a106c4745a662877e93eaebeca7427c4562bcbf79b2,5771,Transparencia-Brasil/medicine-extension-ocds,tasks/documento-ocds/outputs/documento-ocds.json,,2026-11-04T17:28:45-0300
+1,catmat-1.csv,99899292bd443883cc1befcf742af100eb411bc1562e416bf5d4d2e6c80b736b,6740,,,,2026-11-04T17:28:45-0300
+1,catmat-1.rds,8695db844ec99f8032e4c05f7f8ac852c309515e32f176fa1436e270dd610a63,6740,,,,2026-11-04T17:28:45-0300
+1,dicionario-medicamentos-ocds-1.csv,1cf5fbd108efdb53fd3535b82eea0c2c5c57d5785d00b065214f46ff800bf205,6740,Transparencia-Brasil/medicine-extension-ocds,tasks/dicionario-ocds/outputs/dicionario-ocds.csv,9b4c3d150a605f085611a6359e94382c86bc8ff4,2026-11-04T17:28:45-0300
+1,tabela-mapeamento-ocds-1.csv,65226fbbd126b2ee4b271f722d19fb367ac3348186262a3c216725db1e9dc8f5,6740,Transparencia-Brasil/medicine-extension-ocds,tasks/documento-ocds/outputs/documento-ocds.json,9b4c3d150a605f085611a6359e94382c86bc8ff4,2026-11-04T17:28:45-0300

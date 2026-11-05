@@ -5,3 +5,4 @@ sentence-transformers==3.4.1
 tqdm>=4.66.1
 flattentool==0.27.0
 boto3>=1.34.0
+libcoveocds==0.17.0

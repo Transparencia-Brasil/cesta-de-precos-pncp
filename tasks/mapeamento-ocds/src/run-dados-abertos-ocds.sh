@@ -4,6 +4,7 @@
 #
 # Executa, para um unico ANO/MES:
 # - mapeamento PNCP -> JSON OCDS
+# - validacao dos JSONs com libcoveocds (interrompe o pipeline se houver erros)
 # - geracao de CSVs/ZIPs a partir dos JSONs
 # - upload dos ZIPs para AWS S3
 
@@ -27,7 +28,7 @@ Opcoes:
   --ano ANO      Ano dos dados a processar (inteiro >= 2022).
   --mes MES      Mes dos dados a processar (inteiro entre 1 e 12).
   --overwrite    Sobrescreve objetos existentes no S3 durante o upload.
-  --smoke-test   Executa apenas mapeamento e CSVs/ZIPs locais, sem upload para S3.
+  --smoke-test   Executa mapeamento, validacao e CSVs/ZIPs locais, sem upload para S3.
   -h, --help     Mostra esta ajuda.
 EOF
 }
@@ -197,6 +198,7 @@ OUTPUT_PATH="./tasks/mapeamento-ocds/output"
 LOG_DIR="${OUTPUT_PATH}/LOGS"
 
 MAPEAMENTO_LOG_FILE="${LOG_DIR}/mapeamento-${ANO}-${MES_PAD}.log"
+VALIDACAO_LOG_FILE="${LOG_DIR}/valida-ocds-${ANO}-${MES_PAD}.log"
 CSVS_LOG_FILE="${LOG_DIR}/csvs-ocds-${ANO}-${MES_PAD}.log"
 UPLOAD_LOG_FILE="${LOG_DIR}/upload-zips-s3-${ANO}-${MES_PAD}.log"
 
@@ -207,6 +209,7 @@ PYTHON_BIN="./.venv/Scripts/python.exe"
 export PYTHONIOENCODING=utf-8
 export WSLENV="${WSLENV:+${WSLENV}:}PYTHONIOENCODING"
 MAPEAMENTO_PYTHON_SCRIPT="./tasks/mapeamento-ocds/src/mapeamento-pncp-ocds.py"
+VALIDACAO_PYTHON_SCRIPT="./tasks/mapeamento-ocds/src/valida-ocds.py"
 CSVS_PYTHON_SCRIPT="./tasks/mapeamento-ocds/src/csvs-ocds.py"
 UPLOAD_PYTHON_SCRIPT="./tasks/mapeamento-ocds/src/upload-zips-s3.py"
 
@@ -217,6 +220,7 @@ echo " - '${PYTHON_BIN}'"
 echo ""
 echo "Logs da execucao:"
 echo " - '${MAPEAMENTO_LOG_FILE}'"
+echo " - '${VALIDACAO_LOG_FILE}'"
 echo " - '${CSVS_LOG_FILE}'"
 if [[ "${SMOKE_TEST}" == true ]]; then
   echo " - upload S3: pulado pelo modo smoke test"
@@ -232,12 +236,14 @@ echo " - smoke test: ${SMOKE_TEST}"
 # : COMPATIBILIDADE WSL --------------------------------------------------------
 
 MAPEAMENTO_PYTHON_SCRIPT_TO_RUN="${MAPEAMENTO_PYTHON_SCRIPT}"
+VALIDACAO_PYTHON_SCRIPT_TO_RUN="${VALIDACAO_PYTHON_SCRIPT}"
 CSVS_PYTHON_SCRIPT_TO_RUN="${CSVS_PYTHON_SCRIPT}"
 UPLOAD_PYTHON_SCRIPT_TO_RUN="${UPLOAD_PYTHON_SCRIPT}"
 
 if command -v wslpath >/dev/null 2>&1; then
   export WSLENV="${WSLENV:+${WSLENV}:}ANO:MES"
   MAPEAMENTO_PYTHON_SCRIPT_TO_RUN="$(wslpath -w "${MAPEAMENTO_PYTHON_SCRIPT}")"
+  VALIDACAO_PYTHON_SCRIPT_TO_RUN="$(wslpath -w "${VALIDACAO_PYTHON_SCRIPT}")"
   CSVS_PYTHON_SCRIPT_TO_RUN="$(wslpath -w "${CSVS_PYTHON_SCRIPT}")"
   UPLOAD_PYTHON_SCRIPT_TO_RUN="$(wslpath -w "${UPLOAD_PYTHON_SCRIPT}")"
 fi
@@ -248,12 +254,17 @@ fi
 run_logged "Mapeamento PNCP -> JSON OCDS" "${MAPEAMENTO_LOG_FILE}" \
   env ANO="${ANO}" MES="${MES}" "${PYTHON_BIN}" "${MAPEAMENTO_PYTHON_SCRIPT_TO_RUN}"
 
+# Erros de schema ou valores fora de codelists fechadas fazem o valida-ocds.py
+# sair com codigo 1; com set -e/pipefail, o pipeline para aqui (sem CSVs e sem upload).
+run_logged "Validacao OCDS (libcoveocds)" "${VALIDACAO_LOG_FILE}" \
+  "${PYTHON_BIN}" "${VALIDACAO_PYTHON_SCRIPT_TO_RUN}" --ano "${ANO}" --mes "${MES}"
+
 run_logged "Geracao de CSVs/ZIPs OCDS" "${CSVS_LOG_FILE}" \
   "${PYTHON_BIN}" "${CSVS_PYTHON_SCRIPT_TO_RUN}" --ano "${ANO}" --mes "${MES}"
 
 if [[ "${SMOKE_TEST}" == true ]]; then
   echo ""
-  echo "Smoke test finalizado: etapas 1 e 2 executadas; nenhum upload para S3 foi realizado."
+  echo "Smoke test finalizado: mapeamento, validacao e CSVs/ZIPs executados; nenhum upload para S3 foi realizado."
   echo "Pacotes de dados locais prontos para inspecao:"
   echo " - ${OUTPUT_PATH}/${ANO}/${MES}/JSON"
   echo " - ${OUTPUT_PATH}/${ANO}/${MES}/CSV"
