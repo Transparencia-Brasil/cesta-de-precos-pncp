@@ -341,18 +341,18 @@ def primeiro_valor(valor):
     valores = parse_lista(valor)
     return valores[0] if valores else None
 
-def normalizar_strength_value(valor, unidade=None):
+def normalizar_strength_value(valor):
     """Normaliza o valor numerico de concentracao de um principio ativo.
 
     Aceita numeros em formato brasileiro, remove separadores de milhar e troca
-    virgula decimal por ponto. Quando o valor ou a unidade indicam percentual,
-    converte para fracao decimal conforme a representacao esperada no OCDS.
+    virgula decimal por ponto. O simbolo "%" e removido do numero, mas o valor
+    nao e convertido em fracao: ele acompanha a unidade do catalogo (ex.: 5 com
+    unidade "%" significa 5%).
     """
     if not valor_preenchido(valor):
         return None
 
     texto = str(valor).strip()
-    eh_percentual = "%" in texto or str(unidade or "").strip().startswith("%")
     texto_numerico = texto.replace("%", "").strip()
     texto_normalizado = texto_numerico.replace(".", "").replace(",", ".")
 
@@ -361,26 +361,33 @@ def normalizar_strength_value(valor, unidade=None):
     except ValueError:
         return None
 
-    if eh_percentual:
-        numero = round(numero / 100, 12)
-
     return int(numero) if numero.is_integer() else numero
 
 def montar_strength(valor, unidade):
     """Monta o objeto strength de activeIngredients.
 
     Inclui value quando a concentracao pode ser convertida para numero e inclui
-    unit quando ha unidade informada, usando o esquema UNCEFACT.
+    unit quando ha unidade informada. A unidade e publicada como aparece no
+    catalogo (scheme "CATMAT", ex.: "MG", "MG/ML", "%"), sem conversao para
+    UN/CEFACT ou QUDT.
+
+    Quando o proprio valor traz "%" (ex.: "0,9%"), a unidade e "%", mesmo que a
+    lista de unidades do dicionario traga outra na mesma posicao: nesses casos
+    a lista paralela de unidades vem desalinhada (ex.: ['66%', '300'] com
+    ['MG', 'MG']).
     """
     strength = {}
 
-    valor_normalizado = normalizar_strength_value(valor, unidade)
+    valor_normalizado = normalizar_strength_value(valor)
     if valor_normalizado is not None:
         strength["value"] = valor_normalizado
 
-    if valor_preenchido(unidade):
+    if valor_normalizado is not None and "%" in str(valor):
+        unidade = "%"
+
+    if valor_preenchido(unidade) and str(unidade).strip():
         strength["unit"] = {
-            "scheme": "UNCEFACT",
+            "scheme": "CATMAT",
             "id": str(unidade).strip(),
         }
 
@@ -462,7 +469,40 @@ def montar_active_ingredients(item):
     ):
         ingredientes.insert(0, {"name": nome_pdm})
 
-    return ingredientes
+    # O schema exige itens únicos (uniqueItems): remove entradas idênticas,
+    # preservando a ordem
+    unicos = []
+    for ingrediente in ingredientes:
+        if ingrediente not in unicos:
+            unicos.append(ingrediente)
+
+    return unicos
+
+def adicionar_party(parties, party):
+    """Inclui a party na lista do release sem repetir o id (uniqueItems no schema).
+
+    Quando já existe uma party com o mesmo id (ex.: o órgão comprador também é
+    fornecedor na mesma contratação), soma os roles e as classificações, e
+    preenche a escala se ela ainda não existir.
+    """
+    existente = next((p for p in parties if p.get("id") == party.get("id")), None)
+    if existente is None:
+        parties.append(party)
+        return
+
+    for role in party.get("roles", []):
+        if role not in existente.setdefault("roles", []):
+            existente["roles"].append(role)
+
+    detalhes = party.get("details") or {}
+    if detalhes:
+        detalhes_existentes = existente.setdefault("details", {})
+        if "scale" in detalhes and "scale" not in detalhes_existentes:
+            detalhes_existentes["scale"] = detalhes["scale"]
+        for classificacao in detalhes.get("classifications", []):
+            classificacoes = detalhes_existentes.setdefault("classifications", [])
+            if classificacao not in classificacoes:
+                classificacoes.append(classificacao)
 
 def adicionar_attributes(item_json, item_dicionario, proximo_attribute_id):
     """Inclui atributos auditados no item e atualiza o proximo id sequencial.
@@ -697,6 +737,7 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
             **({"dosageForm": primeiro_valor(item['dosageForm'])} if valor_preenchido(item['dosageForm']) else {}),
             **({"administrationRoute": primeiro_valor(item['administrationRoute'])} if valor_preenchido(item['administrationRoute']) else {}),
             **({"activeIngredients": active_ingredients} if active_ingredients else {}),
+            **({"immediateContainer": {"name": primeiro_valor(item['immediateContainer'])}} if primeiro_valor(item['immediateContainer']) else {}),
             "quantity": int(item['quantidade']),
             "unit": unit,
             "relatedLot": 'lot-' + item_id
@@ -775,7 +816,7 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
         "ME": "micro",
         "EPP": "small",
         "Demais": "large",
-        "Não se aplica": "self-employed",
+        "Não se aplica": "selfEmployed",  # código da codelist partyScale
         "Não Informado": None
     }
 
@@ -999,10 +1040,11 @@ for _, row in tqdm(contratacoes_filtradas.iterrows(), total=len(contratacoes_fil
                 "description": poder_id.get(row['data.orgaoEntidade.poderId'], row['data.orgaoEntidade.poderId']),
             })
 
-        release['parties'].append(original_buyer)
+        adicionar_party(release['parties'], original_buyer)
 
     # Adicionando os suppliers
-    release['parties'] = release['parties'] + suppliers
+    for supplier in suppliers:
+        adicionar_party(release['parties'], supplier)
 
     modalidade = modalidade_contratacao.get(codigo_ocds(row['data.modalidadeId']))
     release['tender'] = {
@@ -1124,8 +1166,8 @@ for estado in releases:
                 "https://raw.githubusercontent.com/open-contracting-extensions/ocds_organizationClassification_extension/master/extension.json",
                 "https://raw.githubusercontent.com/open-contracting-extensions/ocds_sustainability_extension/master/extension.json",
                 "https://gitlab.com/dncp-opendata/ocds_statusdetails_extension/-/raw/master/extension.json",
-                "https://extensions.open-contracting.org/en/extensions/medicine/master/",
-                "https://extensions.open-contracting.org/en/extensions/itemAttributes/master/",
+                "https://raw.githubusercontent.com/open-contracting-extensions/ocds_medicine_extension/master/extension.json",
+                "https://gitlab.com/dncp-opendata/ocds_item_attributes_extension/-/raw/master/extension.json",
             ],
             "releases": lote
         })
