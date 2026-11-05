@@ -207,6 +207,12 @@ de ambiente opcionais:
   publicações de 2025/01 a 2026/04 usaram a versão 0.
 - `CATMAT_DIR`: usa outro diretório de versionamento no lugar de `data/catmat`.
 
+Por que a cobertura é de 100%: o classificador (`src/ETL/classificador/filtra-medicamentos.sh`) só atribui códigos do
+`data/catmat/catmat-N.csv` vigente, e o dicionário da mesma versão tem exatamente os mesmos códigos (o versionamento
+interrompe a execução se divergirem). A exceção é a troca de catálogo: um mês classificado com o `catmat-N` e mapeado
+depois que a versão `N+1` já estiver em `data/catmat/` deve ser mapeado com `DICIONARIO_OCDS_VERSAO=N`. Se a versão
+nova tiver removido códigos usados no mês, o log mostra esses itens como sem correspondência.
+
 ### Unidades de concentração
 
 Em `activeIngredients[].strength`, a unidade é publicada como aparece no catálogo, com `scheme: "CATMAT"` (ex.:

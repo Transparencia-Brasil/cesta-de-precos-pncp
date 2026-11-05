@@ -15,23 +15,27 @@ restritos à atualização pontual de bancos criados com o schema anterior.
 
 | Versão | Fonte versionada | Registros validados | Entrada em produção | Resolução da issue de integração | Homologado em |
 | --- | --- | ---: | --- | --- | --- |
-| 0 | `outputs/tabela-mapeamento-ocds.csv` | 5.771 | 18/06/2026 | 30/07/2026 | 04/08/2026 |
+| 0 | `data/catmat/OLD/0/tabela-mapeamento-ocds-0.csv` | 5.771 | 18/06/2026 | 30/07/2026 | 04/08/2026 |
+| 1 | `data/catmat/tabela-mapeamento-ocds-1.csv` | 6.740 | 14/08/2026 | — | — |
+
+A carga do catálogo faz upsert: os códigos de uma versão nova são atualizados e os que ficaram fora dela são
+preservados. Por isso o banco tem a união das versões (6.807 códigos): os 6.740 da v1 com as características da v1 e
+os 67 que só existem na v0 com as características da v0.
 
 ## Fonte versionada
 
-O arquivo usado pelo loader é:
-
-```text
-tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/outputs/tabela-mapeamento-ocds.csv
-```
+Desde a versão 1, a tabela é gerada e versionada pela task [`atualiza-catmat`](../../atualiza-catmat/README.md),
+junto com o catálogo, em `data/catmat/tabela-mapeamento-ocds-N.csv` (a versão vigente é o maior N; as anteriores
+ficam em `data/catmat/OLD/N/`). É esse arquivo que `src/ETL/loaders/carrega-catalogo.R` lê, a partir do
+`catmat-N.rds` de mesma versão.
 
 ## Como atualizar o CSV
 
-Quando a fonte OCDS mudar, execute a partir da raiz do repositório:
+Siga o fluxo da task [`atualiza-catmat`](../../atualiza-catmat/README.md): `01-importa-caracteristicas-ocds.R` gera a
+tabela e `03-versionamento.R` a promove para `data/catmat/`.
 
-```bash
-Rscript.exe tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/src/R/tabela-caracteristicas-ocds.R
-```
+O script `src/R/tabela-caracteristicas-ocds.R` desta task é legado: gerava a versão 0 em
+`outputs/tabela-mapeamento-ocds.csv`, que não é mais usada.
 
 ## Fluxos de banco de dados
 
@@ -58,7 +62,8 @@ Execute o update a partir da raiz do repositório em Bash/WSL:
   export PGPASSWORD="$DB_PASS"
   export PGDATABASE="medicamentos_transparentes"
 
-dataset_csv="$PWD/tasks/alteracoes-no-banco-de-dados/catalogo-caracteristicas-ocds/outputs/tabela-mapeamento-ocds.csv"
+# versão vigente da tabela (ajuste N)
+dataset_csv="$PWD/data/catmat/tabela-mapeamento-ocds-1.csv"
 
 psql -f <(
   sed "s|FROM :'dataset_csv'|FROM '$dataset_csv'|" \
@@ -74,16 +79,17 @@ toda carga.**
 
 - `src/ETL/BD/cria-esquema.sql` cria `caracteristicas_ocds JSONB` e documenta a
   coluna;
-- `src/ETL/loaders/carrega-catalogo.R` lê diretamente o CSV versionado com
-  `here::here()`;
+- `src/ETL/loaders/carrega-catalogo.R` recebe `data/catmat/catmat-N.rds` e lê a
+  `tabela-mapeamento-ocds-N.csv` de mesma versão;
 - a carga usa upsert, permitindo que versões futuras atualizem os valores
   existentes sem executar os scripts de migração.
 
 ## Arquivos principais
 
-- `src/R/tabela-caracteristicas-ocds.R`: gera o CSV a partir da fonte OCDS;
-- `src/R/utils.R`: transforma o documento OCDS no mapeamento;
-- `outputs/tabela-mapeamento-ocds.csv`: fonte versionada usada pelo loader;
+- `data/catmat/tabela-mapeamento-ocds-N.csv`: fonte versionada usada pelo loader
+  (gerada pela task `atualiza-catmat`);
+- `src/R/tabela-caracteristicas-ocds.R` e `src/R/utils.R`: geração legada da
+  versão 0;
 - `outputs/tabela-mapeamento-ocds-old.csv`: versão histórica anterior;
 - `src/sql/alter-catalogo-caracteristicas-ocds.sql`: migração do schema antigo;
 - `src/sql/update-catalogo-caracteristicas-ocds.sql`: população pontual de
