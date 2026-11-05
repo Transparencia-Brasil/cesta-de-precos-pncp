@@ -210,9 +210,7 @@ de ambiente opcionais:
 ### Unidades de concentração
 
 Em `activeIngredients[].strength`, a unidade é publicada como aparece no catálogo, com `scheme: "CATMAT"` (ex.:
-`{"scheme": "CATMAT", "id": "MG/ML"}`), sem conversão para UN/CEFACT ou QUDT. Percentuais ficam em %: `"0,9%"` vira
-`{"value": 0.9, "unit": {"scheme": "CATMAT", "id": "%"}}`. Quando o valor traz `%`, a unidade é `%`, mesmo que o
-dicionário indique outra unidade na mesma posição.
+`{"scheme": "CATMAT", "id": "MG/ML"}`), sem conversão para UN/CEFACT ou QUDT.
 
 ## Validação — `valida-ocds.py` (libcoveocds)
 

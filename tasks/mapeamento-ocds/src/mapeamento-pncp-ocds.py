@@ -341,18 +341,18 @@ def primeiro_valor(valor):
     valores = parse_lista(valor)
     return valores[0] if valores else None
 
-def normalizar_strength_value(valor):
+def normalizar_strength_value(valor, unidade=None):
     """Normaliza o valor numerico de concentracao de um principio ativo.
 
     Aceita numeros em formato brasileiro, remove separadores de milhar e troca
-    virgula decimal por ponto. O simbolo "%" e removido do numero, mas o valor
-    nao e convertido em fracao: ele acompanha a unidade do catalogo (ex.: 5 com
-    unidade "%" significa 5%).
+    virgula decimal por ponto. Quando o valor ou a unidade indicam percentual,
+    converte para fracao decimal conforme a representacao esperada no OCDS.
     """
     if not valor_preenchido(valor):
         return None
 
     texto = str(valor).strip()
+    eh_percentual = "%" in texto or str(unidade or "").strip().startswith("%")
     texto_numerico = texto.replace("%", "").strip()
     texto_normalizado = texto_numerico.replace(".", "").replace(",", ".")
 
@@ -361,6 +361,9 @@ def normalizar_strength_value(valor):
     except ValueError:
         return None
 
+    if eh_percentual:
+        numero = round(numero / 100, 12)
+
     return int(numero) if numero.is_integer() else numero
 
 def montar_strength(valor, unidade):
@@ -368,24 +371,16 @@ def montar_strength(valor, unidade):
 
     Inclui value quando a concentracao pode ser convertida para numero e inclui
     unit quando ha unidade informada. A unidade e publicada como aparece no
-    catalogo (scheme "CATMAT", ex.: "MG", "MG/ML", "%"), sem conversao para
+    catalogo (scheme "CATMAT", ex.: "MG", "MG/ML"), sem conversao para
     UN/CEFACT ou QUDT.
-
-    Quando o proprio valor traz "%" (ex.: "0,9%"), a unidade e "%", mesmo que a
-    lista de unidades do dicionario traga outra na mesma posicao: nesses casos
-    a lista paralela de unidades vem desalinhada (ex.: ['66%', '300'] com
-    ['MG', 'MG']).
     """
     strength = {}
 
-    valor_normalizado = normalizar_strength_value(valor)
+    valor_normalizado = normalizar_strength_value(valor, unidade)
     if valor_normalizado is not None:
         strength["value"] = valor_normalizado
 
-    if valor_normalizado is not None and "%" in str(valor):
-        unidade = "%"
-
-    if valor_preenchido(unidade) and str(unidade).strip():
+    if valor_preenchido(unidade):
         strength["unit"] = {
             "scheme": "CATMAT",
             "id": str(unidade).strip(),
